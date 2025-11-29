@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>유틸리티 다운로드 센터</title>
+    <title>다소리</title>
     <!-- 폰트 및 아이콘 로드 -->
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,7 +40,7 @@
         /* 2. 컨테이너 레이아웃 */
         .container {
             width: 100%;
-            max-width: 900px; /* 카드가 늘어나서 폭을 약간 넓힘 */
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -56,11 +56,6 @@
             background: linear-gradient(to right, #60a5fa, #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        header p {
-            color: var(--text-sub);
-            font-size: 1rem;
         }
 
         /* 3. 그리드 시스템 */
@@ -195,8 +190,8 @@
 
     <div class="container">
         <header>
-            <h1>유틸리티 다운로드</h1>
-            <p>필수 시스템 관리 도구 모음</p>
+            <h1>다소리 프로그램 모음</h1>
+            <!-- 소제목 삭제됨 -->
         </header>
 
         <div class="grid">
@@ -212,7 +207,7 @@
                 </a>
             </div>
 
-            <!-- 2. 구라제거기 -->
+            <!-- 2. 구라제거기 (암호: teus.me 재설정) -->
             <div class="card">
                 <div class="card-header">
                     <div class="icon-box"><i class="fa-solid fa-shield-virus"></i></div>
@@ -254,7 +249,7 @@
                 </a>
             </div>
 
-            <!-- 5. 인증 (수정됨: 하나의 깃허브 다운로드 버튼으로 통합) -->
+            <!-- 5. 인증 (Activate.zip용 암호 dsy 추가 및 GitHub 다운로드) -->
             <div class="card">
                 <div class="card-header">
                     <!-- 아이콘: 열쇠 모양 -->
@@ -263,7 +258,13 @@
                 </div>
                 <p class="card-desc">시스템 및 프로그램 인증을 위한 도구입니다.</p>
                 
-                <!-- 두 개의 링크를 하나의 깃허브 다운로드 버튼으로 통합 -->
+                <!-- Activate.zip의 비밀번호 dsy 표시 및 복사 기능 추가 -->
+                <div class="password-badge" onclick="copyPassword('dsy')">
+                    <span>암호: dsy</span>
+                    <i class="fa-regular fa-copy"></i>
+                </div>
+                
+                <!-- 깃허브 다운로드 링크 및 버튼 클래스 적용 -->
                 <a href="https://github.com/rma3316/dsyweb/raw/main/Activate.zip" download class="download-btn github-btn">
                     <i class="fa-brands fa-github"></i> Activate.zip 다운로드
                 </a>
