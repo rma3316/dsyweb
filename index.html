@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>다소리</title>
+    <title>다소리 다운로드 센터</title>
     <!-- 폰트 및 아이콘 로드 -->
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* 1. 기본 설정 */
+        /* 1. 변수 설정 */
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
+            --primary-bg: #0f172a;
+            --card-glass: rgba(30, 41, 59, 0.65); /* 반투명 배경 */
+            --card-border: rgba(255, 255, 255, 0.1);
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --glow-color: rgba(59, 130, 246, 0.5);
         }
 
         * {
@@ -26,62 +26,142 @@
             padding: 0;
         }
 
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--primary-bg);
             color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            
+            /* 움직이는 배경 효과 */
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
         }
 
-        /* 2. 컨테이너 레이아웃 */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
             width: 100%;
             max-width: 900px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 배경 데코레이션 (빛 번짐 효과) */
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease-out;
         }
 
         header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
+            font-size: 3rem;
+            font-weight: 800;
             margin-bottom: 10px;
-            background: linear-gradient(to right, #60a5fa, #a855f7);
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        header p {
+            color: var(--text-sub);
+            font-size: 1.1rem;
         }
 
-        /* 3. 그리드 시스템 */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 25px;
         }
 
-        /* 4. 카드 디자인 */
+        /* 카드 디자인 (글래스모피즘) */
         .card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: var(--card-glass);
+            backdrop-filter: blur(12px); /* 유리 블러 효과 */
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 30px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            
+            /* 등장 애니메이션 */
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
         }
 
+        /* 카드 순차적 등장 딜레이 */
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(5) { animation-delay: 0.5s; }
+
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-7px);
+            background: rgba(40, 50, 75, 0.8);
+            border-color: rgba(96, 165, 250, 0.5);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        /* 카드 상단 그라데이션 라인 */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::before {
+            opacity: 1;
         }
 
         .card-header {
@@ -91,107 +171,184 @@
         }
 
         .icon-box {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent-color);
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #60a5fa;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             margin-right: 15px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .card:hover .icon-box {
+            background: var(--accent-gradient);
+            color: white;
+            transform: rotate(-5deg) scale(1.1);
+            box-shadow: 0 0 15px var(--glow-color);
         }
 
         .card-title h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #fff;
         }
 
         .card-desc {
             color: var(--text-sub);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
             flex-grow: 1;
         }
 
-        /* 5. 암호 뱃지 */
+        /* 암호 뱃지 업그레이드 */
         .password-badge {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            background-color: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
         
         .password-badge:hover {
-            background-color: rgba(239, 68, 68, 0.2);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .password-badge span {
+            font-family: monospace; /* 암호 같은 느낌 */
+            font-size: 0.95rem;
+            color: #f472b6; /* 핑크색 강조 */
         }
 
         .password-badge i {
-            margin-left: 6px;
-            font-size: 0.7rem;
+            color: var(--text-sub);
         }
 
-        /* 6. 버튼 스타일 */
+        /* 버튼 업그레이드 */
         .download-btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 100%;
-            padding: 12px;
-            background-color: var(--accent-color);
+            padding: 14px;
+            background: var(--accent-gradient);
             color: white;
-            text-align: center;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background-color 0.2s;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
         }
 
         .download-btn:hover {
-            background-color: var(--accent-hover);
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 버튼 내부 빛나는 효과 */
+        .download-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0));
+            transform: rotate(45deg) translateY(100%);
+            transition: transform 0.5s;
+        }
+
+        .download-btn:hover::after {
+            transform: rotate(45deg) translateY(0);
         }
 
         .download-btn i {
-            margin-right: 8px;
+            margin-right: 10px;
         }
 
-        /* 깃허브 버튼 전용 스타일 */
+        /* 깃허브 버튼 전용 */
         .github-btn {
-            background-color: #24292e; /* 깃허브 색상 */
+            background: #24292e;
         }
         .github-btn:hover {
-            background-color: #1b1f23;
+            background: #000;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
         }
 
-        /* 7. 푸터 */
         footer {
-            margin-top: 50px;
+            margin-top: 60px;
             text-align: center;
-            color: var(--text-sub);
+            color: rgba(255, 255, 255, 0.3);
             font-size: 0.8rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
             padding-top: 20px;
+            animation: fadeIn 2s ease-out;
+        }
+
+        /* 키프레임 애니메이션 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* 모바일 대응 */
         @media (max-width: 600px) {
-            header h1 { font-size: 2rem; }
+            header h1 { font-size: 2.2rem; }
             .grid { grid-template-columns: 1fr; }
+            .card { padding: 25px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- 배경 조명 효과 -->
+    <div class="bg-glow"></div>
+
     <div class="container">
         <header>
             <h1>다소리 프로그램 모음</h1>
-            <!-- 소제목 삭제됨 -->
+            <p>엄선된 필수 유틸리티 & 시스템 도구</p>
         </header>
 
         <div class="grid">
@@ -201,22 +358,22 @@
                     <div class="icon-box"><i class="fa-solid fa-desktop"></i></div>
                     <div class="card-title"><h2>Rustdesk</h2></div>
                 </div>
-                <p class="card-desc">빠르고 안전한 오픈소스 원격 데스크톱 소프트웨어입니다.</p>
+                <p class="card-desc">팀뷰어를 대체할 빠르고 안전한 오픈소스 원격 제어 솔루션입니다.</p>
                 <a href="https://github.com/rustdesk/rustdesk/releases/download/1.3.6/rustdesk-1.3.6-x86_64.exe" class="download-btn">
                     <i class="fa-solid fa-download"></i> 다운로드
                 </a>
             </div>
 
-            <!-- 2. 구라제거기 (암호: teus.me 재설정) -->
+            <!-- 2. 구라제거기 -->
             <div class="card">
                 <div class="card-header">
                     <div class="icon-box"><i class="fa-solid fa-shield-virus"></i></div>
                     <div class="card-title"><h2>구라제거기</h2></div>
                 </div>
-                <p class="card-desc">PC에 설치된 불필요한 보안 프로그램 및 뱅킹 앱을 제거합니다.</p>
+                <p class="card-desc">뱅킹 앱 등 PC를 느리게 하는 불필요한 보안 프로그램을 한방에 제거합니다.</p>
                 
                 <div class="password-badge" onclick="copyPassword('teus.me')">
-                    <span>암호: teus.me</span>
+                    <span><i class="fa-solid fa-lock"></i> teus.me</span>
                     <i class="fa-regular fa-copy"></i>
                 </div>
 
@@ -231,7 +388,7 @@
                     <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
                     <div class="card-title"><h2>Everything</h2></div>
                 </div>
-                <p class="card-desc">윈도우용 초고속 파일 검색 도구입니다. 파일을 즉시 찾아줍니다.</p>
+                <p class="card-desc">답답한 윈도우 검색은 그만. 파일 이름을 입력하는 즉시 찾아주는 마법의 도구.</p>
                 <a href="https://www.voidtools.com/Everything-1.4.1.1024.x64.zip" class="download-btn">
                     <i class="fa-solid fa-download"></i> 다운로드
                 </a>
@@ -243,46 +400,41 @@
                     <div class="icon-box"><i class="fa-solid fa-bug-slash"></i></div>
                     <div class="card-title"><h2>Malware Zero</h2></div>
                 </div>
-                <p class="card-desc">악성코드, 애드웨어 및 각종 유해 프로그램을 제거합니다.</p>
+                <p class="card-desc">광고 창이 계속 뜨나요? 악성코드와 애드웨어를 강력하게 박멸합니다.</p>
                 <a href="https://malzero.xyz/download" class="download-btn" target="_blank">
                     <i class="fa-solid fa-external-link-alt"></i> 웹사이트 이동
                 </a>
             </div>
 
-            <!-- 5. 인증 (Activate.zip용 암호 dsy 추가 및 GitHub 다운로드) -->
+            <!-- 5. 인증 -->
             <div class="card">
                 <div class="card-header">
-                    <!-- 아이콘: 열쇠 모양 -->
                     <div class="icon-box"><i class="fa-solid fa-key"></i></div>
-                    <div class="card-title"><h2>인증</h2></div>
+                    <div class="card-title"><h2>인증 도구</h2></div>
                 </div>
-                <p class="card-desc">시스템 및 프로그램 인증을 위한 도구입니다.</p>
+                <p class="card-desc">시스템 관리자 및 프로그램 인증을 위한 전용 유틸리티입니다.</p>
                 
-                <!-- Activate.zip의 비밀번호 dsy 표시 및 복사 기능 추가 -->
                 <div class="password-badge" onclick="copyPassword('dsy')">
-                    <span>암호: dsy</span>
+                    <span><i class="fa-solid fa-lock"></i> dsy</span>
                     <i class="fa-regular fa-copy"></i>
                 </div>
                 
-                <!-- 깃허브 다운로드 링크 및 버튼 클래스 적용 -->
                 <a href="https://github.com/rma3316/dsyweb/raw/main/Activate.zip" download class="download-btn github-btn">
-                    <i class="fa-brands fa-github"></i> Activate.zip 다운로드
+                    <i class="fa-brands fa-github"></i> Activate.zip 받기
                 </a>
             </div>
-            
-            <!-- 추가 카드가 있다면 여기에 넣을 수 있습니다. -->
-
         </div>
 
         <footer>
-            &copy; 2024 Utility Download Center. All rights reserved.
+            &copy; 2026 Dasory Utility Center. Designed for Efficiency.
         </footer>
     </div>
 
     <script>
         function copyPassword(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('암호(' + text + ')가 클립보드에 복사되었습니다!');
+                // 토스트 메시지나 더 멋진 알림을 줄 수도 있지만 일단 기본 알림 유지
+                alert('암호 [' + text + '] 복사 완료!');
             }).catch(err => {
                 console.error('복사 실패:', err);
             });
