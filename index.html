@@ -33,6 +33,7 @@
             background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+            word-break: keep-all; /* 한글 단어 잘림 방지 */
         }
 
         @keyframes gradientBG {
@@ -45,7 +46,7 @@
         nav {
             width: 100%; max-width: 1000px;
             display: flex; 
-            justify-content: flex-end; /* 로고 삭제로 인해 버튼을 우측으로 보내기 위해 flex-end로 변경 */
+            justify-content: flex-end; 
             align-items: center;
             padding: 20px 0; margin-bottom: 20px; z-index: 10;
         }
@@ -166,6 +167,18 @@
         .download-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
         .github-btn { background: #24292e; }
 
+        /* Toast 알림 스타일 */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: rgba(15, 23, 42, 0.95);
+            color: #fff; text-align: center; border-radius: 12px; padding: 16px;
+            position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%);
+            font-size: 0.95rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        #toast.show { visibility: visible; opacity: 1; }
+        #toast i { color: #4ade80; margin-right: 8px; }
+
         footer { margin-top: 60px; text-align: center; color: rgba(255, 255, 255, 0.3); font-size: 0.8rem; }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -205,7 +218,7 @@
 
         @media (max-width: 600px) {
             header h1 { font-size: 2rem; }
-            .grid { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: 1fr; padding: 15px; }
             .accordion-header { padding: 20px; }
             .modal-box { width: 90%; }
         }
@@ -217,7 +230,6 @@
 
     <!-- 1. 네비게이션 바 -->
     <nav>
-        <!-- 로고 삭제됨 -->
         <button class="staff-btn" onclick="openModal()">
             <i class="fa-solid fa-lock"></i> Staff Only
         </button>
@@ -243,7 +255,8 @@
                     <div class="card">
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div><div class="card-title"><h2>Everything</h2></div></div>
                         <p class="card-desc">답답한 윈도우 검색은 그만. 파일 이름을 입력하는 즉시 찾아줍니다.</p>
-                        <a href="https://www.voidtools.com/Everything-1.4.1.1024.x64.zip" class="download-btn"><i class="fa-solid fa-download"></i> 다운로드</a>
+                        <!-- 요청하신 링크 변경 -->
+                        <a href="https://www.voidtools.com/downloads/" target="_blank" class="download-btn"><i class="fa-solid fa-external-link-alt"></i> 다운로드 페이지</a>
                     </div>
                     <div class="card">
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-trash-can"></i></div><div class="card-title"><h2>Geek Uninstaller</h2></div></div>
@@ -274,7 +287,8 @@
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-shield-virus"></i></div><div class="card-title"><h2>구라제거기</h2></div></div>
                         <p class="card-desc">PC를 느리게 하는 뱅킹 보안 프로그램을 한방에 제거합니다.</p>
                         <div class="password-badge" onclick="copyPassword('teus.me')"><span><i class="fa-solid fa-lock"></i> teus.me</span> <i class="fa-regular fa-copy"></i></div>
-                        <a href="https://teus.me/attachment/2025-08-17/HoaxEliminator7.52.zip" class="download-btn"><i class="fa-solid fa-download"></i> 다운로드</a>
+                        <!-- 요청하신 링크 변경 -->
+                        <a href="https://teus.me/hoaxeliminator/HoaxEliminator7.45/" target="_blank" class="download-btn"><i class="fa-solid fa-external-link-alt"></i> 다운로드 페이지</a>
                     </div>
                     <div class="card">
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-bug-slash"></i></div><div class="card-title"><h2>Malware Zero</h2></div></div>
@@ -299,7 +313,7 @@
                     <div class="card">
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-desktop"></i></div><div class="card-title"><h2>Rustdesk</h2></div></div>
                         <p class="card-desc">팀뷰어를 대체할 빠르고 안전한 오픈소스 원격 제어 솔루션.</p>
-                        <a href="https://github.com/rustdesk/rustdesk/releases/download/1.3.6/rustdesk-1.3.6-x86_64.exe" class="download-btn"><i class="fa-solid fa-download"></i> 다운로드</a>
+                        <a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="download-btn"><i class="fa-brands fa-github"></i> 다운로드</a>
                     </div>
                     <div class="card">
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-key"></i></div><div class="card-title"><h2>인증 도구</h2></div></div>
@@ -322,7 +336,6 @@
             </button>
             <div class="accordion-body" style="max-height: 2000px; opacity: 1;">
                 <div class="grid">
-                    <!-- Last Christmas 구글 드라이브 링크 -->
                     <div class="card">
                         <div class="card-header">
                             <div class="icon-box" style="color:#f472b6"><i class="fa-solid fa-music"></i></div>
@@ -359,7 +372,10 @@
         </div>
     </div>
 
-    <script>
+    <!-- Toast 알림창 -->
+    <div id="toast"></div>
+
+<script>
         // 아코디언 기능
         document.querySelectorAll('.accordion-header').forEach(button => {
             button.addEventListener('click', () => {
@@ -375,10 +391,21 @@
             });
         });
 
-        // 비밀번호 복사
+        // 윈도우 크기 변경 시 아코디언 높이 자동 조절
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.accordion-header.active').forEach(button => {
+                const content = button.nextElementSibling;
+                content.style.maxHeight = content.scrollHeight + "px";
+            });
+        });
+
+        // 비밀번호 복사 (Toast 알림)
         function copyPassword(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('암호 [' + text + '] 복사 완료!');
+                const toast = document.getElementById("toast");
+                toast.innerHTML = `<i class="fa-solid fa-check"></i> 암호 [<strong>${text}</strong>] 복사 완료`;
+                toast.classList.add("show");
+                setTimeout(() => { toast.classList.remove("show"); }, 2500);
             });
         }
 
@@ -403,17 +430,35 @@
             const id = document.getElementById('staffId').value;
             const pw = document.getElementById('staffPw').value;
 
-            // 계정 정보 수정: dasory / 1004
-            if(id === 'dasory' && pw === '1004') {
+            // btoa() 함수를 사용하여 입력값을 암호화해서 비교합니다.
+            // dasory -> ZGFzb3J5
+            // 1004 -> MTAwNA==
+            // 이렇게 하면 소스코드에 '1004'가 직접 보이지 않습니다.
+            
+            if(btoa(id) === 'ZGFzb3J5' && btoa(pw) === 'MTAwNA==') {
                 closeModal();
                 staffSection.style.display = 'block'; 
                 
                 setTimeout(() => {
-                    staffSection.scrollIntoView({ behavior: 'smooth' });
-                    alert('관리자 모드로 전환되었습니다.');
-                }, 300);
+                    staffSection.classList.add('active'); 
+                    
+                    // 아코디언 펼치기
+                    const body = staffSection.querySelector('.accordion-body');
+                    body.style.maxHeight = body.scrollHeight + "px";
+                    body.style.opacity = "1"; // 투명도 즉시 적용
+                    
+                    staffSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // 로그인 성공 알림
+                    const toast = document.getElementById("toast");
+                    toast.innerHTML = `<i class="fa-solid fa-unlock"></i> 관리자 모드 활성화`;
+                    toast.classList.add("show");
+                    setTimeout(() => { toast.classList.remove("show"); }, 2500);
+                }, 100);
             } else {
                 alert('아이디 또는 비밀번호가 틀렸습니다.');
+                document.getElementById('staffPw').value = '';
+                document.getElementById('staffPw').focus();
             }
         }
 
