@@ -33,7 +33,7 @@
             background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
-            word-break: keep-all; /* 한글 단어 잘림 방지 */
+            word-break: keep-all;
         }
 
         @keyframes gradientBG {
@@ -157,12 +157,16 @@
         .password-badge:hover { background-color: rgba(255,255,255,0.1); color: #fff; }
         .password-badge span { font-family: monospace; color: #f472b6; }
 
+        /* [수정] gap: 8px 추가하여 아이콘과 글자 사이 간격 벌림 */
         .download-btn {
             display: flex; align-items: center; justify-content: center;
             width: 100%; padding: 12px; background: var(--accent-gradient);
             color: white; text-decoration: none; border-radius: 10px;
             font-weight: 600; font-size: 0.95rem; transition: all 0.3s;
             position: relative; overflow: hidden; border: none; cursor: pointer;
+            
+            margin-top: 20px; 
+            gap: 8px; /* 여기 간격이 추가되었습니다 */
         }
         .download-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
         .github-btn { background: #24292e; }
@@ -255,7 +259,6 @@
                     <div class="card">
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div><div class="card-title"><h2>Everything</h2></div></div>
                         <p class="card-desc">답답한 윈도우 검색은 그만. 파일 이름을 입력하는 즉시 찾아줍니다.</p>
-                        <!-- 요청하신 링크 변경 -->
                         <a href="https://www.voidtools.com/downloads/" target="_blank" class="download-btn"><i class="fa-solid fa-external-link-alt"></i> 다운로드 페이지</a>
                     </div>
                     <div class="card">
@@ -287,7 +290,6 @@
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-shield-virus"></i></div><div class="card-title"><h2>구라제거기</h2></div></div>
                         <p class="card-desc">PC를 느리게 하는 뱅킹 보안 프로그램을 한방에 제거합니다.</p>
                         <div class="password-badge" onclick="copyPassword('teus.me')"><span><i class="fa-solid fa-lock"></i> teus.me</span> <i class="fa-regular fa-copy"></i></div>
-                        <!-- 요청하신 링크 변경 -->
                         <a href="https://teus.me/hoaxeliminator/HoaxEliminator7.45/" target="_blank" class="download-btn"><i class="fa-solid fa-external-link-alt"></i> 다운로드 페이지</a>
                     </div>
                     <div class="card">
@@ -375,7 +377,7 @@
     <!-- Toast 알림창 -->
     <div id="toast"></div>
 
-<script>
+    <script>
         // 아코디언 기능
         document.querySelectorAll('.accordion-header').forEach(button => {
             button.addEventListener('click', () => {
@@ -430,11 +432,7 @@
             const id = document.getElementById('staffId').value;
             const pw = document.getElementById('staffPw').value;
 
-            // btoa() 함수를 사용하여 입력값을 암호화해서 비교합니다.
-            // dasory -> ZGFzb3J5
-            // 1004 -> MTAwNA==
-            // 이렇게 하면 소스코드에 '1004'가 직접 보이지 않습니다.
-            
+            // Base64 인코딩 비교 (dasory / 1004)
             if(btoa(id) === 'ZGFzb3J5' && btoa(pw) === 'MTAwNA==') {
                 closeModal();
                 staffSection.style.display = 'block'; 
@@ -442,14 +440,12 @@
                 setTimeout(() => {
                     staffSection.classList.add('active'); 
                     
-                    // 아코디언 펼치기
                     const body = staffSection.querySelector('.accordion-body');
                     body.style.maxHeight = body.scrollHeight + "px";
-                    body.style.opacity = "1"; // 투명도 즉시 적용
+                    body.style.opacity = "1"; 
                     
                     staffSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     
-                    // 로그인 성공 알림
                     const toast = document.getElementById("toast");
                     toast.innerHTML = `<i class="fa-solid fa-unlock"></i> 관리자 모드 활성화`;
                     toast.classList.add("show");
