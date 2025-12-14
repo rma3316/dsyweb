@@ -9,13 +9,43 @@
     
     <style>
         :root {
+            /* === [기본: 크리스마스 테마 변수] === */
             --primary-bg: #0f172a;
+            --text-main: #fefefe;
+            --text-sub: #cbd5e1;
+            
+            /* 크리스마스 전용 색상 */
+            --theme-bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #310b0b 40%, #020617 100%);
+            --card-glass: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --accent-gradient: linear-gradient(135deg, #ef4444 0%, #10b981 100%); /* 빨강-초록 */
+            --header-gradient: linear-gradient(to right, #ef4444, #ffffff, #10b981); /* 제목 그라데이션 */
+            --icon-color: #10b981; /* 초록 아이콘 */
+            --icon-bg-hover: #ef4444; /* 호버시 빨강 */
+            --staff-btn-border: #fbbf24;
+            --staff-btn-text: #fbbf24;
+            --staff-btn-hover-bg: #fbbf24;
+            --staff-btn-hover-text: #000;
+            --accord-bg: rgba(40, 10, 10, 0.3);
+            --accord-active-icon: #fbbf24;
+            --glow-color: rgba(239, 68, 68, 0.6);
+        }
+
+        /* === [옵션: 일반(Standard) 모드 변수] === */
+        body.standard-mode {
+            --theme-bg-gradient: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
             --card-glass: rgba(30, 41, 59, 0.65);
-            --header-glass: rgba(15, 23, 42, 0.85);
             --card-border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); /* 파랑-보라 */
+            --header-gradient: linear-gradient(to right, #60a5fa, #c084fc, #f472b6);
+            --icon-color: #60a5fa;
+            --icon-bg-hover: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --staff-btn-border: rgba(255, 255, 255, 0.1);
+            --staff-btn-text: #94a3b8;
+            --staff-btn-hover-bg: rgba(255, 255, 255, 0.1);
+            --staff-btn-hover-text: #fff;
+            --accord-bg: rgba(30, 41, 59, 0.4);
+            --accord-active-icon: #60a5fa;
             --glow-color: rgba(59, 130, 246, 0.5);
         }
 
@@ -30,10 +60,16 @@
             align-items: center;
             min-height: 100vh;
             padding: 0 20px 40px 20px;
-            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
+            background: var(--theme-bg-gradient);
             background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            transition: background 0.5s ease;
             word-break: keep-all;
+            overflow-x: hidden;
+        }
+
+        /* Standard 모드일 때 배경 애니메이션 */
+        body.standard-mode {
+            animation: gradientBG 15s ease infinite;
         }
 
         @keyframes gradientBG {
@@ -42,71 +78,118 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* --- 눈 내리는 효과 CSS --- */
+        .snowflake {
+            position: fixed; top: -10px; color: #fff;
+            font-size: 1em; font-family: Arial, sans-serif;
+            text-shadow: 0 0 5px #000; user-select: none;
+            z-index: 0; pointer-events: none;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        @keyframes fall { to { transform: translateY(100vh); } }
+
         /* --- 네비게이션 바 --- */
         nav {
             width: 100%; max-width: 1000px;
             display: flex; 
-            justify-content: flex-end; 
+            justify-content: space-between; /* 양쪽 끝 정렬 */
             align-items: center;
             padding: 20px 0; margin-bottom: 20px; z-index: 10;
         }
 
+        .nav-right { display: flex; gap: 10px; align-items: center; }
+
+        /* 산타 로고 버튼 */
+        .santa-logo-btn {
+            font-size: 1.5rem; color: #fff; text-decoration: none;
+            display: flex; align-items: center; gap: 8px;
+            transition: transform 0.3s;
+            filter: drop-shadow(0 0 10px rgba(255,0,0,0.5));
+        }
+        .santa-logo-btn:hover { transform: scale(1.1) rotate(-5deg); }
+        .santa-logo-btn i { color: #ef4444; }
+
+        /* 테마 토글 버튼 */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
+            color: var(--text-main); padding: 8px 12px;
+            border-radius: 20px; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .theme-toggle-btn:hover { background: rgba(255,255,255,0.2); }
+
         .staff-btn {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            color: var(--text-sub); padding: 8px 16px;
+            border: 1px solid var(--staff-btn-border);
+            color: var(--staff-btn-text); padding: 8px 16px;
             border-radius: 20px; font-size: 0.85rem; cursor: pointer;
             transition: all 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        .staff-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .staff-btn:hover { 
+            background: var(--staff-btn-hover-bg); 
+            color: var(--staff-btn-hover-text); 
+        }
 
         /* --- 컨테이너 --- */
         .container { width: 100%; max-width: 1000px; position: relative; z-index: 1; }
 
-        .bg-glow {
-            position: fixed; width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(0,0,0,0) 70%);
-            top: -200px; left: 50%; transform: translateX(-50%);
-            z-index: -1; pointer-events: none;
+        /* 상단 전구 장식 효과 (크리스마스 모드일 때만 표시) */
+        .christmas-lights {
+            position: absolute; top: -30px; left: 0; right: 0;
+            height: 20px; text-align: center; pointer-events: none;
+            opacity: 1; transition: opacity 0.5s;
         }
-
+        .christmas-lights::after {
+            content: ''; display: block; width: 100%; height: 2px; background: #555;
+            position: absolute; top: 0;
+        }
+        body.standard-mode .christmas-lights { opacity: 0; }
+        
         header { text-align: center; margin-bottom: 50px; margin-top: 20px; animation: fadeInDown 1s ease-out; }
 
         header h1 {
             font-size: 2.8rem; font-weight: 800; margin-bottom: 10px;
-            background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6);
+            background: var(--header-gradient);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            display: inline-block;
         }
         
-        header p { color: var(--text-sub); font-size: 1.1rem; }
+        header p { color: var(--text-sub); font-size: 1.1rem; display: none; /* 요청대로 문구 숨김 */ }
 
         /* --- 아코디언 스타일 --- */
         .accordion-item {
             margin-bottom: 20px; border-radius: 20px; overflow: hidden;
-            border: 1px solid var(--card-border); background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--card-border); 
+            background: var(--accord-bg);
             transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .accordion-header {
-            width: 100%; padding: 25px 30px; background: var(--card-glass);
+            width: 100%; padding: 25px 30px; background: rgba(255,255,255,0.05);
             display: flex; justify-content: space-between; align-items: center;
             cursor: pointer; border: none; outline: none; color: var(--text-main);
             transition: background 0.3s;
         }
-        .accordion-header:hover { background: rgba(40, 50, 75, 0.9); }
+        .accordion-header:hover { background: rgba(255, 255, 255, 0.1); }
 
         .header-content { display: flex; align-items: center; gap: 15px; }
-        .header-content i { font-size: 1.5rem; color: #60a5fa; }
+        
+        .header-content i { font-size: 1.5rem; color: var(--icon-color); transition: color 0.3s; }
+        
         .header-content h3 { font-size: 1.3rem; font-weight: 700; }
 
         .accordion-icon { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); color: var(--text-sub); }
-        .accordion-header.active .accordion-icon { transform: rotate(180deg); color: #60a5fa; }
+        .accordion-header.active .accordion-icon { transform: rotate(180deg); color: var(--accord-active-icon); }
 
         .accordion-body {
             max-height: 0; overflow: hidden;
             transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
-            opacity: 0; background: rgba(15, 23, 42, 0.3);
+            opacity: 0; background: rgba(0, 0, 0, 0.2);
         }
         .accordion-header.active + .accordion-body { opacity: 1; }
 
@@ -123,8 +206,8 @@
 
         .card:hover {
             transform: translateY(-5px);
-            background: rgba(40, 50, 75, 0.8);
-            border-color: rgba(96, 165, 250, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accord-active-icon);
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
@@ -138,55 +221,51 @@
         
         .icon-box {
             width: 45px; height: 45px; border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05); color: #60a5fa;
+            background: rgba(255, 255, 255, 0.05); color: #fff;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.3rem; margin-right: 12px; transition: all 0.3s;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .card:hover .icon-box { background: var(--accent-gradient); color: white; box-shadow: 0 0 15px var(--glow-color); }
+        .card:hover .icon-box { background: var(--icon-bg-hover); color: white; box-shadow: 0 0 15px var(--glow-color); }
 
         .card-title h2 { font-size: 1.2rem; font-weight: 700; color: #fff; }
         .card-desc { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; flex-grow: 1; }
 
         .password-badge {
             display: flex; justify-content: space-between; align-items: center;
-            background-color: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1);
             color: #cbd5e1; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem;
             margin-bottom: 15px; cursor: pointer; transition: all 0.2s;
         }
-        .password-badge:hover { background-color: rgba(255,255,255,0.1); color: #fff; }
-        .password-badge span { font-family: monospace; color: #f472b6; }
+        .password-badge:hover { background-color: rgba(255,255,255,0.1); color: #fff; border-color: var(--icon-color); }
+        .password-badge span { font-family: monospace; color: var(--accord-active-icon); }
 
-        /* [수정] gap: 8px 추가하여 아이콘과 글자 사이 간격 벌림 */
         .download-btn {
             display: flex; align-items: center; justify-content: center;
-            width: 100%; padding: 12px; background: var(--accent-gradient);
+            width: 100%; padding: 12px; 
+            background: var(--accent-gradient);
             color: white; text-decoration: none; border-radius: 10px;
             font-weight: 600; font-size: 0.95rem; transition: all 0.3s;
             position: relative; overflow: hidden; border: none; cursor: pointer;
-            
-            margin-top: 20px; 
-            gap: 8px; /* 여기 간격이 추가되었습니다 */
+            margin-top: 20px; gap: 8px;
         }
-        .download-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
-        .github-btn { background: #24292e; }
-
-        /* Toast 알림 스타일 */
+        .download-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px var(--glow-color); }
+        .github-btn { background: #333; }
+        
+        /* Toast 알림 */
         #toast {
-            visibility: hidden; min-width: 250px; background-color: rgba(15, 23, 42, 0.95);
-            color: #fff; text-align: center; border-radius: 12px; padding: 16px;
+            visibility: hidden; min-width: 250px; background-color: rgba(255, 255, 255, 0.9);
+            color: #1e1b4b; text-align: center; border-radius: 12px; padding: 16px;
             position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%);
-            font-size: 0.95rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px);
+            font-size: 0.95rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: bold;
             opacity: 0; transition: opacity 0.3s;
         }
         #toast.show { visibility: visible; opacity: 1; }
-        #toast i { color: #4ade80; margin-right: 8px; }
 
-        footer { margin-top: 60px; text-align: center; color: rgba(255, 255, 255, 0.3); font-size: 0.8rem; }
+        footer { margin-top: 60px; text-align: center; color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 로그인 모달 스타일 --- */
+        /* 로그인 모달 */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
@@ -194,7 +273,6 @@
             opacity: 0; transition: opacity 0.3s;
         }
         .modal-overlay.show { display: flex; opacity: 1; }
-
         .login-box {
             background: #1e293b; border: 1px solid var(--card-border);
             padding: 40px; border-radius: 20px; width: 350px;
@@ -203,7 +281,6 @@
         }
         .modal-overlay.show .login-box { transform: scale(1); }
         .login-box h2 { margin-bottom: 25px; color: #fff; }
-        
         .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label { display: block; color: var(--text-sub); font-size: 0.8rem; margin-bottom: 5px; }
         .input-group input {
@@ -211,38 +288,55 @@
             border: 1px solid var(--card-border); border-radius: 8px;
             color: #fff; outline: none; transition: border-color 0.3s;
         }
-        .input-group input:focus { border-color: #60a5fa; }
+        .input-group input:focus { border-color: var(--accord-active-icon); }
         .modal-close { margin-top: 15px; color: var(--text-sub); cursor: pointer; font-size: 0.9rem; text-decoration: underline; }
 
-        /* --- Staff Only 히든 섹션 스타일 --- */
+        /* Staff Only 섹션 */
         #staff-section { display: none; }
-        .staff-header-content i { color: #f472b6 !important; }
-        .staff-item { border-color: rgba(244, 114, 182, 0.3) !important; }
+        .staff-header-content i { color: var(--accord-active-icon) !important; }
+        .staff-item { border-color: var(--accord-active-icon) !important; }
         .staff-btn-dl { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%) !important; }
 
         @media (max-width: 600px) {
             header h1 { font-size: 2rem; }
             .grid { grid-template-columns: 1fr; padding: 15px; }
             .accordion-header { padding: 20px; }
-            .modal-box { width: 90%; }
+            nav { padding: 20px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-glow"></div>
+    <!-- 눈 내리는 효과 컨테이너 -->
+    <div id="snow-container"></div>
 
     <!-- 1. 네비게이션 바 -->
     <nav>
-        <button class="staff-btn" onclick="openModal()">
-            <i class="fa-solid fa-lock"></i> Staff Only
-        </button>
+        <!-- 좌측 상단: 산타 로고 (클릭 시 유튜브 이동) -->
+        <a href="https://youtu.be/Sg31CeZlakM?si=PASrKIXHwbBNj6iI" target="_blank" class="santa-logo-btn" title="Click for Music!">
+            <i class="fa-solid fa-sleigh"></i> <!-- 썰매 아이콘 -->
+        </a>
+
+        <!-- 우측 상단: 버튼들 -->
+        <div class="nav-right">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">
+                🎄 테마 끄기
+            </button>
+            <button class="staff-btn" onclick="openModal()">
+                <i class="fa-solid fa-lock"></i> Staff Only
+            </button>
+        </div>
     </nav>
 
     <div class="container">
+        <!-- 상단 전구 장식 -->
+        <div class="christmas-lights"></div>
+
         <header>
+            <!-- 제목 옆 이모지 제거 및 그라데이션 수정됨 -->
             <h1>다소리 다운로드 센터</h1>
-            <p>카테고리를 클릭하여 필요한 도구를 확인하세요</p>
+            <!-- 메리 크리스마스 문구 삭제됨 (p태그 숨김 처리) -->
+            <p>필요한 도구를 확인하세요</p>
         </header>
 
         <!-- 일반: 시스템 필수 도구 -->
@@ -329,7 +423,7 @@
 
         <!-- 3. STAFF ONLY 섹션 (숨김 처리됨) -->
         <div id="staff-section" class="accordion-item staff-item">
-            <button class="accordion-header active" style="background: rgba(80, 20, 40, 0.4);">
+            <button class="accordion-header active" style="background: rgba(0,0,0,0.3);">
                 <div class="header-content staff-header-content">
                     <i class="fa-solid fa-user-secret"></i>
                     <h3>Staff Only (관리자 전용)</h3>
@@ -378,6 +472,70 @@
     <div id="toast"></div>
 
     <script>
+        // --- 눈 내리는 효과 스크립트 ---
+        let snowInterval;
+        const snowContainer = document.getElementById('snow-container');
+
+        function createSnowflake() {
+            // 스탠다드 모드면 눈 생성 중지
+            if (document.body.classList.contains('standard-mode')) return;
+
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.textContent = '❄';
+            
+            snowflake.style.left = Math.random() * 100 + 'vw';
+            snowflake.style.opacity = Math.random();
+            snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+            
+            const duration = Math.random() * 5 + 5 + 's';
+            snowflake.style.animationDuration = duration;
+
+            snowContainer.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, parseFloat(duration) * 1000);
+        }
+
+        function startSnow() {
+            if (!snowInterval) {
+                snowInterval = setInterval(createSnowflake, 300);
+            }
+        }
+
+        function stopSnow() {
+            clearInterval(snowInterval);
+            snowInterval = null;
+            snowContainer.innerHTML = ''; // 눈 모두 제거
+        }
+
+        // --- 테마 토글 기능 ---
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.querySelector('.theme-toggle-btn');
+            
+            body.classList.toggle('standard-mode');
+            
+            if (body.classList.contains('standard-mode')) {
+                // 일반 모드로 전환
+                btn.textContent = '🎅 테마 켜기';
+                stopSnow();
+                document.querySelector('.santa-logo-btn').style.opacity = '0.5'; // 산타 로고 흐리게
+            } else {
+                // 크리스마스 모드로 전환
+                btn.textContent = '🎄 테마 끄기';
+                startSnow();
+                document.querySelector('.santa-logo-btn').style.opacity = '1';
+            }
+        }
+
+        // 초기 실행: 눈 내리기 시작 (기본값이 크리스마스)
+        startSnow();
+
+
+        // --- 기존 기능 스크립트 ---
+
         // 아코디언 기능
         document.querySelectorAll('.accordion-header').forEach(button => {
             button.addEventListener('click', () => {
@@ -393,7 +551,6 @@
             });
         });
 
-        // 윈도우 크기 변경 시 아코디언 높이 자동 조절
         window.addEventListener('resize', () => {
             document.querySelectorAll('.accordion-header.active').forEach(button => {
                 const content = button.nextElementSibling;
@@ -401,7 +558,6 @@
             });
         });
 
-        // 비밀번호 복사 (Toast 알림)
         function copyPassword(text) {
             navigator.clipboard.writeText(text).then(() => {
                 const toast = document.getElementById("toast");
@@ -432,18 +588,14 @@
             const id = document.getElementById('staffId').value;
             const pw = document.getElementById('staffPw').value;
 
-            // Base64 인코딩 비교 (dasory / 1004)
             if(btoa(id) === 'ZGFzb3J5' && btoa(pw) === 'MTAwNA==') {
                 closeModal();
                 staffSection.style.display = 'block'; 
-                
                 setTimeout(() => {
                     staffSection.classList.add('active'); 
-                    
                     const body = staffSection.querySelector('.accordion-body');
                     body.style.maxHeight = body.scrollHeight + "px";
                     body.style.opacity = "1"; 
-                    
                     staffSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     
                     const toast = document.getElementById("toast");
@@ -458,7 +610,6 @@
             }
         }
 
-        // 엔터키 로그인 지원
         document.getElementById('staffPw').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') checkLogin();
         });
