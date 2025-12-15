@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메이드 카페 주문하기 ❤️</title>
+    <style>
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; padding: 15px; background-color: #fff0f5; text-align: center; }
+        h2 { color: #d81b60; margin-bottom: 5px; }
+        p.subtitle { font-size: 14px; color: #888; margin-bottom: 20px; }
+        
+        .table-input-box { margin-bottom: 20px; background: white; padding: 10px; border-radius: 10px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input { font-size: 18px; padding: 5px; width: 60px; text-align: center; border: 1px solid #ddd; border-radius: 5px; }
+
+        .menu-container { display: flex; flex-direction: column; gap: 10px; }
+        .menu-item { 
+            background: white; border: 1px solid #ffc1e3; border-radius: 12px; padding: 15px; 
+            display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+            box-shadow: 0 2px 4px rgba(255, 182, 193, 0.3);
+        }
+        .menu-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 5px; line-height: 1.4; }
+        .menu-desc { font-size: 13px; color: #666; margin-bottom: 10px; }
+        .menu-price { color: #d81b60; font-weight: bold; font-size: 14px; }
+        
+        .controls { display: flex; align-items: center; gap: 10px; align-self: flex-end; margin-top: 5px; }
+        .btn-count { 
+            width: 30px; height: 30px; border-radius: 50%; border: none; 
+            font-size: 18px; font-weight: bold; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-minus { background: #eee; color: #555; }
+        .btn-plus { background: #ff80ab; color: white; }
+        .count-display { font-size: 18px; font-weight: bold; width: 20px; text-align: center; }
+
+        #cartBar {
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: white; padding: 15px; border-top: 2px solid #ff80ab;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
+        }
+        #totalCount { font-weight: bold; color: #d81b60; }
+        #orderBtn { 
+            background: #d81b60; color: white; border: none; padding: 10px 20px; 
+            font-size: 18px; border-radius: 20px; font-weight: bold; cursor: pointer; 
+        }
+        .spacer { height: 80px; } 
+    </style>
+</head>
+<body>
+
+    <h2>🎀 메이드 카페 주문 🎀</h2>
+    <p class="subtitle">모든 메뉴는 무료입니다 (Free)</p>
+    
+    <div class="table-input-box">
+        <label>Table No.</label>
+        <input type="number" id="tableNo" placeholder="0">
+    </div>
+
+    <div id="menuList" class="menu-container"></div>
+    <div class="spacer"></div>
+
+    <div id="cartBar">
+        <span id="totalCount">총 0개 선택됨</span>
+        <button id="orderBtn" onclick="sendOrder()">주문하기 ❤️</button>
+    </div>
+
+    <script type="module">
+        // 가져오신 키를 여기에 적용했습니다!
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5lLY7p09aqglYrqYEF6hBBRxIOaB59Uk",
+            authDomain: "madecafe-85738.firebaseapp.com",
+            projectId: "madecafe-85738",
+            storageBucket: "madecafe-85738.firebasestorage.app",
+            messagingSenderId: "481793894590",
+            appId: "1:481793894590:web:00873d3f6285c87d6756ef",
+            measurementId: "G-HVE60ZL3XZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 메뉴 데이터
+        const menus = [
+            { id: 1, name: "초코파이를 고백용으로 쓰지 말아주세요 제발😢", limit: 2 },
+            { id: 2, name: "주인님 오늘은 레몬땅의 축복을 메지컬 에.이.드.❤️", limit: 2 },
+            { id: 3, name: "미유하고 울면 기분이 high해지는 메이드짱의 의문의 러블리 액체들🫢", limit: 2 },
+            { id: 4, name: "강냉이를 바라보자 강냉이가 나를 응시했다🫣", limit: 2 },
+            { id: 5, name: "룰렛(무조건 해야하고 드셔야함 나쁠지도 모르지만 좋을지모름)🎊", limit: 2 },
+            { id: 6, name: "메이드짱의 서비스 타임과 애교?😳", limit: 999 }
+        ];
+
+        let cart = {}; 
+
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tableParam = urlParams.get('table');
+            if(tableParam) document.getElementById('tableNo').value = tableParam;
+            renderMenu();
+        };
+
+        function renderMenu() {
+            const container = document.getElementById('menuList');
+            container.innerHTML = menus.map(menu => `
+                <div class="menu-item">
+                    <div class="menu-name">${menu.name}</div>
+                    <div class="menu-price">Free ${menu.limit < 10 ? `<span style="font-size:12px; color:#999;">(최대 ${menu.limit}개)</span>` : ''}</div>
+                    <div class="controls">
+                        <button class="btn-count btn-minus" onclick="changeCount(${menu.id}, -1)">-</button>
+                        <span class="count-display" id="cnt-${menu.id}">0</span>
+                        <button class="btn-count btn-plus" onclick="changeCount(${menu.id}, 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.changeCount = (id, delta) => {
+            const menu = menus.find(m => m.id === id);
+            const currentQty = cart[id] || 0;
+            const newQty = currentQty + delta;
+
+            if (newQty < 0) return;
+            if (newQty > menu.limit) {
+                alert(`"${menu.name.substring(0, 5)}..." 메뉴는 최대 ${menu.limit}개까지만 주문 가능합니다! 😢`);
+                return;
+            }
+
+            if (newQty === 0) delete cart[id];
+            else cart[id] = newQty;
+
+            document.getElementById(`cnt-${id}`).innerText = newQty;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const total = Object.values(cart).reduce((a, b) => a + b, 0);
+            document.getElementById('totalCount').innerText = `총 ${total}개 선택됨`;
+        }
+
+        window.sendOrder = async () => {
+            const tableNo = document.getElementById('tableNo').value;
+            const total = Object.values(cart).reduce((a, b) => a + b, 0);
+
+            if(!tableNo) return alert("테이블 번호를 입력해주세요! 💦");
+            if(total === 0) return alert("메뉴를 하나 이상 선택해주세요! ❤️");
+
+            const orderItems = Object.keys(cart).map(id => {
+                const menu = menus.find(m => m.id == id);
+                return `${menu.name} x${cart[id]}`;
+            });
+
+            if(confirm(`[Table ${tableNo}] 주문하시겠습니까?`)) {
+                try {
+                    await addDoc(collection(db, "orders"), {
+                        table: tableNo,
+                        menu: orderItems,
+                        status: "접수",
+                        time: serverTimestamp()
+                    });
+                    alert("주문이 접수되었습니다! 주인님 잠시만 기다려주세요 ❤️");
+                    location.reload(); 
+                } catch (e) {
+                    alert("오류 발생: " + e.message);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
