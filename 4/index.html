@@ -3,22 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>주방 주문 현황</title>
+    <title>주방 주문 현황 👩‍🍳</title>
+    
+    <!-- 귀여운 폰트 추가 (Jua) -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #333; color: white; }
-        .order-card { background: white; color: black; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .order-info { font-size: 1.1rem; width: 80%; }
-        .table-num { font-weight: bold; color: #d32f2f; font-size: 1.5rem; margin-right: 10px; display:inline-block; min-width:80px; }
-        .menu-text { line-height: 1.5; display: inline-block; vertical-align: middle; }
-        .btn-done { background: #4caf50; color: white; border: none; padding: 15px 25px; border-radius: 5px; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
+        :root {
+            --bg-dark: #2c2c2c;
+            --card-bg: #ffffff;
+            --accent-pink: #ff80ab;
+            --strong-pink: #d81b60;
+            --text-dark: #333;
+        }
+
+        body { 
+            font-family: 'Jua', sans-serif; 
+            padding: 20px; 
+            background-color: var(--bg-dark); 
+            color: white; 
+            margin: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-pink);
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 0px #000;
+        }
+        
+        h1 span { font-size: 24px; color: #aaa; vertical-align: middle; margin-left: 10px; }
+
+        /* 주문 리스트 그리드 (반응형) */
+        #orderList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 주문 카드 스타일 */
+        .order-card { 
+            background: var(--card-bg); 
+            color: var(--text-dark); 
+            border-radius: 15px; 
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex; 
+            flex-direction: column;
+            animation: popIn 0.3s ease-out;
+            border-top: 6px solid var(--accent-pink);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* 카드 헤더 (테이블 번호 + 시간) */
+        .card-header {
+            background: #fff0f5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #ffc1e3;
+        }
+
+        .table-num { 
+            font-weight: bold; 
+            color: var(--strong-pink); 
+            font-size: 1.8rem; 
+        }
+        
+        .order-time {
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        /* 메뉴 리스트 영역 */
+        .menu-list { 
+            padding: 20px; 
+            font-size: 1.2rem; 
+            line-height: 1.6;
+            flex-grow: 1; /* 내용이 적어도 버튼을 아래로 밀어냄 */
+        }
+        .menu-item { display: block; margin-bottom: 5px; word-break: keep-all; }
+        .menu-item::before { content: "🍰 "; }
+
+        /* 완료 버튼 */
+        .btn-done { 
+            background: var(--strong-pink); 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            cursor: pointer; 
+            font-size: 1.3rem; 
+            font-family: 'Jua', sans-serif;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .btn-done:hover { background: #ad1457; }
+        .btn-done:active { transform: translateY(2px); }
+
+        /* 대기 중 메시지 */
+        .empty-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px;
+            color: #777;
+            font-size: 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>🔥 실시간 주문 현황 (주방)</h1>
-    <div id="orderList">주문을 기다리는 중...</div>
+    <h1>🔥 Kitchen Display <span>맛있어지는 주문들</span></h1>
+    <div id="orderList">
+        <!-- 주문 카드가 여기에 들어갑니다 -->
+    </div>
 
     <script type="module">
-        // 주방 쪽에도 동일한 키를 적용했습니다.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -42,7 +154,12 @@
         onSnapshot(q, (snapshot) => {
             orderList.innerHTML = ""; 
             if(snapshot.empty) {
-                orderList.innerHTML = "<p>현재 대기 중인 주문이 없습니다.</p>";
+                orderList.innerHTML = `
+                    <div class="empty-message">
+                        현재 대기 중인 주문이 없습니다.<br>
+                        주인님을 기다리는 중... 💤
+                    </div>
+                `;
                 return;
             }
 
@@ -50,13 +167,28 @@
                 const data = docSnap.data();
                 const id = docSnap.id;
                 
+                // 시간 포맷팅 (Timestamp -> 00:00)
+                let timeString = "방금 전";
+                if(data.time) {
+                    const date = data.time.toDate();
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    timeString = `${hours}:${minutes}`;
+                }
+
+                // 메뉴 배열을 줄바꿈 태그로 변환
+                const menuHtml = data.menu.map(m => `<span class="menu-item">${m}</span>`).join('');
+                
                 const html = `
                     <div class="order-card">
-                        <div class="order-info">
-                            <span class="table-num">T ${data.table}</span>
-                            <span class="menu-text">${data.menu.join("<br>")}</span>
+                        <div class="card-header">
+                            <span class="table-num">Table ${data.table}</span>
+                            <span class="order-time">🕒 ${timeString}</span>
                         </div>
-                        <button class="btn-done" onclick="completeOrder('${id}')">완료</button>
+                        <div class="menu-list">
+                            ${menuHtml}
+                        </div>
+                        <button class="btn-done" onclick="completeOrder('${id}')">조리 완료 (Done) ✅</button>
                     </div>
                 `;
                 orderList.innerHTML += html;
@@ -64,8 +196,14 @@
         });
 
         window.completeOrder = async (id) => {
-            if(confirm("조리가 완료되었나요?")) {
-                await deleteDoc(doc(db, "orders", id));
+            // 주방은 바쁘니까 confirm 없이 바로 삭제하거나, 
+            // 실수 방지를 위해 confirm을 유지할 수 있습니다. 여기선 유지했습니다.
+            if(confirm("이 주문을 완료 처리하시겠습니까?")) {
+                try {
+                    await deleteDoc(doc(db, "orders", id));
+                } catch(e) {
+                    alert("오류: " + e.message);
+                }
             }
         }
     </script>
