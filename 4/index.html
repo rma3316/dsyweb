@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주방 주문 현황</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #333; color: white; }
+        .order-card { background: white; color: black; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .order-info { font-size: 1.1rem; width: 80%; }
+        .table-num { font-weight: bold; color: #d32f2f; font-size: 1.5rem; margin-right: 10px; display:inline-block; min-width:80px; }
+        .menu-text { line-height: 1.5; display: inline-block; vertical-align: middle; }
+        .btn-done { background: #4caf50; color: white; border: none; padding: 15px 25px; border-radius: 5px; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🔥 실시간 주문 현황 (주방)</h1>
+    <div id="orderList">주문을 기다리는 중...</div>
+
+    <script type="module">
+        // 주방 쪽에도 동일한 키를 적용했습니다.
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5lLY7p09aqglYrqYEF6hBBRxIOaB59Uk",
+            authDomain: "madecafe-85738.firebaseapp.com",
+            projectId: "madecafe-85738",
+            storageBucket: "madecafe-85738.firebasestorage.app",
+            messagingSenderId: "481793894590",
+            appId: "1:481793894590:web:00873d3f6285c87d6756ef",
+            measurementId: "G-HVE60ZL3XZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const orderList = document.getElementById('orderList');
+
+        const q = query(collection(db, "orders"), orderBy("time", "asc"));
+        
+        onSnapshot(q, (snapshot) => {
+            orderList.innerHTML = ""; 
+            if(snapshot.empty) {
+                orderList.innerHTML = "<p>현재 대기 중인 주문이 없습니다.</p>";
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const id = docSnap.id;
+                
+                const html = `
+                    <div class="order-card">
+                        <div class="order-info">
+                            <span class="table-num">T ${data.table}</span>
+                            <span class="menu-text">${data.menu.join("<br>")}</span>
+                        </div>
+                        <button class="btn-done" onclick="completeOrder('${id}')">완료</button>
+                    </div>
+                `;
+                orderList.innerHTML += html;
+            });
+        });
+
+        window.completeOrder = async (id) => {
+            if(confirm("조리가 완료되었나요?")) {
+                await deleteDoc(doc(db, "orders", id));
+            }
+        }
+    </script>
+</body>
+</html>
