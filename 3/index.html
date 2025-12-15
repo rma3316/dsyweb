@@ -2,69 +2,224 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>메이드 카페 주문하기 ❤️</title>
+    
+    <!-- 귀여운 폰트 추가 (Jua, Gaegu) -->
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Apple SD Gothic Neo', sans-serif; padding: 15px; background-color: #fff0f5; text-align: center; }
-        h2 { color: #d81b60; margin-bottom: 5px; }
-        p.subtitle { font-size: 14px; color: #888; margin-bottom: 20px; }
-        
-        .table-input-box { margin-bottom: 20px; background: white; padding: 10px; border-radius: 10px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input { font-size: 18px; padding: 5px; width: 60px; text-align: center; border: 1px solid #ddd; border-radius: 5px; }
+        :root {
+            --main-pink: #ff80ab;
+            --dark-pink: #d81b60;
+            --light-pink: #ffe4f0;
+            --bg-color: #fff0f5;
+        }
 
-        .menu-container { display: flex; flex-direction: column; gap: 10px; }
+        body { 
+            font-family: 'Jua', sans-serif; /* 귀여운 제목 폰트 */
+            background-color: var(--bg-color);
+            /* 땡땡이 배경 패턴 */
+            background-image: radial-gradient(#ffc1e3 15%, transparent 16%), radial-gradient(#ffc1e3 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            
+            padding: 20px; 
+            text-align: center; 
+            margin: 0;
+            color: #444;
+        }
+
+        h2 { 
+            font-family: 'Jua', sans-serif;
+            color: var(--dark-pink); 
+            font-size: 28px;
+            margin-bottom: 5px; 
+            text-shadow: 2px 2px 0px #fff;
+        }
+        
+        p.subtitle { 
+            font-family: 'Gaegu', cursive;
+            font-size: 18px; 
+            color: #666; 
+            margin-bottom: 25px; 
+            background: rgba(255,255,255,0.6);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        
+        /* 테이블 번호 입력 박스 */
+        .table-input-box { 
+            background: white; 
+            padding: 15px 25px; 
+            border-radius: 25px; 
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(216, 27, 96, 0.15); 
+            border: 3px solid var(--light-pink);
+            margin-bottom: 25px;
+        }
+        .table-input-box label { font-size: 20px; color: var(--dark-pink); }
+        input { 
+            font-family: 'Jua', sans-serif;
+            font-size: 22px; 
+            padding: 5px; 
+            width: 70px; 
+            text-align: center; 
+            border: 2px solid var(--main-pink); 
+            border-radius: 12px; 
+            color: var(--dark-pink);
+            outline: none;
+        }
+        input:focus { box-shadow: 0 0 0 3px var(--light-pink); }
+
+        .menu-container { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 메뉴 아이템 카드 */
         .menu-item { 
-            background: white; border: 1px solid #ffc1e3; border-radius: 12px; padding: 15px; 
-            display: flex; flex-direction: column; align-items: flex-start; text-align: left;
-            box-shadow: 0 2px 4px rgba(255, 182, 193, 0.3);
+            background: rgba(255, 255, 255, 0.95); 
+            border: 2px dashed var(--main-pink); /* 스티치 효과 */
+            border-radius: 20px; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-start; 
+            text-align: left;
+            box-shadow: 0 5px 10px rgba(216, 27, 96, 0.05);
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
         }
-        .menu-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 5px; line-height: 1.4; }
-        .menu-desc { font-size: 13px; color: #666; margin-bottom: 10px; }
-        .menu-price { color: #d81b60; font-weight: bold; font-size: 14px; }
-        
-        .controls { display: flex; align-items: center; gap: 10px; align-self: flex-end; margin-top: 5px; }
-        .btn-count { 
-            width: 30px; height: 30px; border-radius: 50%; border: none; 
-            font-size: 18px; font-weight: bold; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center;
-        }
-        .btn-minus { background: #eee; color: #555; }
-        .btn-plus { background: #ff80ab; color: white; }
-        .count-display { font-size: 18px; font-weight: bold; width: 20px; text-align: center; }
+        .menu-item:hover { transform: translateY(-3px); }
 
+        .menu-name { 
+            font-size: 19px; 
+            color: #333; 
+            margin-bottom: 8px; 
+            line-height: 1.3;
+            word-break: keep-all;
+        }
+        .menu-desc { font-size: 14px; color: #888; font-family: 'Apple SD Gothic Neo', sans-serif; } /* 설명은 가독성 좋게 */
+        
+        .price-tag {
+            background-color: var(--light-pink);
+            color: var(--dark-pink);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* 수량 조절 버튼 영역 */
+        .controls { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            align-self: flex-end; 
+            margin-top: 10px; 
+            background: #fff;
+            padding: 5px;
+            border-radius: 30px;
+            border: 1px solid #eee;
+        }
+        .btn-count { 
+            width: 34px; height: 34px; border-radius: 50%; border: none; 
+            font-size: 20px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.1s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-count:active { transform: scale(0.9); }
+        
+        .btn-minus { background: #f0f0f0; color: #888; }
+        .btn-plus { background: var(--main-pink); color: white; }
+        
+        .count-display { 
+            font-size: 20px; 
+            font-weight: bold; 
+            width: 25px; 
+            text-align: center; 
+            color: #333;
+        }
+
+        /* 하단 장바구니 바 */
         #cartBar {
-            position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: white; padding: 15px; border-top: 2px solid #ff80ab;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
+            position: fixed; bottom: 20px; left: 50%; 
+            transform: translateX(-50%);
+            width: 90%; max-width: 500px;
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(5px);
+            padding: 15px 25px; 
+            border-radius: 35px;
+            border: 2px solid var(--main-pink);
+            box-shadow: 0 10px 25px rgba(216, 27, 96, 0.2); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-sizing: border-box;
+            z-index: 100;
         }
-        #totalCount { font-weight: bold; color: #d81b60; }
+        
+        #totalCount { 
+            font-size: 18px; 
+            color: var(--dark-pink); 
+        }
+
         #orderBtn { 
-            background: #d81b60; color: white; border: none; padding: 10px 20px; 
-            font-size: 18px; border-radius: 20px; font-weight: bold; cursor: pointer; 
+            background: linear-gradient(135deg, #ff80ab, #d81b60);
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            font-family: 'Jua', sans-serif;
+            font-size: 20px; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
+            transition: transform 0.2s;
+            animation: pulse 2s infinite;
         }
-        .spacer { height: 80px; } 
+        #orderBtn:active { transform: scale(0.95); }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .spacer { height: 100px; } 
+
+        /* 알림 모달 스타일 (브라우저 기본 alert 대신 이쁘게 하고 싶다면 추가 구현 필요하지만, 기본적으로는 CSS만 수정) */
     </style>
 </head>
 <body>
 
     <h2>🎀 메이드 카페 주문 🎀</h2>
-    <p class="subtitle">모든 메뉴는 무료입니다 (Free)</p>
+    <p class="subtitle">모든 메뉴는 주인님을 위해 무료입니다 (Free) ✨</p>
     
     <div class="table-input-box">
         <label>Table No.</label>
-        <input type="number" id="tableNo" placeholder="0">
+        <input type="number" id="tableNo" placeholder="?" inputmode="numeric">
     </div>
 
     <div id="menuList" class="menu-container"></div>
     <div class="spacer"></div>
 
-    <div id="cartBar">
+    <div id="cartBar" style="display:none;">
         <span id="totalCount">총 0개 선택됨</span>
         <button id="orderBtn" onclick="sendOrder()">주문하기 ❤️</button>
     </div>
 
     <script type="module">
-        // 가져오신 키를 여기에 적용했습니다!
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -81,14 +236,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 메뉴 데이터
         const menus = [
-            { id: 1, name: "초코파이를 고백용으로 쓰지 말아주세요 제발😢", limit: 2 },
-            { id: 2, name: "주인님 오늘은 레몬땅의 축복을 메지컬 에.이.드.❤️", limit: 2 },
-            { id: 3, name: "미유하고 울면 기분이 high해지는 메이드짱의 의문의 러블리 액체들🫢", limit: 2 },
-            { id: 4, name: "강냉이를 바라보자 강냉이가 나를 응시했다🫣", limit: 2 },
-            { id: 5, name: "룰렛(무조건 해야하고 드셔야함 나쁠지도 모르지만 좋을지모름)🎊", limit: 2 },
-            { id: 6, name: "메이드짱의 서비스 타임과 애교?😳", limit: 999 }
+            { id: 1, name: "초코파이를 고백용으로 쓰지 말아주세요 제발 😢", limit: 2 },
+            { id: 2, name: "주인님 오늘은 레몬땅의 축복을! 메지컬 에.이.드. 🍋", limit: 2 },
+            { id: 3, name: "마시면 기분이 High해지는 메이드짱의 의문의 러블리 액체들 🧪", limit: 2 },
+            { id: 4, name: "강냉이를 바라보자 강냉이가 나를 응시했다 👀", limit: 2 },
+            { id: 5, name: "두근두근 룰렛 (거부권 없음! 좋은 걸지도..?) 🎊", limit: 2 },
+            { id: 6, name: "메이드짱의 스페셜 서비스 타임과 애교? 😳", limit: 999 }
         ];
 
         let cart = {}; 
@@ -105,11 +259,14 @@
             container.innerHTML = menus.map(menu => `
                 <div class="menu-item">
                     <div class="menu-name">${menu.name}</div>
-                    <div class="menu-price">Free ${menu.limit < 10 ? `<span style="font-size:12px; color:#999;">(최대 ${menu.limit}개)</span>` : ''}</div>
+                    <div class="price-tag">
+                        Free 
+                        ${menu.limit < 10 ? `<span style="font-weight:normal; opacity:0.8; font-size:12px;">(최대 ${menu.limit}개)</span>` : ''}
+                    </div>
                     <div class="controls">
-                        <button class="btn-count btn-minus" onclick="changeCount(${menu.id}, -1)">-</button>
+                        <button class="btn-count btn-minus" onclick="changeCount(${menu.id}, -1)">−</button>
                         <span class="count-display" id="cnt-${menu.id}">0</span>
-                        <button class="btn-count btn-plus" onclick="changeCount(${menu.id}, 1)">+</button>
+                        <button class="btn-count btn-plus" onclick="changeCount(${menu.id}, 1)">＋</button>
                     </div>
                 </div>
             `).join('');
@@ -122,7 +279,7 @@
 
             if (newQty < 0) return;
             if (newQty > menu.limit) {
-                alert(`"${menu.name.substring(0, 5)}..." 메뉴는 최대 ${menu.limit}개까지만 주문 가능합니다! 😢`);
+                alert(`"${menu.name.substring(0, 8)}..." \n이 메뉴는 1인당 최대 ${menu.limit}개까지만 가능해요! 😢`);
                 return;
             }
 
@@ -136,21 +293,29 @@
         function updateTotal() {
             const total = Object.values(cart).reduce((a, b) => a + b, 0);
             document.getElementById('totalCount').innerText = `총 ${total}개 선택됨`;
+            
+            // 0개일 때는 하단 바 숨기기, 1개 이상일 때 부드럽게 보이기
+            const cartBar = document.getElementById('cartBar');
+            if(total > 0) {
+                cartBar.style.display = 'flex';
+            } else {
+                cartBar.style.display = 'none';
+            }
         }
 
         window.sendOrder = async () => {
             const tableNo = document.getElementById('tableNo').value;
             const total = Object.values(cart).reduce((a, b) => a + b, 0);
 
-            if(!tableNo) return alert("테이블 번호를 입력해주세요! 💦");
-            if(total === 0) return alert("메뉴를 하나 이상 선택해주세요! ❤️");
+            if(!tableNo) return alert("주인님! 테이블 번호를 입력해주셔야 해요! 💦");
+            if(total === 0) return alert("메뉴를 하나라도 선택해주세요! ❤️");
 
             const orderItems = Object.keys(cart).map(id => {
                 const menu = menus.find(m => m.id == id);
                 return `${menu.name} x${cart[id]}`;
             });
 
-            if(confirm(`[Table ${tableNo}] 주문하시겠습니까?`)) {
+            if(confirm(`[Table ${tableNo}] 주문하시겠어요? ❤️`)) {
                 try {
                     await addDoc(collection(db, "orders"), {
                         table: tableNo,
@@ -158,13 +323,13 @@
                         status: "접수",
                         time: serverTimestamp()
                     });
-                    alert("주문이 접수되었습니다! 주인님 잠시만 기다려주세요 ❤️");
+                    alert("주문이 접수되었습니다! \n잠시만 기다려주세요 주인님 ❤️");
                     location.reload(); 
                 } catch (e) {
-                    alert("오류 발생: " + e.message);
+                    alert("오류가 발생했어요 ㅠㅠ: " + e.message);
                 }
             }
         }
     </script>
 </body>
-</html>
+</html>d
