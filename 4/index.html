@@ -2,133 +2,97 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>주방 주문 현황 👩‍🍳</title>
-    
-    <!-- 귀여운 폰트 추가 (Jua) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>주방 디스플레이 👩‍🍳</title>
     <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --bg-dark: #2c2c2c;
-            --card-bg: #ffffff;
-            --accent-pink: #ff80ab;
-            --strong-pink: #d81b60;
-            --text-dark: #333;
-        }
+        :root { --bg-dark: #222; --card-bg: #fff; --accent-pink: #ff80ab; --strong-pink: #c2185b; }
+        * { box-sizing: border-box; }
 
         body { 
             font-family: 'Jua', sans-serif; 
-            padding: 20px; 
-            background-color: var(--bg-dark); 
-            color: white; 
-            margin: 0;
+            padding: 15px; background-color: var(--bg-dark); 
+            color: white; margin: 0; 
+            padding-bottom: 50px;
         }
 
-        h1 {
-            text-align: center;
-            color: var(--accent-pink);
-            font-size: 32px;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 0px #000;
+        h1 { 
+            text-align: center; color: var(--accent-pink); 
+            font-size: 26px; margin: 10px 0 25px 0; 
         }
-        
-        h1 span { font-size: 24px; color: #aaa; vertical-align: middle; margin-left: 10px; }
+        h1 span { font-size: 18px; color: #aaa; display: block; margin-top: 5px; }
 
-        /* 주문 리스트 그리드 (반응형) */
-        #orderList {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+        /* 그리드 레이아웃: 모바일 1열, PC/태블릿 2열 이상 */
+        #orderList { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 15px; 
+            max-width: 600px; margin: 0 auto; 
+        }
+        @media (min-width: 768px) {
+            #orderList { grid-template-columns: 1fr 1fr; max-width: 1000px; }
         }
 
-        /* 주문 카드 스타일 */
+        /* 주문 카드 */
         .order-card { 
-            background: var(--card-bg); 
-            color: var(--text-dark); 
-            border-radius: 15px; 
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            display: flex; 
-            flex-direction: column;
-            animation: popIn 0.3s ease-out;
-            border-top: 6px solid var(--accent-pink);
+            background: var(--card-bg); color: #333; border-radius: 12px; 
+            overflow: hidden; display: flex; flex-direction: column; 
+            border-top: 5px solid var(--accent-pink);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease-out;
         }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        /* 🚨 호출 카드 (강조 효과) */
+        .order-card.urgent {
+            border: 4px solid #ff3d00; background: #fffde7;
+            animation: pulseCard 0.8s infinite alternate;
         }
+        @keyframes pulseCard { from { box-shadow: 0 0 10px #ff3d00; } to { box-shadow: 0 0 25px #ff3d00; } }
 
-        /* 카드 헤더 (테이블 번호 + 시간) */
-        .card-header {
-            background: #fff0f5;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px dashed #ffc1e3;
+        /* 카드 헤더 */
+        .card-header { 
+            background: #fff0f5; padding: 12px 15px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px dashed #ffc1e3; 
         }
+        .table-num { font-size: 22px; color: var(--strong-pink); font-weight: bold; }
+        .order-time { font-size: 14px; color: #777; background: #fff; padding: 4px 8px; border-radius: 8px; border: 1px solid #ddd; }
 
-        .table-num { 
-            font-weight: bold; 
-            color: var(--strong-pink); 
-            font-size: 1.8rem; 
-        }
-        
-        .order-time {
-            font-size: 0.9rem;
-            color: #888;
-            background: white;
-            padding: 3px 8px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
-
-        /* 메뉴 리스트 영역 */
+        /* 메뉴 리스트 박스형 디자인 (한 줄에 하나씩) */
         .menu-list { 
-            padding: 20px; 
-            font-size: 1.2rem; 
-            line-height: 1.6;
-            flex-grow: 1; /* 내용이 적어도 버튼을 아래로 밀어냄 */
+            padding: 15px; flex-grow: 1; 
+            display: flex; flex-direction: column; gap: 8px; 
         }
-        .menu-item { display: block; margin-bottom: 5px; word-break: keep-all; }
-        .menu-item::before { content: "🍰 "; }
+        .menu-item { 
+            background: #fdf2f7; padding: 10px; border-radius: 8px; 
+            font-size: 16px; line-height: 1.4; border-left: 4px solid var(--accent-pink); 
+            word-break: keep-all; 
+        }
+
+        /* 요청사항 메모 표시 */
+        .note-box { 
+            background: #fff9c4; color: #555; padding: 10px; margin: 0 15px 15px 15px; 
+            border-radius: 8px; font-size: 14px; border: 1px dashed #fbc02d; 
+        }
+        .note-box::before { content: "📢 요청: "; font-weight: bold; color: #f57f17; }
 
         /* 완료 버튼 */
         .btn-done { 
-            background: var(--strong-pink); 
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            cursor: pointer; 
-            font-size: 1.3rem; 
-            font-family: 'Jua', sans-serif;
-            transition: background 0.2s;
-            width: 100%;
+            background: var(--strong-pink); color: white; border: none; 
+            padding: 15px; cursor: pointer; font-size: 18px; 
+            font-family: 'Jua', sans-serif; width: 100%; 
         }
-        .btn-done:hover { background: #ad1457; }
-        .btn-done:active { transform: translateY(2px); }
-
-        /* 대기 중 메시지 */
-        .empty-message {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 50px;
-            color: #777;
-            font-size: 1.5rem;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-        }
+        .btn-done:active { background: #ad1457; }
+        
+        .btn-done.call-btn { background: #ff9800; }
+        
+        .empty-message { text-align: center; padding: 60px 20px; color: #666; font-size: 18px; background: rgba(255,255,255,0.1); border-radius: 15px; border: 2px dashed #444; }
     </style>
 </head>
 <body>
-    <h1>🔥 Kitchen Display <span>맛있어지는 주문들</span></h1>
-    <div id="orderList">
-        <!-- 주문 카드가 여기에 들어갑니다 -->
-    </div>
+    <h1>🔥 KITCHEN <span>주문 현황판</span></h1>
+    <div id="orderList"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -146,20 +110,13 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
         const orderList = document.getElementById('orderList');
-
         const q = query(collection(db, "orders"), orderBy("time", "asc"));
         
         onSnapshot(q, (snapshot) => {
             orderList.innerHTML = ""; 
             if(snapshot.empty) {
-                orderList.innerHTML = `
-                    <div class="empty-message">
-                        현재 대기 중인 주문이 없습니다.<br>
-                        주인님을 기다리는 중... 💤
-                    </div>
-                `;
+                orderList.innerHTML = `<div class="empty-message">대기 중인 주문이 없습니다 💤</div>`;
                 return;
             }
 
@@ -167,43 +124,53 @@
                 const data = docSnap.data();
                 const id = docSnap.id;
                 
-                // 시간 포맷팅 (Timestamp -> 00:00)
-                let timeString = "방금 전";
+                let timeString = "방금";
                 if(data.time) {
                     const date = data.time.toDate();
-                    const hours = String(date.getHours()).padStart(2, '0');
-                    const minutes = String(date.getMinutes()).padStart(2, '0');
-                    timeString = `${hours}:${minutes}`;
+                    timeString = `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
                 }
 
-                // 메뉴 배열을 줄바꿈 태그로 변환
-                const menuHtml = data.menu.map(m => `<span class="menu-item">${m}</span>`).join('');
+                let cardContent = '';
                 
-                const html = `
-                    <div class="order-card">
-                        <div class="card-header">
-                            <span class="table-num">Table ${data.table}</span>
-                            <span class="order-time">🕒 ${timeString}</span>
+                if (data.type === 'call') {
+                    // [호출] 디자인
+                    cardContent = `
+                        <div class="order-card urgent">
+                            <div class="card-header">
+                                <span class="table-num">🚨 Table ${data.table}</span>
+                                <span class="order-time">${timeString}</span>
+                            </div>
+                            <div class="menu-list" style="text-align:center; justify-content:center; font-size:20px; font-weight:bold;">
+                                🔔 메이드 호출!<br><span style="font-size:14px; color:#d84315;">(딩동~)</span>
+                            </div>
+                            <button class="btn-done call-btn" onclick="completeOrder('${id}', 'call')">호출 확인 (완료)</button>
                         </div>
-                        <div class="menu-list">
-                            ${menuHtml}
+                    `;
+                } else {
+                    // [일반 주문] 디자인
+                    const menuHtml = data.menu ? data.menu.map(m => `<div class="menu-item">${m}</div>`).join('') : '';
+                    const noteHtml = data.note ? `<div class="note-box">${data.note}</div>` : '';
+
+                    cardContent = `
+                        <div class="order-card">
+                            <div class="card-header">
+                                <span class="table-num">Table ${data.table}</span>
+                                <span class="order-time">${timeString}</span>
+                            </div>
+                            <div class="menu-list">${menuHtml}</div>
+                            ${noteHtml}
+                            <button class="btn-done" onclick="completeOrder('${id}', 'order')">조리 완료 ✅</button>
                         </div>
-                        <button class="btn-done" onclick="completeOrder('${id}')">조리 완료 (Done) ✅</button>
-                    </div>
-                `;
-                orderList.innerHTML += html;
+                    `;
+                }
+                orderList.innerHTML += cardContent;
             });
         });
 
-        window.completeOrder = async (id) => {
-            // 주방은 바쁘니까 confirm 없이 바로 삭제하거나, 
-            // 실수 방지를 위해 confirm을 유지할 수 있습니다. 여기선 유지했습니다.
-            if(confirm("이 주문을 완료 처리하시겠습니까?")) {
-                try {
-                    await deleteDoc(doc(db, "orders", id));
-                } catch(e) {
-                    alert("오류: " + e.message);
-                }
+        window.completeOrder = async (id, type) => {
+            const msg = type === 'call' ? "호출 건을 닫으시겠습니까?" : "주문을 완료 처리하시겠습니까?";
+            if(confirm(msg)) {
+                await deleteDoc(doc(db, "orders", id));
             }
         }
     </script>
