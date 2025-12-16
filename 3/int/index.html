@@ -166,7 +166,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 메뉴 ID는 재고 관리자 페이지(manager.html)의 초기화된 ID와 일치해야 합니다.
+        // 메뉴 ID
         const menus = [
             { id: 1, name: "초코파이를 고백용으로 쓰지 말아주세요 제발 😢", limit: 2 },
             { id: 2, name: "주인님 오늘은 레몬땅의 축복을! 메지컬 에.이.드. 🍋", limit: 2 },
@@ -179,7 +179,7 @@
         let cart = {}; 
         let inventoryStatus = {}; // 실시간 재고 정보 저장용
 
-        // [초기화] QR코드 체크 및 재고 리스너 등록
+        // [초기화]
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const tableParam = urlParams.get('table');
@@ -195,46 +195,47 @@
                 }
             }
             
-            // 1. 우선 메뉴 화면 그리기
+            // 1. 화면 그리기
             renderMenu();
 
-            // 2. 실시간 재고(inventory) 감시 시작
+            // 🔥 [추가된 부분] 룰렛(id:5)을 기본으로 1개 담기
+            changeCount(5, 1);
+
+            // 2. 실시간 재고(inventory) 감시
             onSnapshot(collection(db, "inventory"), (snapshot) => {
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    const menuId = docSnap.id; // 문서 ID가 메뉴 ID임
+                    const menuId = docSnap.id;
                     
-                    inventoryStatus[menuId] = data.count; // 재고 수량 저장
+                    inventoryStatus[menuId] = data.count; 
                     
                     updateStockUI(menuId, data.count);
                 });
             });
         };
 
-        // 재고 상태에 따라 UI 업데이트 (품절 처리 등)
+        // 재고 상태 UI 업데이트
         function updateStockUI(id, count) {
             const statusEl = document.getElementById(`stock-msg-${id}`);
             const itemEl = document.getElementById(`menu-item-${id}`);
             
             if(!statusEl || !itemEl) return;
 
-            // 1. 품절 (0개 이하)
             if(count <= 0) {
                 statusEl.innerHTML = "<span style='color:red; font-weight:bold;'>⛔ 품절 (Sold Out)</span>";
                 itemEl.classList.add('sold-out');
-                // 장바구니에 담겨있었다면 강제 제거
+                
+                // 품절 시 카트에서 제거
                 if(cart[id]) {
                     delete cart[id];
                     document.getElementById(`cnt-${id}`).innerText = 0;
                     updateTotal();
                 }
             } 
-            // 2. 마감 임박 (5개 미만)
             else if(count < 5) {
                 statusEl.innerHTML = `<span style='color:#d81b60; font-weight:bold;'>⚡ 마감임박! (${count}개 남음)</span>`;
                 itemEl.classList.remove('sold-out');
             } 
-            // 3. 넉넉함
             else {
                 statusEl.innerHTML = "";
                 itemEl.classList.remove('sold-out');
@@ -292,19 +293,17 @@
             const currentQty = cart[id] || 0;
             const newQty = currentQty + delta;
             
-            // 현재 재고 확인
-            const stock = inventoryStatus[String(id)] ?? 999; // 정보 없으면 999로 가정(로딩전)
+            // 재고 정보가 아직 안 왔으면(로딩중) 999로 가정
+            const stock = inventoryStatus[String(id)] ?? 999; 
 
             if (newQty < 0) return;
             
-            // 1. 개인 제한 체크
             if (newQty > menu.limit) {
                 if (menu.id === 5) alert("룰렛은 1번만 돌릴 수 있어요! (운명은 한 번뿐..✨)");
                 else alert(`이 메뉴는 최대 ${menu.limit}개까지만 가능해요! 😢`);
                 return;
             }
 
-            // 2. 재고 수량 체크 (화면상)
             if (newQty > stock) {
                 alert(`앗! 남은 재고가 ${stock}개 뿐이에요 💦`);
                 return;
@@ -324,7 +323,6 @@
             cartBar.style.display = total > 0 ? 'flex' : 'none';
         }
 
-        // [주문하기] 트랜잭션 사용: 재고 확인 -> 차감 -> 주문 생성을 원자적으로 처리
         window.sendOrder = async () => {
             if(!checkTableNumber()) return; 
             const tableNo = document.getElementById('tableNo').value;
@@ -338,7 +336,6 @@
                     await runTransaction(db, async (transaction) => {
                         const orderMenuNames = [];
 
-                        // 1. 장바구니에 담긴 모든 메뉴의 재고 문서 읽기
                         for (const [id, qty] of Object.entries(cart)) {
                             const stockRef = doc(db, "inventory", String(id));
                             const stockDoc = await transaction.get(stockRef);
@@ -350,19 +347,14 @@
                             const currentStock = stockDoc.data().count;
                             const menuName = menus.find(m => m.id == id).name;
 
-                            // 2. 재고 검증
                             if (currentStock < qty) {
                                 throw `[${menuName}] 재고 부족! (남은 수량: ${currentStock}개)`;
                             }
 
-                            // 3. 재고 차감 예약
                             transaction.update(stockRef, { count: currentStock - qty });
-                            
-                            // 주문서 내용 생성
                             orderMenuNames.push(`${menuName} x${qty}`);
                         }
 
-                        // 4. 주문서 생성 예약
                         const newOrderRef = doc(collection(db, "orders"));
                         transaction.set(newOrderRef, {
                             table: tableNo,
@@ -379,7 +371,6 @@
 
                 } catch (e) {
                     console.error(e);
-                    // 객체 에러면 메시지만 추출, 문자열이면 그대로 출력
                     const msg = typeof e === 'object' ? e.message : e;
                     alert("주문 실패 😢: " + msg);
                 }
