@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>메이드 카페 ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --main-pink: #ff80ab; 
+            --dark-pink: #d81b60; 
+            --light-pink: #ffe4f0; 
+            --bg-color: #fff0f5; 
+            --shadow: 0 4px 12px rgba(216, 27, 96, 0.15);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            font-family: 'Jua', sans-serif; 
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#ffc1e3 15%, transparent 16%), radial-gradient(#ffc1e3 15%, transparent 16%);
+            background-size: 20px 20px; background-position: 0 0, 10px 10px;
+            padding: 20px 15px 140px 15px; 
+            text-align: center; color: #444; margin: 0;
+        }
+
+        /* 타이틀 */
+        h2 { font-size: 26px; color: var(--dark-pink); margin: 45px 0 5px 0; text-shadow: 2px 2px 0px #fff; }
+        p.subtitle { 
+            font-family: 'Gaegu', cursive; font-size: 16px; color: #666; 
+            background: rgba(255,255,255,0.8); padding: 6px 15px; border-radius: 20px; 
+            display: inline-block; margin-bottom: 20px; 
+        }
+        
+        /* 메이드 호출 버튼 (우측 상단 고정) */
+        .call-maid-btn {
+            position: fixed; top: 15px; right: 15px; z-index: 1000;
+            background: #ff9800; color: white; border: 2px solid #fff;
+            padding: 8px 16px; border-radius: 25px;
+            font-family: 'Jua', sans-serif; font-size: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .call-maid-btn:active { transform: scale(0.95); }
+
+        /* 테이블 번호 입력 */
+        .table-input-box { 
+            background: white; padding: 12px 20px; border-radius: 20px; 
+            display: inline-flex; align-items: center; gap: 10px; 
+            box-shadow: var(--shadow); border: 3px solid var(--light-pink); 
+            margin-bottom: 25px; width: 100%; max-width: 350px; justify-content: center;
+        }
+        .table-input-box label { font-size: 18px; color: var(--dark-pink); white-space: nowrap; }
+        
+        input[type="number"] { 
+            font-family: 'Jua', sans-serif; font-size: 20px; padding: 8px; width: 80px; 
+            text-align: center; border: 2px solid var(--main-pink); border-radius: 12px; 
+            color: var(--dark-pink); outline: none; background: #fffbfd;
+        }
+        /* QR 접속 시 잠금 스타일 */
+        input[readonly] { background: #eee; color: #888; border-color: #ccc; }
+
+        /* 메뉴 리스트 */
+        .menu-container { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
+        
+        .menu-item { 
+            background: #fff; border: 2px dashed var(--main-pink); border-radius: 20px; 
+            padding: 18px; display: flex; flex-direction: column; 
+            align-items: flex-start; text-align: left; 
+            box-shadow: var(--shadow); position: relative;
+        }
+
+        .menu-name { font-size: 18px; color: #333; margin-bottom: 6px; line-height: 1.35; word-break: keep-all; }
+        .price-tag { background-color: var(--light-pink); color: var(--dark-pink); padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: bold; }
+        
+        /* 재고 상태 표시 */
+        .stock-status { font-size: 13px; margin-top: 5px; min-height: 18px; }
+
+        /* 수량 조절 버튼 */
+        .controls { 
+            display: flex; align-items: center; gap: 15px; align-self: flex-end; margin-top: 12px; 
+            background: #fdf2f7; padding: 6px 8px; border-radius: 30px; 
+        }
+        .btn-count { 
+            width: 38px; height: 38px; border-radius: 50%; border: none; 
+            font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .btn-minus { background: #fff; color: #888; border: 1px solid #eee; }
+        .btn-plus { background: var(--main-pink); color: white; }
+        .count-display { font-size: 22px; font-weight: bold; width: 24px; text-align: center; color: #333; }
+        
+        /* 품절 시 스타일 */
+        .sold-out .menu-name { color: #aaa; text-decoration: line-through; }
+        .sold-out .controls { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
+        .sold-out .price-tag { background: #eee; color: #999; }
+
+        /* 장바구니 하단 바 */
+        #cartBar { 
+            position: fixed; bottom: 20px; left: 15px; right: 15px; margin: 0 auto; max-width: 500px;
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+            padding: 15px; border-radius: 25px; border: 2px solid var(--main-pink); 
+            box-shadow: 0 10px 30px rgba(216, 27, 96, 0.4); 
+            display: flex; flex-direction: column; gap: 12px; z-index: 999;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        }
+
+        /* 요청사항 메모장 */
+        #requestNote { 
+            width: 100%; padding: 12px; border: 1px solid #e0e0e0; 
+            border-radius: 12px; font-family: 'Gaegu', cursive; font-size: 16px; 
+            background: #f9f9f9; resize: none; 
+        }
+        #requestNote:focus { outline: none; border-color: var(--main-pink); background: #fff; }
+
+        .cart-top { display: flex; justify-content: space-between; align-items: center; }
+        #totalCount { font-size: 17px; color: var(--dark-pink); font-weight: bold; }
+        
+        #orderBtn { 
+            background: linear-gradient(135deg, #ff80ab, #d81b60); color: white; border: none; padding: 12px 24px; 
+            font-family: 'Jua', sans-serif; font-size: 18px; border-radius: 20px; cursor: pointer; flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <button class="call-maid-btn" onclick="callMaid()">🔔 메이드 호출</button>
+
+    <h2>🎀 메이드 카페 주문 🎀</h2>
+    <p class="subtitle">주인님을 위한 실시간 메뉴판 ✨</p>
+    
+    <div class="table-input-box">
+        <label>Table No.</label>
+        <input type="number" id="tableNo" placeholder="?" inputmode="numeric" min="1" max="25">
+    </div>
+
+    <div id="menuList" class="menu-container">
+        <!-- 메뉴가 로딩되면 여기에 표시됩니다 -->
+        <div style="padding:20px;">로딩중... 🍪</div>
+    </div>
+
+    <div id="cartBar" style="display:none;">
+        <textarea id="requestNote" rows="1" placeholder="요청사항 (예: 초코파이 부숴서 주세요!!)"></textarea>
+        <div class="cart-top">
+            <span id="totalCount">총 0개 선택</span>
+            <button id="orderBtn" onclick="sendOrder()">주문하기 ❤️</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, runTransaction, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5lLY7p09aqglYrqYEF6hBBRxIOaB59Uk",
+            authDomain: "madecafe-85738.firebaseapp.com",
+            projectId: "madecafe-85738",
+            storageBucket: "madecafe-85738.firebasestorage.app",
+            messagingSenderId: "481793894590",
+            appId: "1:481793894590:web:00873d3f6285c87d6756ef",
+            measurementId: "G-HVE60ZL3XZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 메뉴 ID는 재고 관리자 페이지(manager.html)의 초기화된 ID와 일치해야 합니다.
+        const menus = [
+            { id: 1, name: "초코파이를 고백용으로 쓰지 말아주세요 제발 😢", limit: 2 },
+            { id: 2, name: "주인님 오늘은 레몬땅의 축복을! 메지컬 에.이.드. 🍋", limit: 2 },
+            { id: 3, name: "마시면 기분이 High해지는 메이드짱의 의문의 러블리 액체들 🧪", limit: 2 },
+            { id: 4, name: "강냉이를 바라보자 강냉이가 나를 응시했다 👀", limit: 2 },
+            { id: 5, name: "두근두근 룰렛 (거부권 없음! 좋은 걸지도..?) 🎊", limit: 1 },
+            { id: 6, name: "메이드짱의 스페셜 서비스 타임과 애교? 😳", limit: 999 }
+        ];
+
+        let cart = {}; 
+        let inventoryStatus = {}; // 실시간 재고 정보 저장용
+
+        // [초기화] QR코드 체크 및 재고 리스너 등록
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tableParam = urlParams.get('table');
+            
+            if(tableParam) {
+                const tableNum = parseInt(tableParam);
+                if(tableNum >= 1 && tableNum <= 25) {
+                    const tableInput = document.getElementById('tableNo');
+                    tableInput.value = tableNum;
+                    tableInput.readOnly = true; 
+                } else {
+                    alert("QR코드 오류: 테이블 번호는 1~25번만 가능합니다.");
+                }
+            }
+            
+            // 1. 우선 메뉴 화면 그리기
+            renderMenu();
+
+            // 2. 실시간 재고(inventory) 감시 시작
+            onSnapshot(collection(db, "inventory"), (snapshot) => {
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const menuId = docSnap.id; // 문서 ID가 메뉴 ID임
+                    
+                    inventoryStatus[menuId] = data.count; // 재고 수량 저장
+                    
+                    updateStockUI(menuId, data.count);
+                });
+            });
+        };
+
+        // 재고 상태에 따라 UI 업데이트 (품절 처리 등)
+        function updateStockUI(id, count) {
+            const statusEl = document.getElementById(`stock-msg-${id}`);
+            const itemEl = document.getElementById(`menu-item-${id}`);
+            
+            if(!statusEl || !itemEl) return;
+
+            // 1. 품절 (0개 이하)
+            if(count <= 0) {
+                statusEl.innerHTML = "<span style='color:red; font-weight:bold;'>⛔ 품절 (Sold Out)</span>";
+                itemEl.classList.add('sold-out');
+                // 장바구니에 담겨있었다면 강제 제거
+                if(cart[id]) {
+                    delete cart[id];
+                    document.getElementById(`cnt-${id}`).innerText = 0;
+                    updateTotal();
+                }
+            } 
+            // 2. 마감 임박 (5개 미만)
+            else if(count < 5) {
+                statusEl.innerHTML = `<span style='color:#d81b60; font-weight:bold;'>⚡ 마감임박! (${count}개 남음)</span>`;
+                itemEl.classList.remove('sold-out');
+            } 
+            // 3. 넉넉함
+            else {
+                statusEl.innerHTML = "";
+                itemEl.classList.remove('sold-out');
+            }
+        }
+
+        function checkTableNumber() {
+            const tableNo = document.getElementById('tableNo').value;
+            if(!tableNo) {
+                alert("주인님! 테이블 번호를 입력해주셔야 해요! 💦");
+                return false;
+            }
+            if(tableNo < 1 || tableNo > 25) {
+                alert("테이블 번호는 1번부터 25번까지만 가능해요! ❤️");
+                return false;
+            }
+            return true;
+        }
+
+        window.callMaid = async () => {
+            if(!checkTableNumber()) return;
+            const tableNo = document.getElementById('tableNo').value;
+
+            if(confirm(`[Table ${tableNo}] 메이드를 호출하시겠습니까? 🔔`)) {
+                try {
+                    await addDoc(collection(db, "orders"), {
+                        table: tableNo,
+                        type: 'call',
+                        status: "호출",
+                        time: serverTimestamp()
+                    });
+                    alert("메이드님이 곧 달려갑니다! 🏃‍♀️💨");
+                } catch(e) { alert("오류: " + e.message); }
+            }
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menuList');
+            container.innerHTML = menus.map(menu => `
+                <div class="menu-item" id="menu-item-${menu.id}">
+                    <div class="menu-name">${menu.name}</div>
+                    <div class="stock-status" id="stock-msg-${menu.id}"></div>
+                    <div class="price-tag">Free ${menu.limit < 10 ? `<span style="font-weight:normal;opacity:0.8;font-size:12px;">(최대 ${menu.limit}개)</span>` : ''}</div>
+                    <div class="controls">
+                        <button class="btn-count btn-minus" onclick="changeCount(${menu.id}, -1)">−</button>
+                        <span class="count-display" id="cnt-${menu.id}">0</span>
+                        <button class="btn-count btn-plus" onclick="changeCount(${menu.id}, 1)">＋</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.changeCount = (id, delta) => {
+            const menu = menus.find(m => m.id === id);
+            const currentQty = cart[id] || 0;
+            const newQty = currentQty + delta;
+            
+            // 현재 재고 확인
+            const stock = inventoryStatus[String(id)] ?? 999; // 정보 없으면 999로 가정(로딩전)
+
+            if (newQty < 0) return;
+            
+            // 1. 개인 제한 체크
+            if (newQty > menu.limit) {
+                if (menu.id === 5) alert("룰렛은 1번만 돌릴 수 있어요! (운명은 한 번뿐..✨)");
+                else alert(`이 메뉴는 최대 ${menu.limit}개까지만 가능해요! 😢`);
+                return;
+            }
+
+            // 2. 재고 수량 체크 (화면상)
+            if (newQty > stock) {
+                alert(`앗! 남은 재고가 ${stock}개 뿐이에요 💦`);
+                return;
+            }
+
+            if (newQty === 0) delete cart[id];
+            else cart[id] = newQty;
+            
+            document.getElementById(`cnt-${id}`).innerText = newQty;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const total = Object.values(cart).reduce((a, b) => a + b, 0);
+            document.getElementById('totalCount').innerText = `총 ${total}개`;
+            const cartBar = document.getElementById('cartBar');
+            cartBar.style.display = total > 0 ? 'flex' : 'none';
+        }
+
+        // [주문하기] 트랜잭션 사용: 재고 확인 -> 차감 -> 주문 생성을 원자적으로 처리
+        window.sendOrder = async () => {
+            if(!checkTableNumber()) return; 
+            const tableNo = document.getElementById('tableNo').value;
+            const note = document.getElementById('requestNote').value; 
+            const total = Object.values(cart).reduce((a, b) => a + b, 0);
+
+            if(total === 0) return alert("메뉴를 선택해주세요! ❤️");
+
+            if(confirm(`주문하시겠습니까? (재고가 즉시 차감됩니다) ❤️`)) {
+                try {
+                    await runTransaction(db, async (transaction) => {
+                        const orderMenuNames = [];
+
+                        // 1. 장바구니에 담긴 모든 메뉴의 재고 문서 읽기
+                        for (const [id, qty] of Object.entries(cart)) {
+                            const stockRef = doc(db, "inventory", String(id));
+                            const stockDoc = await transaction.get(stockRef);
+
+                            if (!stockDoc.exists()) {
+                                throw "오류: 해당 메뉴의 재고 데이터가 없습니다.";
+                            }
+
+                            const currentStock = stockDoc.data().count;
+                            const menuName = menus.find(m => m.id == id).name;
+
+                            // 2. 재고 검증
+                            if (currentStock < qty) {
+                                throw `[${menuName}] 재고 부족! (남은 수량: ${currentStock}개)`;
+                            }
+
+                            // 3. 재고 차감 예약
+                            transaction.update(stockRef, { count: currentStock - qty });
+                            
+                            // 주문서 내용 생성
+                            orderMenuNames.push(`${menuName} x${qty}`);
+                        }
+
+                        // 4. 주문서 생성 예약
+                        const newOrderRef = doc(collection(db, "orders"));
+                        transaction.set(newOrderRef, {
+                            table: tableNo,
+                            menu: orderMenuNames,
+                            note: note, 
+                            type: 'order',
+                            status: "접수",
+                            time: serverTimestamp()
+                        });
+                    });
+
+                    alert("주문 접수 완료! 맛있게 만들어드릴게요 ❤️");
+                    location.reload(); 
+
+                } catch (e) {
+                    console.error(e);
+                    // 객체 에러면 메시지만 추출, 문자열이면 그대로 출력
+                    const msg = typeof e === 'object' ? e.message : e;
+                    alert("주문 실패 😢: " + msg);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
