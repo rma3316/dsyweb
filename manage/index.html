@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>재고 관리자 📦</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Jua', sans-serif; background: #333; color: white; padding: 20px; text-align: center; }
+        h1 { color: #ff80ab; }
+        
+        .item-list { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+        .item-row { 
+            background: #444; padding: 15px; border-radius: 10px; 
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid #555;
+        }
+        .item-name { text-align: left; font-size: 16px; flex: 1; margin-right: 10px; }
+        .stock-control { display: flex; align-items: center; gap: 5px; }
+        
+        input { width: 60px; padding: 8px; text-align: center; font-size: 18px; border-radius: 5px; border: none; }
+        button { cursor: pointer; border: none; border-radius: 5px; padding: 8px 15px; font-family: 'Jua'; }
+        
+        .btn-save { background: #ff80ab; color: white; }
+        .btn-save:hover { background: #d81b60; }
+        
+        .init-btn { margin-top: 30px; background: #555; color: #aaa; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>📦 실시간 재고 관리</h1>
+    <div id="inventoryList" class="item-list">로딩중...</div>
+
+    <br>
+    <button class="init-btn" onclick="initializeData()">⚠️ 메뉴 데이터 초기화 (처음 한 번만)</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5lLY7p09aqglYrqYEF6hBBRxIOaB59Uk",
+            authDomain: "madecafe-85738.firebaseapp.com",
+            projectId: "madecafe-85738",
+            storageBucket: "madecafe-85738.firebasestorage.app",
+            messagingSenderId: "481793894590",
+            appId: "1:481793894590:web:00873d3f6285c87d6756ef",
+            measurementId: "G-HVE60ZL3XZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 메뉴 기본 정보 (이름 매칭용)
+        const menuData = [
+            { id: 1, name: "초코파이" },
+            { id: 2, name: "메지컬 에이드" },
+            { id: 3, name: "러블리 액체" },
+            { id: 4, name: "강냉이" },
+            { id: 5, name: "두근두근 룰렛" },
+            { id: 6, name: "스페셜 서비스" }
+        ];
+
+        // 실시간 재고 리스너
+        onSnapshot(collection(db, "inventory"), (snapshot) => {
+            const list = document.getElementById('inventoryList');
+            list.innerHTML = "";
+            
+            // 데이터를 ID 순서대로 정렬
+            const items = [];
+            snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+            items.sort((a,b) => a.id - b.id);
+
+            items.forEach(item => {
+                list.innerHTML += `
+                    <div class="item-row">
+                        <div class="item-name">${item.name}</div>
+                        <div class="stock-control">
+                            <span>현재: </span>
+                            <input type="number" id="val-${item.id}" value="${item.count}">
+                            <button class="btn-save" onclick="updateStock('${item.id}')">수정</button>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+
+        // 재고 수정 함수
+        window.updateStock = async (id) => {
+            const newVal = document.getElementById(`val-${id}`).value;
+            await updateDoc(doc(db, "inventory", id), {
+                count: parseInt(newVal)
+            });
+            alert("수정 완료!");
+        }
+
+        // 초기 데이터 세팅 (처음 한 번만 실행)
+        window.initializeData = async () => {
+            if(!confirm("모든 재고가 100개로 초기화됩니다. 하시겠습니까?")) return;
+            
+            for(const menu of menuData) {
+                // 문서 ID를 숫자로 문자열화하여 저장 ('1', '2'...)
+                await setDoc(doc(db, "inventory", String(menu.id)), {
+                    id: menu.id,
+                    name: menu.name,
+                    count: 100 // 기본 재고
+                });
+            }
+            alert("초기화 완료!");
+        }
+    </script>
+</body>
+</html>
