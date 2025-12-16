@@ -166,7 +166,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 메뉴 ID
+        // 메뉴 ID 정의
         const menus = [
             { id: 1, name: "초코파이를 고백용으로 쓰지 말아주세요 제발 😢", limit: 2 },
             { id: 2, name: "주인님 오늘은 레몬땅의 축복을! 메지컬 에.이.드. 🍋", limit: 2 },
@@ -177,7 +177,7 @@
         ];
 
         let cart = {}; 
-        let inventoryStatus = {}; // 실시간 재고 정보 저장용
+        let inventoryStatus = {}; // 실시간 재고 정보
 
         // [초기화]
         window.onload = () => {
@@ -198,17 +198,16 @@
             // 1. 화면 그리기
             renderMenu();
 
-            // 🔥 [추가된 부분] 룰렛(id:5)을 기본으로 1개 담기
+            // 🔥 룰렛(id:5) 기본 1개 담기
             changeCount(5, 1);
 
-            // 2. 실시간 재고(inventory) 감시
+            // 2. 실시간 재고 감시
             onSnapshot(collection(db, "inventory"), (snapshot) => {
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     const menuId = docSnap.id;
                     
                     inventoryStatus[menuId] = data.count; 
-                    
                     updateStockUI(menuId, data.count);
                 });
             });
@@ -292,8 +291,6 @@
             const menu = menus.find(m => m.id === id);
             const currentQty = cart[id] || 0;
             const newQty = currentQty + delta;
-            
-            // 재고 정보가 아직 안 왔으면(로딩중) 999로 가정
             const stock = inventoryStatus[String(id)] ?? 999; 
 
             if (newQty < 0) return;
@@ -323,6 +320,7 @@
             cartBar.style.display = total > 0 ? 'flex' : 'none';
         }
 
+        // [주문하기] 트랜잭션 오류 수정됨 (읽기 전체 완료 후 쓰기 실행)
         window.sendOrder = async () => {
             if(!checkTableNumber()) return; 
             const tableNo = document.getElementById('tableNo').value;
@@ -335,7 +333,9 @@
                 try {
                     await runTransaction(db, async (transaction) => {
                         const orderMenuNames = [];
+                        const updates = []; // 업데이트할 내용을 저장할 배열
 
+                        // 1단계: [읽기 전용] 모든 메뉴 재고 확인
                         for (const [id, qty] of Object.entries(cart)) {
                             const stockRef = doc(db, "inventory", String(id));
                             const stockDoc = await transaction.get(stockRef);
@@ -347,14 +347,22 @@
                             const currentStock = stockDoc.data().count;
                             const menuName = menus.find(m => m.id == id).name;
 
+                            // 재고 검사
                             if (currentStock < qty) {
                                 throw `[${menuName}] 재고 부족! (남은 수량: ${currentStock}개)`;
                             }
 
-                            transaction.update(stockRef, { count: currentStock - qty });
+                            // 차감 내용 예약 (아직 쓰지 않음)
+                            updates.push({ ref: stockRef, newCount: currentStock - qty });
                             orderMenuNames.push(`${menuName} x${qty}`);
                         }
 
+                        // 2단계: [쓰기 전용] 실제 차감 실행
+                        updates.forEach(item => {
+                            transaction.update(item.ref, { count: item.newCount });
+                        });
+
+                        // 주문서 생성
                         const newOrderRef = doc(collection(db, "orders"));
                         transaction.set(newOrderRef, {
                             table: tableNo,
