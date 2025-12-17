@@ -22,16 +22,32 @@
         }
         h1 span { font-size: 18px; color: #aaa; display: block; margin-top: 5px; }
 
-        /* 소리 켜기 버튼 스타일 */
-        #soundToggle {
-            display: block; margin: 0 auto 20px auto;
-            background: #444; color: #fff; border: 1px solid #666;
-            padding: 8px 16px; border-radius: 20px; cursor: pointer;
-            font-family: 'Jua', sans-serif; font-size: 14px;
+        /* 🔥 [변경] 시작 오버레이 (전체 화면 덮기) */
+        #startOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
         }
-        #soundToggle.active { background: var(--accent-pink); border-color: var(--accent-pink); color: #222; font-weight: bold; }
+        
+        /* 😜 클릭 버튼 스타일 */
+        .start-btn {
+            font-family: 'Jua', sans-serif;
+            font-size: 40px; color: white;
+            background: var(--strong-pink);
+            border: 4px solid var(--accent-pink);
+            padding: 30px 60px; border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(255, 128, 171, 0.6);
+            animation: bounce 1s infinite alternate;
+        }
+        .start-btn:active { transform: scale(0.95); }
+        .start-msg { margin-top: 20px; font-size: 20px; color: #ddd; }
 
-        /* 그리드 레이아웃: 모바일 1열, PC/태블릿 2열 이상 */
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+        /* 그리드 레이아웃 */
         #orderList { 
             display: grid; 
             grid-template-columns: 1fr; 
@@ -52,14 +68,13 @@
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* 🚨 호출 카드 (강조 효과) */
+        /* 🚨 호출 카드 */
         .order-card.urgent {
             border: 4px solid #ff3d00; background: #fffde7;
             animation: pulseCard 0.8s infinite alternate;
         }
         @keyframes pulseCard { from { box-shadow: 0 0 10px #ff3d00; } to { box-shadow: 0 0 25px #ff3d00; } }
 
-        /* 카드 헤더 */
         .card-header { 
             background: #fff0f5; padding: 12px 15px; 
             display: flex; justify-content: space-between; align-items: center; 
@@ -68,7 +83,6 @@
         .table-num { font-size: 22px; color: var(--strong-pink); font-weight: bold; }
         .order-time { font-size: 14px; color: #777; background: #fff; padding: 4px 8px; border-radius: 8px; border: 1px solid #ddd; }
 
-        /* 메뉴 리스트 */
         .menu-list { 
             padding: 15px; flex-grow: 1; 
             display: flex; flex-direction: column; gap: 8px; 
@@ -79,32 +93,32 @@
             word-break: keep-all; 
         }
 
-        /* 요청사항 메모 표시 */
         .note-box { 
             background: #fff9c4; color: #555; padding: 10px; margin: 0 15px 15px 15px; 
             border-radius: 8px; font-size: 14px; border: 1px dashed #fbc02d; 
         }
         .note-box::before { content: "📢 요청: "; font-weight: bold; color: #f57f17; }
 
-        /* 완료 버튼 */
         .btn-done { 
             background: var(--strong-pink); color: white; border: none; 
             padding: 15px; cursor: pointer; font-size: 18px; 
             font-family: 'Jua', sans-serif; width: 100%; 
         }
-        .btn-done:active { background: #ad1457; }
-        
         .btn-done.call-btn { background: #ff9800; }
         
         .empty-message { text-align: center; padding: 60px 20px; color: #666; font-size: 18px; background: rgba(255,255,255,0.1); border-radius: 15px; border: 2px dashed #444; }
     </style>
 </head>
 <body>
-    <h1>🔥 KITCHEN <span>주문 현황판</span></h1>
     
-    <!-- 🔊 소리 재생용 오디오 태그 및 버튼 -->
+    <!-- 🔥 [변경] 전체 화면 클릭 유도 오버레이 -->
+    <div id="startOverlay">
+        <button class="start-btn" onclick="startKitchen()">클릭💗</button>
+        <div class="start-msg">주방을 시작하려면 눌러주세요!</div>
+    </div>
+
+    <h1>🔥 KITCHEN <span>주문 현황판</span></h1>
     <audio id="alertSound" src="effect.mp3" preload="auto"></audio>
-    <button id="soundToggle" onclick="toggleSound()">🔇 소리 켜기 (Click)</button>
 
     <div id="orderList"></div>
 
@@ -127,35 +141,28 @@
         const orderList = document.getElementById('orderList');
         const q = query(collection(db, "orders"), orderBy("time", "asc"));
 
-        // 🎵 소리 관련 변수 및 함수
-        let isSoundEnabled = false;
-        let isFirstLoad = true; // 첫 로딩 시 소리 방지용 플래그
+        let isSoundReady = false; // 클릭했는지 확인하는 변수
+        let isFirstLoad = true;
         const audio = document.getElementById('alertSound');
-        const soundBtn = document.getElementById('soundToggle');
 
-        window.toggleSound = () => {
-            if (!isSoundEnabled) {
-                // 브라우저 정책상 사용자 인터랙션 후 play() 해야 함
-                audio.play().then(() => {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    isSoundEnabled = true;
-                    soundBtn.innerText = "🔊 소리 켜짐 (주문 시 알림)";
-                    soundBtn.classList.add('active');
-                }).catch(e => alert("소리 재생 권한이 필요합니다."));
-            } else {
-                isSoundEnabled = false;
-                soundBtn.innerText = "🔇 소리 켜기 (Click)";
-                soundBtn.classList.remove('active');
-            }
+        // 🔥 [변경] "클릭😜" 버튼 누르면 실행되는 함수
+        window.startKitchen = () => {
+            // 1. 빈 소리를 한번 재생해서 브라우저 권한을 뚫음
+            audio.play().then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+            }).catch(e => console.log("오디오 권한 필요"));
+
+            // 2. 오버레이 숨기기
+            document.getElementById('startOverlay').style.display = 'none';
+            isSoundReady = true; // 이제 소리 낼 준비 완료
         };
         
         onSnapshot(q, (snapshot) => {
-            // 🔥 새로운 주문 감지 및 소리 재생 로직
-            if (!isFirstLoad && isSoundEnabled) {
+            // 🔥 [변경] '클릭'을 한 상태여야만 소리가 남
+            if (!isFirstLoad && isSoundReady) {
                 snapshot.docChanges().forEach((change) => {
                     if (change.type === "added") {
-                        // 새 주문(added)이 들어오면 소리 재생
                         audio.currentTime = 0;
                         audio.play().catch(e => console.log('재생 실패:', e));
                     }
@@ -182,7 +189,6 @@
                 let cardContent = '';
                 
                 if (data.type === 'call') {
-                    // [호출] 디자인
                     cardContent = `
                         <div class="order-card urgent">
                             <div class="card-header">
@@ -196,7 +202,6 @@
                         </div>
                     `;
                 } else {
-                    // [일반 주문] 디자인
                     const menuHtml = data.menu ? data.menu.map(m => `<div class="menu-item">${m}</div>`).join('') : '';
                     const noteHtml = data.note ? `<div class="note-box">${data.note}</div>` : '';
 
@@ -214,8 +219,6 @@
                 }
                 orderList.innerHTML += cardContent;
             });
-
-            // 첫 데이터 로드가 끝났음을 표시
             isFirstLoad = false;
         });
 
