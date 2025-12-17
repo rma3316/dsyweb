@@ -121,6 +121,10 @@
             background: linear-gradient(135deg, #ff80ab, #d81b60); color: white; border: none; padding: 12px 24px; 
             font-family: 'Jua', sans-serif; font-size: 18px; border-radius: 20px; cursor: pointer; flex-shrink: 0;
             box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
+            transition: background 0.3s;
+        }
+        #orderBtn:disabled {
+            background: #ccc; cursor: not-allowed; box-shadow: none;
         }
     </style>
 </head>
@@ -166,7 +170,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 메뉴 ID 정의
+        // 🔥 [설정] 주문 제한 시간 (밀리초 단위): 10초 = 10000
+        const ORDER_COOLDOWN = 10000;
+
         const menus = [
             { id: 1, name: "초코파이를 고백용으로 쓰지 말아주세요 제발 😢", limit: 2 },
             { id: 2, name: "주인님 오늘은 레몬땅의 축복을! 메지컬 에.이.드. 🍋", limit: 2 },
@@ -177,9 +183,8 @@
         ];
 
         let cart = {}; 
-        let inventoryStatus = {}; // 실시간 재고 정보
+        let inventoryStatus = {};
 
-        // [초기화]
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const tableParam = urlParams.get('table');
@@ -195,25 +200,19 @@
                 }
             }
             
-            // 1. 화면 그리기
             renderMenu();
+            changeCount(5, 1); // 룰렛 기본 1개
 
-            // 🔥 룰렛(id:5) 기본 1개 담기
-            changeCount(5, 1);
-
-            // 2. 실시간 재고 감시
             onSnapshot(collection(db, "inventory"), (snapshot) => {
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     const menuId = docSnap.id;
-                    
                     inventoryStatus[menuId] = data.count; 
                     updateStockUI(menuId, data.count);
                 });
             });
         };
 
-        // 재고 상태 UI 업데이트
         function updateStockUI(id, count) {
             const statusEl = document.getElementById(`stock-msg-${id}`);
             const itemEl = document.getElementById(`menu-item-${id}`);
@@ -223,8 +222,6 @@
             if(count <= 0) {
                 statusEl.innerHTML = "<span style='color:red; font-weight:bold;'>⛔ 품절 (Sold Out)</span>";
                 itemEl.classList.add('sold-out');
-                
-                // 품절 시 카트에서 제거
                 if(cart[id]) {
                     delete cart[id];
                     document.getElementById(`cnt-${id}`).innerText = 0;
@@ -258,6 +255,14 @@
             if(!checkTableNumber()) return;
             const tableNo = document.getElementById('tableNo').value;
 
+            // 호출 쿨타임 (간단하게 5초)
+            const lastCallKey = 'lastCallTime';
+            const lastCall = localStorage.getItem(lastCallKey);
+            if(lastCall && (Date.now() - parseInt(lastCall) < 5000)) {
+                 alert("메이드님이 달려오고 있어요! 잠시만 기다려주세요 🏃‍♀️");
+                 return;
+            }
+
             if(confirm(`[Table ${tableNo}] 메이드를 호출하시겠습니까? 🔔`)) {
                 try {
                     await addDoc(collection(db, "orders"), {
@@ -266,6 +271,7 @@
                         status: "호출",
                         time: serverTimestamp()
                     });
+                    localStorage.setItem(lastCallKey, Date.now());
                     alert("메이드님이 곧 달려갑니다! 🏃‍♀️💨");
                 } catch(e) { alert("오류: " + e.message); }
             }
@@ -320,49 +326,63 @@
             cartBar.style.display = total > 0 ? 'flex' : 'none';
         }
 
-        // [주문하기] 트랜잭션 오류 수정됨 (읽기 전체 완료 후 쓰기 실행)
+        // ===========================================
+        // 🔥 수정된 부분: 쿨타임 및 버튼 중복 방지 로직
+        // ===========================================
         window.sendOrder = async () => {
             if(!checkTableNumber()) return; 
             const tableNo = document.getElementById('tableNo').value;
             const note = document.getElementById('requestNote').value; 
             const total = Object.values(cart).reduce((a, b) => a + b, 0);
+            const orderBtn = document.getElementById('orderBtn'); // 버튼 제어용
 
             if(total === 0) return alert("메뉴를 선택해주세요! ❤️");
 
+            // 1. [쿨타임 체크] 10초 이내 재주문 방지
+            const lastOrderTime = localStorage.getItem('lastOrderTime');
+            if (lastOrderTime) {
+                const elapsed = Date.now() - parseInt(lastOrderTime);
+                if (elapsed < ORDER_COOLDOWN) {
+                    const remainSec = Math.ceil((ORDER_COOLDOWN - elapsed) / 1000);
+                    alert(`주인님! 주문이 너무 빨라요 💦\n${remainSec}초 뒤에 다시 주문해주세요 ❤️`);
+                    return;
+                }
+            }
+
             if(confirm(`주문하시겠습니까? (재고가 즉시 차감됩니다) ❤️`)) {
+                
+                // 2. [버튼 잠금] 누르자마자 비활성화
+                orderBtn.disabled = true;
+                orderBtn.innerText = "⏳ 처리중...";
+
                 try {
                     await runTransaction(db, async (transaction) => {
                         const orderMenuNames = [];
-                        const updates = []; // 업데이트할 내용을 저장할 배열
+                        const updates = []; 
 
-                        // 1단계: [읽기 전용] 모든 메뉴 재고 확인
+                        // 재고 확인 단계
                         for (const [id, qty] of Object.entries(cart)) {
                             const stockRef = doc(db, "inventory", String(id));
                             const stockDoc = await transaction.get(stockRef);
 
-                            if (!stockDoc.exists()) {
-                                throw "오류: 해당 메뉴의 재고 데이터가 없습니다.";
-                            }
+                            if (!stockDoc.exists()) throw "오류: 해당 메뉴의 데이터가 없습니다.";
 
                             const currentStock = stockDoc.data().count;
                             const menuName = menus.find(m => m.id == id).name;
 
-                            // 재고 검사
                             if (currentStock < qty) {
                                 throw `[${menuName}] 재고 부족! (남은 수량: ${currentStock}개)`;
                             }
 
-                            // 차감 내용 예약 (아직 쓰지 않음)
                             updates.push({ ref: stockRef, newCount: currentStock - qty });
                             orderMenuNames.push(`${menuName} x${qty}`);
                         }
 
-                        // 2단계: [쓰기 전용] 실제 차감 실행
+                        // 업데이트 실행
                         updates.forEach(item => {
                             transaction.update(item.ref, { count: item.newCount });
                         });
 
-                        // 주문서 생성
                         const newOrderRef = doc(collection(db, "orders"));
                         transaction.set(newOrderRef, {
                             table: tableNo,
@@ -374,6 +394,9 @@
                         });
                     });
 
+                    // 3. 성공 시 시간 기록 (쿨타임 시작)
+                    localStorage.setItem('lastOrderTime', Date.now());
+
                     alert("주문 접수 완료! 맛있게 만들어드릴게요 ❤️");
                     location.reload(); 
 
@@ -381,6 +404,10 @@
                     console.error(e);
                     const msg = typeof e === 'object' ? e.message : e;
                     alert("주문 실패 😢: " + msg);
+                    
+                    // 실패 시 버튼 원상복구
+                    orderBtn.disabled = false;
+                    orderBtn.innerText = "주문하기 ❤️";
                 }
             }
         }
