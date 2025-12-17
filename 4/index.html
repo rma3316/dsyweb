@@ -11,10 +11,15 @@
 
         body { 
             font-family: 'Jua', sans-serif; 
-            padding: 15px; background-color: var(--bg-dark); 
-            color: white; margin: 0; 
-            padding-bottom: 50px;
-        }
+            background-color: #222;
+            /* 사선 줄무늬 패턴 */
+            background-image: repeating-linear-gradient(
+                45deg,
+                #222,
+                #222 10px,
+                #2d2024 10px, /* 아주 은은한 붉은 톤 */
+                #2d2024 20px
+            );
 
         h1 { 
             text-align: center; color: var(--accent-pink); 
