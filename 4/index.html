@@ -22,6 +22,15 @@
         }
         h1 span { font-size: 18px; color: #aaa; display: block; margin-top: 5px; }
 
+        /* 소리 켜기 버튼 스타일 */
+        #soundToggle {
+            display: block; margin: 0 auto 20px auto;
+            background: #444; color: #fff; border: 1px solid #666;
+            padding: 8px 16px; border-radius: 20px; cursor: pointer;
+            font-family: 'Jua', sans-serif; font-size: 14px;
+        }
+        #soundToggle.active { background: var(--accent-pink); border-color: var(--accent-pink); color: #222; font-weight: bold; }
+
         /* 그리드 레이아웃: 모바일 1열, PC/태블릿 2열 이상 */
         #orderList { 
             display: grid; 
@@ -59,7 +68,7 @@
         .table-num { font-size: 22px; color: var(--strong-pink); font-weight: bold; }
         .order-time { font-size: 14px; color: #777; background: #fff; padding: 4px 8px; border-radius: 8px; border: 1px solid #ddd; }
 
-        /* 메뉴 리스트 박스형 디자인 (한 줄에 하나씩) */
+        /* 메뉴 리스트 */
         .menu-list { 
             padding: 15px; flex-grow: 1; 
             display: flex; flex-direction: column; gap: 8px; 
@@ -92,6 +101,11 @@
 </head>
 <body>
     <h1>🔥 KITCHEN <span>주문 현황판</span></h1>
+    
+    <!-- 🔊 소리 재생용 오디오 태그 및 버튼 -->
+    <audio id="alertSound" src="effect.mp3" preload="auto"></audio>
+    <button id="soundToggle" onclick="toggleSound()">🔇 소리 켜기 (Click)</button>
+
     <div id="orderList"></div>
 
     <script type="module">
@@ -112,11 +126,46 @@
         const db = getFirestore(app);
         const orderList = document.getElementById('orderList');
         const q = query(collection(db, "orders"), orderBy("time", "asc"));
+
+        // 🎵 소리 관련 변수 및 함수
+        let isSoundEnabled = false;
+        let isFirstLoad = true; // 첫 로딩 시 소리 방지용 플래그
+        const audio = document.getElementById('alertSound');
+        const soundBtn = document.getElementById('soundToggle');
+
+        window.toggleSound = () => {
+            if (!isSoundEnabled) {
+                // 브라우저 정책상 사용자 인터랙션 후 play() 해야 함
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    isSoundEnabled = true;
+                    soundBtn.innerText = "🔊 소리 켜짐 (주문 시 알림)";
+                    soundBtn.classList.add('active');
+                }).catch(e => alert("소리 재생 권한이 필요합니다."));
+            } else {
+                isSoundEnabled = false;
+                soundBtn.innerText = "🔇 소리 켜기 (Click)";
+                soundBtn.classList.remove('active');
+            }
+        };
         
         onSnapshot(q, (snapshot) => {
+            // 🔥 새로운 주문 감지 및 소리 재생 로직
+            if (!isFirstLoad && isSoundEnabled) {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        // 새 주문(added)이 들어오면 소리 재생
+                        audio.currentTime = 0;
+                        audio.play().catch(e => console.log('재생 실패:', e));
+                    }
+                });
+            }
+
             orderList.innerHTML = ""; 
             if(snapshot.empty) {
                 orderList.innerHTML = `<div class="empty-message">대기 중인 주문이 없습니다 💤</div>`;
+                isFirstLoad = false;
                 return;
             }
 
@@ -165,6 +214,9 @@
                 }
                 orderList.innerHTML += cardContent;
             });
+
+            // 첫 데이터 로드가 끝났음을 표시
+            isFirstLoad = false;
         });
 
         window.completeOrder = async (id, type) => {
