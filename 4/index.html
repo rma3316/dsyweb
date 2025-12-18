@@ -35,219 +35,8 @@
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             backdrop-filter: blur(5px);
+            transition: opacity 0.5s;
         }
-        
-        .start-btn {
-            font-family: 'Jua', sans-serif;
-            font-size: 40px; color: white;
-            background: var(--strong-pink);
-            border: 4px solid var(--accent-pink);
-            padding: 30px 60px; border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 0 30px rgba(255, 128, 171, 0.6);
-            animation: bounce 1s infinite alternate;
-        }
-        .start-btn:active { transform: scale(0.95); }
-        .start-msg { margin-top: 20px; font-size: 20px; color: #ddd; }
-
-        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
-
-        /* 그리드 레이아웃 */
-        #orderList { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-            max-width: 600px; margin: 0 auto; 
-        }
-        @media (min-width: 768px) {
-            #orderList { grid-template-columns: 1fr 1fr; max-width: 1000px; }
-        }
-
-        /* 주문 카드 */
-        .order-card { 
-            background: var(--card-bg); color: #333; border-radius: 12px; 
-            overflow: hidden; display: flex; flex-direction: column; 
-            border-top: 5px solid var(--accent-pink);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s ease-out;
-        }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* 🚨 호출 카드 */
-        .order-card.urgent {
-            border: 4px solid #ff3d00; background: #fffde7;
-            animation: pulseCard 0.8s infinite alternate;
-        }
-        @keyframes pulseCard { from { box-shadow: 0 0 10px #ff3d00; } to { box-shadow: 0 0 25px #ff3d00; } }
-
-        .card-header { 
-            background: #fff0f5; padding: 12px 15px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px dashed #ffc1e3; 
-        }
-        .table-num { font-size: 22px; color: var(--strong-pink); font-weight: bold; }
-        .order-time { font-size: 14px; color: #777; background: #fff; padding: 4px 8px; border-radius: 8px; border: 1px solid #ddd; }
-
-        .menu-list { 
-            padding: 15px; flex-grow: 1; 
-            display: flex; flex-direction: column; gap: 8px; 
-        }
-        .menu-item { 
-            background: #fdf2f7; padding: 10px; border-radius: 8px; 
-            font-size: 16px; line-height: 1.4; border-left: 4px solid var(--accent-pink); 
-            word-break: keep-all; 
-        }
-
-        .note-box { 
-            background: #fff9c4; color: #555; padding: 10px; margin: 0 15px 15px 15px; 
-            border-radius: 8px; font-size: 14px; border: 1px dashed #fbc02d; 
-        }
-        .note-box::before { content: "📢 요청: "; font-weight: bold; color: #f57f17; }
-
-        .btn-done { 
-            background: var(--strong-pink); color: white; border: none; 
-            padding: 15px; cursor: pointer; font-size: 18px; 
-            font-family: 'Jua', sans-serif; width: 100%; 
-        }
-        .btn-done.call-btn { background: #ff9800; }
-        
-        .empty-message { text-align: center; padding: 60px 20px; color: #666; font-size: 18px; background: rgba(255,255,255,0.1); border-radius: 15px; border: 2px dashed #444; }
-    </style>
-</head>
-<body>
-    
-    <div id="startOverlay">
-        <button class="start-btn" onclick="startKitchen()">클릭💗</button>
-        <div class="start-msg">주방을 시작하려면 눌러주세요!</div>
-    </div>
-
-    <h1>🔥 KITCHEN <span>주문 현황판</span></h1>
-    <!-- 오디오 태그 제거함 (JS에서 동적 생성) -->
-
-    <div id="orderList"></div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyC5lLY7p09aqglYrqYEF6hBBRxIOaB59Uk",
-            authDomain: "madecafe-85738.firebaseapp.com",
-            projectId: "madecafe-85738",
-            storageBucket: "madecafe-85738.firebasestorage.app",
-            messagingSenderId: "481793894590",
-            appId: "1:481793894590:web:00873d3f6285c87d6756ef",
-            measurementId: "G-HVE60ZL3XZ"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const orderList = document.getElementById('orderList');
-        const q = query(collection(db, "orders"), orderBy("time", "asc"));
-
-        let isSoundReady = false; 
-        let isFirstLoad = true;
-
-        // 🔥 [소리 재생 함수] : 호출시마다 새로운 Audio 객체 생성 -> 소리 겹침 가능
-        function playAlertSound(type) {
-            // 타입에 따라 다른 파일 선택
-            const soundFile = (type === 'call') ? 'made.mp3' : 'effect.mp3';
-            
-            const audio = new Audio(soundFile);
-            audio.volume = 1.0; 
-            audio.play().catch(e => console.log('사운드 재생 오류:', e));
-        }
-
-        // 🔥 [시작 버튼]
-        window.startKitchen = () => {
-            // 브라우저 권한 획득을 위해 두 파일 모두 한번씩 짧게 로드(음소거)
-            const dummy1 = new Audio('effect.mp3');
-            const dummy2 = new Audio('made.mp3');
-            
-            Promise.all([
-                dummy1.play().then(() => dummy1.pause()),
-                dummy2.play().then(() => dummy2.pause())
-            ]).catch(e => console.log("오디오 권한 획득 중(무시 가능)"));
-
-            // 오버레이 숨기기
-            document.getElementById('startOverlay').style.display = 'none';
-            isSoundReady = true; 
-        };
-        
-        onSnapshot(q, (snapshot) => {
-            // 🔥 새로운 주문/호출이 들어왔을 때 소리 재생
-            if (!isFirstLoad && isSoundReady) {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added") {
-                        // 데이터 확인하여 타입에 맞는 소리 재생
-                        const data = change.doc.data();
-                        playAlertSound(data.type);
-                    }
-                });
-            }
-
-            orderList.innerHTML = ""; 
-            if(snapshot.empty) {
-                orderList.innerHTML = `<div class="empty-message">대기 중인 주문이 없습니다 💤</div>`;
-                isFirstLoad = false;
-                return;
-            }
-
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                const id = docSnap.id;
-                
-                let timeString = "방금";
-                if(data.time) {
-                    const date = data.time.toDate();
-                    timeString = `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
-                }
-
-                let cardContent = '';
-                
-                if (data.type === 'call') {
-                    cardContent = `
-                        <div class="order-card urgent">
-                            <div class="card-header">
-                                <span class="table-num">🚨 Table ${data.table}</span>
-                                <span class="order-time">${timeString}</span>
-                            </div>
-                            <div class="menu-list" style="text-align:center; justify-content:center; font-size:20px; font-weight:bold;">
-                                🔔 메이드 호출!<br><span style="font-size:14px; color:#d84315;">(딩동~)</span>
-                            </div>
-                            <button class="btn-done call-btn" onclick="completeOrder('${id}', 'call')">호출 확인 (완료)</button>
-                        </div>
-                    `;
-                } else {
-                    const menuHtml = data.menu ? data.menu.map(m => `<div class="menu-item">${m}</div>`).join('') : '';
-                    const noteHtml = data.note ? `<div class="note-box">${data.note}</div>` : '';
-
-                    cardContent = `
-                        <div class="order-card">
-                            <div class="card-header">
-                                <span class="table-num">Table ${data.table}</span>
-                                <span class="order-time">${timeString}</span>
-                            </div>
-                            <div class="menu-list">${menuHtml}</div>
-                            ${noteHtml}
-                            <button class="btn-done" onclick="completeOrder('${id}', 'order')">조리 완료 ✅</button>
-                        </div>
-                    `;
-                }
-                orderList.innerHTML += cardContent;
-            });
-            isFirstLoad = false;
-        });
-
-        window.completeOrder = async (id, type) => {
-            const msg = type === 'call' ? "호출 건을 닫으시겠습니까?" : "주문을 완료 처리하시겠습니까?";
-            if(confirm(msg)) {
-                await deleteDoc(doc(db, "orders", id));
-            }
-        }
-    </script>
-</body>
-</html>        }
         
         /* 😜 클릭 버튼 스타일 */
         .start-btn {
@@ -329,21 +118,20 @@
 </head>
 <body>
     
-    <!-- 🔥 [변경] 전체 화면 클릭 유도 오버레이 -->
+    <!-- 🔥 onclick 제거함 (안전하게 JS로 제어) -->
     <div id="startOverlay">
-        <button class="start-btn" onclick="startKitchen()">클릭💗</button>
+        <button id="startBtn" class="start-btn">클릭💗</button>
         <div class="start-msg">주방을 시작하려면 눌러주세요!</div>
     </div>
 
     <h1>🔥 KITCHEN <span>주문 현황판</span></h1>
-    <audio id="alertSound" src="effect.mp3" preload="auto"></audio>
-
     <div id="orderList"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // 🔥 파이어베이스 설정
         const firebaseConfig = {
             apiKey: "AIzaSyC5lLY7p09aqglYrqYEF6hBBRxIOaB59Uk",
             authDomain: "madecafe-85738.firebaseapp.com",
@@ -356,33 +144,60 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
         const orderList = document.getElementById('orderList');
-        const q = query(collection(db, "orders"), orderBy("time", "asc"));
-
-        let isSoundReady = false; // 클릭했는지 확인하는 변수
+        const overlay = document.getElementById('startOverlay');
+        const startBtn = document.getElementById('startBtn');
+        
+        let isSoundReady = false; 
         let isFirstLoad = true;
-        const audio = document.getElementById('alertSound');
 
-        // 🔥 [변경] "클릭😜" 버튼 누르면 실행되는 함수
-        window.startKitchen = () => {
-            // 1. 빈 소리를 한번 재생해서 브라우저 권한을 뚫음
-            audio.play().then(() => {
-                audio.pause();
-                audio.currentTime = 0;
-            }).catch(e => console.log("오디오 권한 필요"));
+        // 🔥 [소리 재생 함수]
+        function playAlertSound(type) {
+            const soundFile = (type === 'call') ? 'made.mp3' : 'effect.mp3';
+            try {
+                const audio = new Audio(soundFile);
+                audio.volume = 1.0; 
+                audio.play().catch(e => console.log('소리 재생 실패 (브라우저 정책):', e));
+            } catch (err) {
+                console.log("오디오 객체 생성 오류:", err);
+            }
+        }
 
-            // 2. 오버레이 숨기기
-            document.getElementById('startOverlay').style.display = 'none';
-            isSoundReady = true; // 이제 소리 낼 준비 완료
-        };
+        // 🔥 [시작 버튼 클릭 이벤트]
+        // onclick="" 대신 여기서 직접 연결하여 더 안정적으로 동작함
+        if (startBtn) {
+            startBtn.addEventListener('click', () => {
+                console.log("시작 버튼 클릭됨!");
+
+                // 1. 소리 권한 뚫기 시도 (실패해도 상관없음)
+                try {
+                    const dummy1 = new Audio('effect.mp3');
+                    const dummy2 = new Audio('made.mp3');
+                    dummy1.play().then(() => dummy1.pause()).catch(() => {});
+                    dummy2.play().then(() => dummy2.pause()).catch(() => {});
+                } catch(e) {
+                    console.log("오디오 파일이 없거나 오류 발생 (무시하고 진행)");
+                }
+
+                // 2. 화면 넘기기 (무조건 실행)
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 500);
+                
+                isSoundReady = true; 
+            });
+        }
+
+        // 🔥 [실시간 주문 감지]
+        const q = query(collection(db, "orders"), orderBy("time", "asc"));
         
         onSnapshot(q, (snapshot) => {
-            // 🔥 [변경] '클릭'을 한 상태여야만 소리가 남
             if (!isFirstLoad && isSoundReady) {
                 snapshot.docChanges().forEach((change) => {
                     if (change.type === "added") {
-                        audio.currentTime = 0;
-                        audio.play().catch(e => console.log('재생 실패:', e));
+                        playAlertSound(change.doc.data().type);
                     }
                 });
             }
@@ -416,7 +231,7 @@
                             <div class="menu-list" style="text-align:center; justify-content:center; font-size:20px; font-weight:bold;">
                                 🔔 메이드 호출!<br><span style="font-size:14px; color:#d84315;">(딩동~)</span>
                             </div>
-                            <button class="btn-done call-btn" onclick="completeOrder('${id}', 'call')">호출 확인 (완료)</button>
+                            <button class="btn-done call-btn" id="btn-${id}">호출 확인 (완료)</button>
                         </div>
                     `;
                 } else {
@@ -431,16 +246,25 @@
                             </div>
                             <div class="menu-list">${menuHtml}</div>
                             ${noteHtml}
-                            <button class="btn-done" onclick="completeOrder('${id}', 'order')">조리 완료 ✅</button>
+                            <button class="btn-done" id="btn-${id}">조리 완료 ✅</button>
                         </div>
                     `;
                 }
-                orderList.innerHTML += cardContent;
+                orderList.insertAdjacentHTML('beforeend', cardContent);
+
+                // 버튼에 이벤트 리스너 직접 연결 (onclick 문제 방지)
+                setTimeout(() => {
+                    const btn = document.getElementById(`btn-${id}`);
+                    if(btn) {
+                        btn.addEventListener('click', () => completeOrder(id, data.type));
+                    }
+                }, 0);
             });
             isFirstLoad = false;
         });
 
-        window.completeOrder = async (id, type) => {
+        // 🔥 [주문 완료 처리 함수]
+        async function completeOrder(id, type) {
             const msg = type === 'call' ? "호출 건을 닫으시겠습니까?" : "주문을 완료 처리하시겠습니까?";
             if(confirm(msg)) {
                 await deleteDoc(doc(db, "orders", id));
