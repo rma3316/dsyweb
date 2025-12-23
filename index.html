@@ -374,17 +374,27 @@
             </button>
             <div class="accordion-body">
                 <div class="grid">
+                    <!-- Rustdesk 카드 -->
                     <div class="card">
                         <div class="card-header"><div class="icon-box"><i class="fa-solid fa-desktop"></i></div><h2>Rustdesk</h2></div>
                         <p>팀뷰어를 대체하는 오픈소스 원격 제어 솔루션</p>
                         <div class="btn-wrapper"><a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="download-btn">다운로드</a></div>
                     </div>
-                    <div class="card">
-                        <div class="card-header"><div class="icon-box"><i class="fa-solid fa-key"></i></div><h2>인증 도구</h2></div>
-                        <p>시스템 정품 인증 및 관리 유틸리티</p>
+                    
+                    <!-- 인증 도구 카드 (공사중 버전) -->
+                    <div class="card" style="opacity: 0.8;">
+                        <div class="card-header">
+                            <div class="icon-box" style="background: rgba(255,255,255,0.05);">
+                                <i class="fa-solid fa-person-digging"></i>
+                            </div>
+                            <h2>인증 도구 (공사중)</h2>
+                        </div>
+                        <p>더 안전한 도구 제공을 위해 현재 시스템 점검 및 업데이트 진행 중입니다.</p>
                         <div class="btn-wrapper">
-                            <div class="password-badge" onclick="copyPassword('dsy')"><span><i class="fa-solid fa-lock"></i> dsy</span> <i class="fa-regular fa-copy"></i></div>
-                            <a href="https://github.com/rma3316/dsyweb/raw/main/Activate.zip" download class="download-btn github-btn">Activate.zip</a>
+                            <!-- 기존 비밀번호 배지는 제거하고 버튼을 비활성화 스타일로 변경 -->
+                            <a href="javascript:void(0)" class="download-btn" style="background: #4b5563; cursor: not-allowed; transform: none; box-shadow: none;">
+                                <i class="fa-solid fa-wrench"></i> 업데이트 중
+                            </a>
                         </div>
                     </div>
                 </div>
