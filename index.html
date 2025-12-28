@@ -3,564 +3,546 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>다소리 크리스마스 센터</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>Dasory Download Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            /* === [크리스마스 테마 변수] === */
-            --primary-bg: #0f172a;
-            --text-main: #fefefe;
-            --text-sub: #cbd5e1;
+            /* 컬러 팔레트: Deep Space & Neon Accent */
+            --bg-dark: #020617;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
             
-            /* 배경: 깊은 밤하늘 + 붉은 기운 */
-            --theme-bg-gradient: radial-gradient(circle at 50% 0%, #2b0c0c 0%, #1e1b4b 50%, #020617 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
             
-            --card-glass: rgba(255, 255, 255, 0.08);
-            --card-border: rgba(255, 255, 255, 0.15);
-            --accent-gradient: linear-gradient(135deg, #ef4444 0%, #10b981 100%);
+            --accent-primary: #3b82f6; /* Blue */
+            --accent-secondary: #8b5cf6; /* Purple */
+            --accent-glow: rgba(59, 130, 246, 0.6);
             
-            --christmas-red: #ef4444;
-            --christmas-green: #10b981;
-            --christmas-gold: #fbbf24;
-            
-            --accord-bg: rgba(40, 10, 10, 0.3);
-            --accord-active-icon: #fbbf24;
-            --icon-bg-hover: #ef4444;
-            --glow-color: rgba(239, 68, 68, 0.6);
-        }
-
-        /* === [옵션: 일반(Standard) 모드] === */
-        body.standard-mode {
-            --theme-bg-gradient: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
-            --card-glass: rgba(30, 41, 59, 0.65);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            --accord-bg: rgba(30, 41, 59, 0.4);
-            --accord-active-icon: #60a5fa;
-            --icon-bg-hover: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            --christmas-gold: #94a3b8; 
-            --christmas-green: #60a5fa;
-            --christmas-red: #3b82f6;
+            --gradient-text: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            --gradient-btn: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Pretendard', sans-serif;
-            background-color: var(--primary-bg);
+            background-color: var(--bg-dark);
             color: var(--text-main);
             display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding: 0 20px 40px 20px;
-            background: var(--theme-bg-gradient);
-            background-attachment: fixed;
-            background-size: 400% 400%;
-            transition: background 0.5s ease;
-            word-break: keep-all; overflow-x: hidden;
+            min-height: 100vh;
+            padding: 0 20px 60px 20px;
+            overflow-x: hidden;
+            word-break: keep-all;
         }
 
-        body.standard-mode { animation: gradientBG 15s ease infinite; }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        /* 눈 효과 */
-        .snowflake {
-            position: fixed; top: -10px; color: #fff; font-size: 1em; text-shadow: 0 0 5px #000;
-            z-index: 0; pointer-events: none; animation: fall linear infinite;
+        /* --- 배경 애니메이션 (Moving Orbs) --- */
+        .ambient-light {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden; pointer-events: none;
         }
-        @keyframes fall { to { transform: translateY(100vh); } }
-
-        /* 네비게이션 */
-        nav { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; padding: 20px 0; z-index: 10; }
-        .nav-right { display: flex; gap: 10px; align-items: center; }
-        
-        .santa-logo-btn { font-size: 1.5rem; color: #fff; text-decoration: none; transition: transform 0.3s; filter: drop-shadow(0 0 10px rgba(255,0,0,0.5)); }
-        .santa-logo-btn:hover { transform: scale(1.1) rotate(-5deg); }
-        .santa-logo-btn i { color: #ef4444; }
-
-        .theme-toggle-btn, .staff-btn {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid var(--card-border);
-            color: var(--text-main); padding: 8px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s;
+        .orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.4;
+            animation: floatOrb 20s infinite ease-in-out alternate;
         }
-        .staff-btn { border-color: var(--christmas-gold); color: var(--christmas-gold); display: flex; gap: 8px; align-items: center;}
-        .staff-btn:hover { background: var(--christmas-gold); color: #000; font-weight: bold; }
-        .theme-toggle-btn:hover { background: rgba(255,255,255,0.2); }
+        .orb-1 { width: 400px; height: 400px; background: #1e3a8a; top: -100px; left: -100px; animation-delay: 0s; }
+        .orb-2 { width: 300px; height: 300px; background: #581c87; bottom: -50px; right: -50px; animation-delay: -5s; }
+        .orb-3 { width: 200px; height: 200px; background: #0f766e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.2; }
 
-        .container { width: 100%; max-width: 800px; position: relative; z-index: 1; }
-
-        /* 🎄 크리스마스 히어로 섹션 */
-        .christmas-hero {
-            text-align: center; background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px;
-            padding: 40px 20px; margin-bottom: 40px; margin-top: 20px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.3); backdrop-filter: blur(10px);
-            animation: fadeInDown 1s ease-out; position: relative; overflow: hidden;
-        }
-        
-        .christmas-hero::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
-            background: linear-gradient(90deg, #ef4444 0%, #10b981 25%, #fbbf24 50%, #10b981 75%, #ef4444 100%);
-            opacity: 0.7;
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
         }
 
-        /* ⭐ [수정] 페페 이미지 박스: 다시 네모(둥근 모서리)로 변경 */
-        .pepe-img-box {
-            width: 150px; height: 150px; margin: 0 auto 20px auto;
-            border-radius: 25px; /* 원형(50%)에서 둥근 네모로 변경 */
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-            border: 3px solid rgba(255,255,255,0.1); transition: transform 0.3s;
+        /* --- 네비게이션 --- */
+        nav {
+            width: 100%; max-width: 900px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 30px 0; margin-bottom: 20px; z-index: 10;
         }
-        .pepe-img-box:hover { transform: scale(1.05) rotate(2deg); }
-        .pepe-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
-        .christmas-title { font-size: 1.3rem; font-weight: 600; color: var(--christmas-gold); margin-bottom: 15px; letter-spacing: 1px;}
-
-        /* 카운트다운 스타일 */
-        .countdown-container {
-            display: flex; justify-content: center; gap: 15px; margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        .countdown-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .gift-btn {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
             border-radius: 12px;
-            padding: 10px 15px;
-            min-width: 70px;
-            text-align: center;
+            color: #f472b6; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
         }
-        .count-num {
-            display: block; font-size: 2rem; font-weight: 800;
-            background: linear-gradient(to bottom, #fff, #cbd5e1);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            font-variant-numeric: tabular-nums;
+        .gift-btn::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at center, rgba(244,114,182,0.4) 0%, transparent 70%);
+            opacity: 0; transition: opacity 0.3s;
         }
-        .count-label {
-            display: block; font-size: 0.75rem; color: var(--christmas-red);
-            font-weight: bold; margin-top: 5px; text-transform: uppercase;
-        }
+        .gift-btn:hover { border-color: #f472b6; transform: rotate(-10deg) scale(1.05); color: #fff; box-shadow: 0 0 20px rgba(244, 114, 182, 0.3); }
+        .gift-btn:hover::before { opacity: 1; }
 
-        /* 🛠️ [수정] 아코디언 헤더 스타일 (아이콘 + 텍스트 정렬) */
-        .tool-title { text-align: left; margin-bottom: 20px; font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 8px;}
+        .staff-btn {
+            background: transparent; border: 1px solid var(--glass-border);
+            color: var(--text-muted); padding: 10px 20px;
+            border-radius: 30px; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .staff-btn:hover { background: var(--glass-highlight); color: #fff; border-color: rgba(255,255,255,0.3); }
 
-        .accordion-item { 
-            margin-bottom: 15px; 
-            border-radius: 16px; 
-            overflow: hidden; 
-            border: 1px solid var(--card-border); 
-            background: var(--accord-bg); 
-            transition: all 0.3s; 
+        /* --- 헤더 --- */
+        .container { width: 100%; max-width: 900px; position: relative; z-index: 1; }
+
+        header { text-align: center; margin: 40px 0 60px; animation: fadeIn 1s ease-out; }
+        
+        header h1 {
+            font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 15px;
+            background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.2));
         }
         
-        .accordion-header { 
-            width: 100%; 
-            padding: 20px 25px; 
-            background: rgba(255,255,255,0.03); 
-            display: flex; 
-            justify-content: space-between; /* 양 끝 정렬 */
-            align-items: center; 
-            cursor: pointer; 
-            border: none; 
-            outline: none; 
-            color: var(--text-main); 
-        }
-        
-        /* 아이콘과 텍스트를 감싸는 그룹 */
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 15px; /* 아이콘과 텍스트 사이 간격 */
-        }
-        
-        .header-content i {
-            font-size: 1.5rem; /* 아이콘 크기 키움 */
-            width: 30px;
-            text-align: center;
+        header p { 
+            color: var(--text-muted); font-size: 1.05rem; font-weight: 300; 
+            display: inline-block; padding: 5px 15px;
+            background: rgba(0,0,0,0.2); border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .header-content h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 0;
-            padding-top: 2px; /* 시각적 중앙 정렬 미세조정 */
+        /* --- 아코디언 (Glassmorphism 2.0) --- */
+        .accordion-item {
+            margin-bottom: 24px; border-radius: 24px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
         }
+        .accordion-item:hover { border-color: rgba(255,255,255,0.15); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.3); }
 
-        .accordion-header:hover { background: rgba(255, 255, 255, 0.08); }
+        .accordion-header {
+            width: 100%; padding: 28px 32px; background: transparent;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; border: none; outline: none; color: var(--text-main);
+        }
         
-        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease, opacity 0.5s ease; opacity: 0; background: rgba(0, 0, 0, 0.2); }
+        .header-content { display: flex; align-items: center; gap: 18px; }
+        .header-icon {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: rgba(255,255,255,0.05); color: #60a5fa;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; transition: 0.3s;
+        }
+        .accordion-header:hover .header-icon { background: var(--accent-primary); color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
+        .header-text h3 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; }
+        .header-text span { font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 4px; font-weight: 400; }
+
+        .accordion-toggle { color: var(--text-muted); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .accordion-header.active .accordion-toggle { transform: rotate(180deg); color: #fff; }
+
+        .accordion-body {
+            max-height: 0; opacity: 0; overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.4s ease;
+            background: rgba(0,0,0,0.2);
+        }
         .accordion-header.active + .accordion-body { opacity: 1; }
-        .accordion-header.active i.fa-chevron-down { transform: rotate(180deg); color: var(--accord-active-icon); }
 
-        /* 그리드 및 카드 */
+        /* --- 그리드 & 카드 --- */
         .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px; 
-            padding: 25px; 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; padding: 30px; 
         }
-        
-        .card { 
-            background: var(--card-glass); 
-            border-radius: 12px; 
-            padding: 25px 20px; 
-            border: 1px solid rgba(255,255,255,0.05); 
-            transition: transform 0.2s, background 0.3s; 
-            position: relative; 
+
+        .card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px; padding: 25px;
+            display: flex; flex-direction: column;
+            transition: all 0.3s ease; position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column; 
-            height: 100%; 
         }
-        
-        .card:hover { transform: translateY(-3px); border-color: var(--accord-active-icon); background: rgba(255,255,255,0.1); }
-        .card:hover::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--accent-gradient); }
-        
-        .card-header { display: flex; align-items: center; margin-bottom: 15px; }
-        .icon-box { margin-right: 12px; width: 40px; height: 40px; min-width: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 10px; transition: 0.3s; font-size: 1.1rem;}
-        .card:hover .icon-box { background: var(--icon-bg-hover); color: white; box-shadow: 0 0 10px var(--glow-color); }
-        .card h2 { font-size: 1.05rem; color: #fff; line-height: 1.2;}
-        
-        .card p { 
-            font-size: 0.9rem; 
-            color: var(--text-sub); 
-            margin-bottom: 20px; 
-            line-height: 1.5; 
-            flex-grow: 1; 
+        .card:hover { 
+            transform: translateY(-5px); 
+            background: rgba(255,255,255,0.05); 
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 15px 30px -5px rgba(0,0,0,0.4);
         }
-        
-        .btn-wrapper { margin-top: auto; width: 100%; }
-        
-        .download-btn { display: block; width: 100%; padding: 12px; text-align: center; background: var(--accent-gradient); color: white; border-radius: 8px; text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: transform 0.2s; }
-        .download-btn:hover { transform: scale(1.02); box-shadow: 0 0 15px var(--glow-color); }
-        
-        .password-badge { display: flex; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 15px; cursor: pointer; border: 1px solid transparent; color: #94a3b8; }
-        .password-badge:hover { border-color: var(--christmas-green); color: #fff; }
 
-        /* 로그인 모달 */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-overlay.show { display: flex; }
-        .login-box { background: #1e293b; padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); width: 320px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .login-box input { width: 100%; padding: 12px; margin-bottom: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; outline: none; }
-        .login-box input:focus { border-color: var(--christmas-gold); }
+        .card-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: rgba(255,255,255,0.05); color: #94a3b8;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; margin-bottom: 15px; transition: 0.3s;
+        }
+        .card:hover .card-icon { background: var(--gradient-btn); color: #fff; }
 
-        #toast { visibility: hidden; min-width: 250px; background-color: rgba(255, 255, 255, 0.9); color: #1e1b4b; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%); font-weight: bold; opacity: 0; transition: opacity 0.3s; }
-        #toast.show { visibility: visible; opacity: 1; }
+        .card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
+        .card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
+
+        /* 다운로드 버튼 */
+        .btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px; border-radius: 12px;
+            background: var(--gradient-btn); color: #fff;
+            text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            transition: 0.3s; border: none; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+        }
+        .btn:hover { filter: brightness(1.1); box-shadow: 0 0 25px var(--accent-glow); transform: scale(1.02); }
         
-        footer { margin-top: 60px; text-align: center; color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-outline {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-muted); box-shadow: none;
+        }
+        .btn-outline:hover { border-color: #fff; color: #fff; }
 
-        /* Staff 섹션 숨김 스타일 */
-        #staff-section { display: none; }
+        .password-badge {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+            padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;
+            color: var(--text-muted); display: flex; justify-content: space-between;
+            margin-bottom: 15px; cursor: pointer; transition: 0.2s;
+        }
+        .password-badge span { color: #f472b6; font-family: 'Courier New', monospace; font-weight: bold; }
+        .password-badge:hover { background: rgba(255,255,255,0.05); color: #fff; }
+
+        /* --- [공사중 카드 스타일] --- */
+        .card-construction {
+            opacity: 0.75;
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.01),
+                rgba(255, 255, 255, 0.01) 10px,
+                rgba(255, 255, 255, 0.03) 10px,
+                rgba(255, 255, 255, 0.03) 20px
+            );
+        }
+        .card-construction:hover { transform: none; box-shadow: none; border-color: var(--glass-border); }
+        .card-construction .card-icon { color: #64748b; background: rgba(255,255,255,0.03); }
+        .card-construction h2 { color: #94a3b8; }
+        .btn-disabled {
+            background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none;
+        }
+        .btn-disabled:hover { filter: none; transform: none; box-shadow: none; }
+
+        /* --- Staff 섹션 (Hidden) --- */
+        #staff-section { display: none; border-color: rgba(236, 72, 153, 0.3); }
+        #staff-section .header-icon { color: #ec4899; }
+        #staff-section .accordion-header:hover .header-icon { background: #ec4899; }
+        .staff-dl-btn { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); }
+
+        /* --- 모달 --- */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
+            z-index: 100; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .login-box {
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px; border-radius: 24px; width: 340px; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transform: scale(0.95); transition: transform 0.3s;
+        }
+        .modal-overlay.show .login-box { transform: scale(1); }
+        .login-box h2 { color: #fff; margin-bottom: 25px; font-size: 1.5rem; }
+        .input-group input {
+            width: 100%; padding: 14px; margin-bottom: 12px;
+            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+            border-radius: 12px; color: #fff; outline: none; transition: 0.3s;
+        }
+        .input-group input:focus { border-color: #60a5fa; background: rgba(0,0,0,0.5); }
+        .modal-close { margin-top: 20px; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; text-decoration: underline; }
+
+        /* Toast */
+        #toast {
+            visibility: hidden; min-width: 250px; background: rgba(255,255,255,0.9); color: #0f172a;
+            text-align: center; border-radius: 50px; padding: 16px 24px;
+            position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px);
+            font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        footer { margin-top: 80px; color: rgba(255,255,255,0.2); font-size: 0.85rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 600px) {
+            header h1 { font-size: 2.2rem; }
+            .grid { padding: 20px; }
+            .accordion-header { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="snow-container"></div>
+    <!-- 은은한 배경 오로라 -->
+    <div class="ambient-light">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
 
+    <!-- 네비게이션 -->
     <nav>
-        <a href="https://youtu.be/Sg31CeZlakM?si=PASrKIXHwbBNj6iI" target="_blank" class="santa-logo-btn" title="Click for Music!">
-            <i class="fa-solid fa-sleigh"></i>
+        <a href="#" target="_blank" class="gift-btn" title="Special Gift">
+            <i class="fa-solid fa-gift"></i>
         </a>
-        <div class="nav-right">
-            <button class="theme-toggle-btn" onclick="toggleTheme()">🎄 테마 끄기</button>
-            <button class="staff-btn" onclick="openModal()"><i class="fa-solid fa-lock"></i> Staff Only</button>
-        </div>
+        <button class="staff-btn" onclick="openModal()">
+            <i class="fa-solid fa-lock"></i> Staff Only
+        </button>
     </nav>
 
     <div class="container">
-        
-        <!-- 🎄 [1] 크리스마스 히어로 섹션 -->
-        <section class="christmas-hero">
-            <div class="pepe-img-box">
-                <!-- ⭐ pepe.jpg 이미지 -->
-                <img src="pepe.jpg" onerror="this.src='https://media1.tenor.com/m/h9Xo-de91J0AAAAC/pepe-christmas.gif'" alt="Christmas Pepe">
-            </div>
-            
-            <div class="christmas-title">Christmas is coming!</div>
-            
-            <!-- ✨ 카운트다운 (일 : 시 : 분 : 초) -->
-            <div class="countdown-container">
-                <div class="countdown-box">
-                    <span class="count-num" id="d-days">00</span>
-                    <span class="count-label">Days</span>
-                </div>
-                <div class="countdown-box">
-                    <span class="count-num" id="d-hours">00</span>
-                    <span class="count-label">Hours</span>
-                </div>
-                <div class="countdown-box">
-                    <span class="count-num" id="d-mins">00</span>
-                    <span class="count-label">Mins</span>
-                </div>
-                <div class="countdown-box">
-                    <span class="count-num" id="d-secs">00</span>
-                    <span class="count-label">Secs</span>
-                </div>
-            </div>
-        </section>
+        <header>
+            <h1>Dasory Download Center</h1>
+            <p>Premium Utilities for Efficiency</p>
+        </header>
 
-        <div style="height: 30px;"></div>
-
-        <!-- 🛠️ [2] 도구 섹션 -->
-        <div class="tool-title"><i class="fa-solid fa-list-check"></i> 다운로드 목록</div>
-
-        <!-- 아코디언 1: 시스템 -->
+        <!-- 1. 시스템 필수 도구 -->
         <div class="accordion-item">
-            <button class="accordion-header active">
-                <!-- ⭐ [수정] 아이콘 + 텍스트 정렬 -->
+            <div class="accordion-header active">
                 <div class="header-content">
-                    <i class="fa-solid fa-toolbox" style="color:var(--christmas-green)"></i>
-                    <h3>시스템 필수 도구</h3>
+                    <div class="header-icon"><i class="fa-solid fa-toolbox"></i></div>
+                    <div class="header-text">
+                        <h3>시스템 필수 도구</h3>
+                        <span>System Essentials</span>
+                    </div>
                 </div>
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
+                <i class="fa-solid fa-chevron-down accordion-toggle"></i>
+            </div>
             <div class="accordion-body" style="max-height: 2000px; opacity: 1;">
                 <div class="grid">
                     <div class="card">
-                        <div class="card-header"><div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div><h2>Everything</h2></div>
-                        <p>파일 이름을 입력하는 즉시 찾아주는 검색 도구</p>
-                        <div class="btn-wrapper"><a href="https://www.voidtools.com/downloads/" target="_blank" class="download-btn">다운로드</a></div>
+                        <div class="card-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <h2>Everything</h2>
+                        <p>답답한 윈도우 검색은 그만.<br>파일 이름을 입력하는 즉시 찾아줍니다.</p>
+                        <!-- 아이콘 추가 -->
+                        <a href="https://www.voidtools.com/downloads/" target="_blank" class="btn">
+                            <i class="fa-solid fa-up-right-from-square"></i> 다운로드 페이지
+                        </a>
                     </div>
                     <div class="card">
-                        <div class="card-header"><div class="icon-box"><i class="fa-solid fa-trash-can"></i></div><h2>Geek Uninstaller</h2></div>
-                        <p>프로그램 강제 제거 및 찌꺼기 정리</p>
-                        <div class="btn-wrapper"><a href="https://geekuninstaller.com/geek.zip" class="download-btn">다운로드</a></div>
+                        <div class="card-icon"><i class="fa-solid fa-trash-can"></i></div>
+                        <h2>Geek Uninstaller</h2>
+                        <p>삭제되지 않는 프로그램 강제 제거 및<br>레지스트리 찌꺼기 정리 도구.</p>
+                        <a href="https://geekuninstaller.com/geek.zip" class="btn">
+                            <i class="fa-solid fa-download"></i> 다운로드
+                        </a>
                     </div>
                     <div class="card">
-                        <div class="card-header"><div class="icon-box"><i class="fa-solid fa-cubes"></i></div><h2>Ninite</h2></div>
-                        <p>Chrome, Zoom 등 필수 프로그램 일괄 자동 설치</p>
-                        <div class="btn-wrapper"><a href="https://ninite.com/" target="_blank" class="download-btn">사이트 이동</a></div>
+                        <div class="card-icon"><i class="fa-solid fa-cubes"></i></div>
+                        <h2>Ninite</h2>
+                        <p>Chrome, Zoom 등 필수 프로그램들을<br>한 번에 자동으로 설치해줍니다.</p>
+                        <!-- 아이콘 추가 -->
+                        <a href="https://ninite.com/" target="_blank" class="btn btn-outline">
+                            <i class="fa-solid fa-up-right-from-square"></i> 사이트 이동
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 아코디언 2: 보안 -->
+        <!-- 2. 보안 및 최적화 -->
         <div class="accordion-item">
-            <button class="accordion-header">
+            <div class="accordion-header">
                 <div class="header-content">
-                    <i class="fa-solid fa-shield-halved" style="color:var(--christmas-green)"></i>
-                    <h3>보안 및 최적화</h3>
+                    <div class="header-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="header-text">
+                        <h3>보안 및 최적화</h3>
+                        <span>Security & Optimization</span>
+                    </div>
                 </div>
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
+                <i class="fa-solid fa-chevron-down accordion-toggle"></i>
+            </div>
             <div class="accordion-body">
                 <div class="grid">
                     <div class="card">
-                        <div class="card-header"><div class="icon-box"><i class="fa-solid fa-shield-virus"></i></div><h2>구라제거기</h2></div>
-                        <p>뱅킹 보안 프로그램 일괄 제거</p>
-                        <div class="btn-wrapper">
-                            <div class="password-badge" onclick="copyPassword('teus.me')"><span><i class="fa-solid fa-lock"></i> teus.me</span> <i class="fa-regular fa-copy"></i></div>
-                            <a href="https://teus.me/hoaxeliminator/HoaxEliminator7.45/" target="_blank" class="download-btn">다운로드</a>
+                        <div class="card-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                        <h2>구라제거기</h2>
+                        <p>PC를 느리게 하는 뱅킹 보안 프로그램을<br>한방에 제거하여 속도를 향상시킵니다.</p>
+                        <div class="password-badge" onclick="copyPassword('teus.me')">
+                            <i class="fa-solid fa-key"></i> <span>teus.me</span> <i class="fa-regular fa-copy"></i>
                         </div>
+                        <!-- 아이콘 추가 -->
+                        <a href="https://teus.me/hoaxeliminator/HoaxEliminator7.45/" target="_blank" class="btn">
+                            <i class="fa-solid fa-up-right-from-square"></i> 다운로드 페이지
+                        </a>
                     </div>
                     <div class="card">
-                        <div class="card-header"><div class="icon-box"><i class="fa-solid fa-bug-slash"></i></div><h2>Malware Zero</h2></div>
-                        <p>광고 프로그램 및 악성코드 박멸 도구</p>
-                        <div class="btn-wrapper"><a href="https://malzero.xyz/download" target="_blank" class="download-btn">사이트 이동</a></div>
+                        <div class="card-icon"><i class="fa-solid fa-bug-slash"></i></div>
+                        <h2>Malware Zero</h2>
+                        <p>악성코드, 애드웨어, 악성 광고 창을<br>강력하게 박멸하는 스크립트 도구.</p>
+                        <!-- 아이콘 추가 -->
+                        <a href="https://malzero.xyz/download" target="_blank" class="btn btn-outline">
+                            <i class="fa-solid fa-up-right-from-square"></i> 사이트 이동
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 아코디언 3: 원격 -->
+        <!-- 3. 원격 및 관리 -->
         <div class="accordion-item">
-            <button class="accordion-header">
+            <div class="accordion-header">
                 <div class="header-content">
-                    <i class="fa-solid fa-network-wired" style="color:var(--christmas-green)"></i>
-                    <h3>원격 및 관리</h3>
+                    <div class="header-icon"><i class="fa-solid fa-network-wired"></i></div>
+                    <div class="header-text">
+                        <h3>원격 및 관리</h3>
+                        <span>Remote & Management</span>
+                    </div>
                 </div>
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
+                <i class="fa-solid fa-chevron-down accordion-toggle"></i>
+            </div>
             <div class="accordion-body">
                 <div class="grid">
-                    <!-- Rustdesk 카드 -->
                     <div class="card">
-                        <div class="card-header"><div class="icon-box"><i class="fa-solid fa-desktop"></i></div><h2>Rustdesk</h2></div>
-                        <p>팀뷰어를 대체하는 오픈소스 원격 제어 솔루션</p>
-                        <div class="btn-wrapper"><a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="download-btn">다운로드</a></div>
+                        <div class="card-icon"><i class="fa-solid fa-desktop"></i></div>
+                        <h2>Rustdesk</h2>
+                        <p>TeamViewer를 대체할 빠르고 안전한<br>오픈소스 원격 제어 솔루션.</p>
+                        <a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="btn"><i class="fa-brands fa-github"></i> GitHub 다운로드</a>
                     </div>
                     
-                    <!-- 인증 도구 카드 (공사중 버전) -->
-                    <div class="card" style="opacity: 0.8;">
-                        <div class="card-header">
-                            <div class="icon-box" style="background: rgba(255,255,255,0.05);">
-                                <i class="fa-solid fa-person-digging"></i>
-                            </div>
-                            <h2>인증 도구 (공사중)</h2>
-                        </div>
-                        <p>더 안전한 도구 제공을 위해 현재 시스템 점검 및 업데이트 진행 중입니다.</p>
-                        <div class="btn-wrapper">
-                            <!-- 기존 비밀번호 배지는 제거하고 버튼을 비활성화 스타일로 변경 -->
-                            <a href="javascript:void(0)" class="download-btn" style="background: #4b5563; cursor: not-allowed; transform: none; box-shadow: none;">
-                                <i class="fa-solid fa-wrench"></i> 업데이트 중
-                            </a>
-                        </div>
+                    <!-- 공사중 카드 (세련된 버전) -->
+                    <div class="card card-construction">
+                        <div class="card-icon"><i class="fa-solid fa-person-digging"></i></div>
+                        <h2>인증 도구 (Maintenance)</h2>
+                        <p>더 안전하고 확실한 도구 제공을 위해<br>현재 시스템 점검 및 업데이트 중입니다.</p>
+                        <button class="btn btn-disabled">
+                            <i class="fa-solid fa-wrench"></i> 점검 중 (N/A)
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Staff Only (숨김) -->
-        <div id="staff-section" class="accordion-item" style="border-color:var(--christmas-gold);">
-            <button class="accordion-header active">
+        <!-- 4. Staff Only (Hidden) -->
+        <div id="staff-section" class="accordion-item">
+            <div class="accordion-header active">
                 <div class="header-content">
-                    <i class="fa-solid fa-user-secret" style="color:var(--christmas-gold)"></i>
-                    <h3>Staff Only (관리자)</h3>
+                    <div class="header-icon"><i class="fa-solid fa-user-secret"></i></div>
+                    <div class="header-text">
+                        <h3>Staff Only</h3>
+                        <span>Authorized Personnel Only</span>
+                    </div>
                 </div>
-            </button>
+                <i class="fa-solid fa-chevron-down accordion-toggle"></i>
+            </div>
             <div class="accordion-body" style="max-height: 2000px; opacity: 1;">
                 <div class="grid">
                     <div class="card">
-                        <div class="card-header">
-                            <div class="icon-box" style="color:#f472b6"><i class="fa-solid fa-music"></i></div>
-                            <div class="card-title"><h2>Last Christmas</h2></div>
-                        </div>
-                        <p>학교축제용 (Google Drive)</p>
-                        <div class="btn-wrapper">
-                            <a href="https://raw.githubusercontent.com/rma3316/dsyweb/main/Last%20Christmas%20-%20Wham!%20in%20C%20Major%20%7BReverb%7D%20%5BvF7EB7eL2GY%5D-VEED.mp3
-" class="download-btn" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);" target="_blank">
-                                <i class="fa-brands fa-google-drive"></i> 구글 드라이브
-                            </a>
-                        </div>
+                        <div class="card-icon" style="color:#ec4899"><i class="fa-solid fa-music"></i></div>
+                        <h2>Last Christmas</h2>
+                        <p>학교 축제 및 행사용 고음질 음원 파일<br>(Google Drive Secure Link)</p>
+                        <a href="https://drive.google.com/file/d/1sqAys8fwUr_qgFq3LYF8Kngvz45XDDw2/view?usp=sharing" target="_blank" class="btn staff-dl-btn">
+                            <i class="fa-brands fa-google-drive"></i> 드라이브 열기
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
         <footer>
-            &copy; 2026 Dasory Utility Center. Designed for Christmas. ☃️
+            &copy; 2026 Dasory Utility Center. All rights reserved.
         </footer>
     </div>
 
     <!-- 로그인 모달 -->
     <div class="modal-overlay" id="loginModal">
         <div class="login-box">
-            <h2 style="color:#fff; margin-bottom:20px;">Staff Login</h2>
+            <h2><i class="fa-solid fa-fingerprint"></i> Identity Verify</h2>
             <div class="input-group">
-                <label style="display:block; text-align:left; color:#ccc; margin-bottom:5px; font-size:0.9rem;">ID</label>
-                <input type="text" id="staffId" placeholder="아이디 입력">
+                <input type="text" id="staffId" placeholder="Access ID">
+                <input type="password" id="staffPw" placeholder="Passcode">
             </div>
-            <div class="input-group">
-                <label style="display:block; text-align:left; color:#ccc; margin-bottom:5px; font-size:0.9rem;">Password</label>
-                <input type="password" id="staffPw" placeholder="비밀번호 입력">
-            </div>
-            <button class="download-btn" onclick="checkLogin()" style="margin-top:10px;">로그인</button>
-            <div style="margin-top:15px; color:#aaa; cursor:pointer; text-decoration:underline; font-size:0.8rem;" onclick="closeModal()">닫기</div>
+            <button class="btn" onclick="checkLogin()" style="width:100%">Verify & Login</button>
+            <div class="modal-close" onclick="closeModal()">Cancel</div>
         </div>
     </div>
 
+    <!-- Toast -->
     <div id="toast"></div>
 
     <script>
-        // --- 🎅 1. D-Day 카운터 ---
-        function updateCountdown() {
-            const now = new Date();
-            const year = now.getFullYear();
-            let christmas = new Date(year, 11, 25); // 12월 25일
-
-            if (now > christmas) christmas.setFullYear(year + 1);
-
-            const diff = christmas - now;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((diff / 1000 / 60) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
-
-            // 각 요소에 값 넣기
-            document.getElementById('d-days').innerText = days;
-            document.getElementById('d-hours').innerText = String(hours).padStart(2, '0');
-            document.getElementById('d-mins').innerText = String(minutes).padStart(2, '0');
-            document.getElementById('d-secs').innerText = String(seconds).padStart(2, '0');
-        }
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-
-        // --- ❄️ 2. 눈 내리는 효과 ---
-        let snowInterval;
-        const snowContainer = document.getElementById('snow-container');
-        
-        function createSnowflake() {
-            if (document.body.classList.contains('standard-mode')) return;
-            const snow = document.createElement('div');
-            snow.classList.add('snowflake');
-            snow.innerText = '❄';
-            snow.style.left = Math.random() * 100 + 'vw';
-            snow.style.opacity = Math.random();
-            snow.style.fontSize = (Math.random() * 10 + 10) + 'px';
-            snow.style.animationDuration = (Math.random() * 3 + 5) + 's';
-            snowContainer.appendChild(snow);
-            setTimeout(() => { snow.remove(); }, 8000);
-        }
-        function startSnow() { if (!snowInterval) snowInterval = setInterval(createSnowflake, 300); }
-        function stopSnow() { clearInterval(snowInterval); snowInterval = null; snowContainer.innerHTML = ''; }
-        startSnow();
-
-        // --- 3. 테마 토글 ---
-        function toggleTheme() {
-            document.body.classList.toggle('standard-mode');
-            const btn = document.querySelector('.theme-toggle-btn');
-            if (document.body.classList.contains('standard-mode')) {
-                btn.textContent = '🎅 테마 켜기';
-                stopSnow();
-            } else {
-                btn.textContent = '🎄 테마 끄기';
-                startSnow();
-            }
-        }
-
-        // --- 4. 아코디언 & 기타 ---
-        document.querySelectorAll('.accordion-header').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const content = btn.nextElementSibling;
-                btn.classList.toggle('active');
-                content.style.maxHeight = btn.classList.contains('active') ? content.scrollHeight + 'px' : '0';
-                content.style.opacity = btn.classList.contains('active') ? 1 : 0;
+        // 아코디언 로직
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const body = header.nextElementSibling;
+                header.classList.toggle('active');
+                if (header.classList.contains('active')) {
+                    body.style.maxHeight = body.scrollHeight + "px";
+                    body.style.opacity = "1";
+                } else {
+                    body.style.maxHeight = "0";
+                    body.style.opacity = "0";
+                }
             });
         });
 
+        // 창 크기 조절 시 아코디언 높이 보정
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.accordion-header.active').forEach(header => {
+                const body = header.nextElementSibling;
+                body.style.maxHeight = body.scrollHeight + "px";
+            });
+        });
+
+        // 비밀번호 복사 Toast
         function copyPassword(text) {
             navigator.clipboard.writeText(text).then(() => {
-                const toast = document.getElementById("toast");
-                toast.innerHTML = `<i class="fa-solid fa-gift"></i> [${text}] 복사 완료!`;
-                toast.classList.add("show");
-                setTimeout(() => toast.classList.remove("show"), 2000);
+                showToast(`<i class="fa-solid fa-check-circle"></i> Password Copied: ${text}`);
             });
         }
 
-        // --- 5. 로그인 ---
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerHTML = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2500);
+        }
+
+        /* --- 로그인 로직 --- */
         const modal = document.getElementById('loginModal');
         const staffSection = document.getElementById('staff-section');
 
-        function openModal() { modal.classList.add('show'); document.getElementById('staffId').focus(); }
-        function closeModal() { modal.classList.remove('show'); document.getElementById('staffId').value=''; document.getElementById('staffPw').value=''; }
+        function openModal() {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            document.getElementById('staffId').focus();
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+            document.getElementById('staffId').value = '';
+            document.getElementById('staffPw').value = '';
+        }
 
         function checkLogin() {
             const id = document.getElementById('staffId').value;
             const pw = document.getElementById('staffPw').value;
 
+            // Simple Base64 Check (dasory / 1004)
             if(btoa(id) === 'ZGFzb3J5' && btoa(pw) === 'MTAwNA==') {
                 closeModal();
                 staffSection.style.display = 'block'; 
+                
                 setTimeout(() => {
                     staffSection.classList.add('active'); 
                     const body = staffSection.querySelector('.accordion-body');
                     body.style.maxHeight = body.scrollHeight + "px";
                     body.style.opacity = "1"; 
                     staffSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    const toast = document.getElementById("toast");
-                    toast.innerHTML = `<i class="fa-solid fa-unlock"></i> 관리자 모드 ON`;
-                    toast.classList.add("show");
-                    setTimeout(() => { toast.classList.remove("show"); }, 2500);
+                    showToast(`<i class="fa-solid fa-lock-open"></i> Staff Access Granted`);
                 }, 100);
             } else {
-                alert('아이디 또는 비밀번호가 틀렸습니다.');
+                alert('Access Denied. Invalid Credentials.');
                 document.getElementById('staffPw').value = '';
                 document.getElementById('staffPw').focus();
             }
         }
-        document.getElementById('staffPw').addEventListener('keypress', function (e) { if (e.key === 'Enter') checkLogin(); });
+
+        document.getElementById('staffPw').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkLogin();
+        });
     </script>
 </body>
 </html>
