@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ✅ [수정됨] 파비콘을 pepe.jpg로 변경 -->
+    <!-- 같은 폴더 안에 pepe.jpg 파일이 있어야 합니다 -->
+    <link rel="icon" href="pepe.jpg" type="image/jpeg">
+
+    <meta name="theme-color" content="#020617">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Dasory Download Center">
+    <meta property="og:description" content="Premium Utilities for Efficiency & Management">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop">
+
     <title>Dasory Download Center</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -38,6 +50,16 @@
             overflow-x: hidden;
             word-break: keep-all;
         }
+
+        /* ✅ 커스텀 스크롤바 */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 5px; 
+            border: 2px solid var(--bg-dark); 
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 
         /* --- 배경 애니메이션 (Moving Orbs) --- */
         .ambient-light {
@@ -224,10 +246,11 @@
         .btn-disabled:hover { filter: none; transform: none; box-shadow: none; }
 
         /* --- Staff 섹션 (Hidden) --- */
-        #staff-section { display: none; border-color: rgba(236, 72, 153, 0.3); }
-        #staff-section .header-icon { color: #ec4899; }
-        #staff-section .accordion-header:hover .header-icon { background: #ec4899; }
-        .staff-dl-btn { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); }
+        #staff-section { display: none; border-color: rgba(255, 255, 255, 0.2); }
+        #staff-section .header-icon { color: #fff; background: #333; }
+        #staff-section .accordion-header:hover .header-icon { background: #24292e; color: #fff; }
+        .github-btn { background: #24292e !important; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .github-btn:hover { background: #000 !important; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
 
         /* --- 모달 --- */
         .modal-overlay {
@@ -315,7 +338,6 @@
                         <div class="card-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
                         <h2>Everything</h2>
                         <p>답답한 윈도우 검색은 그만.<br>파일 이름을 입력하는 즉시 찾아줍니다.</p>
-                        <!-- 아이콘 추가 -->
                         <a href="https://www.voidtools.com/downloads/" target="_blank" class="btn">
                             <i class="fa-solid fa-up-right-from-square"></i> 다운로드 페이지
                         </a>
@@ -325,14 +347,13 @@
                         <h2>Geek Uninstaller</h2>
                         <p>삭제되지 않는 프로그램 강제 제거 및<br>레지스트리 찌꺼기 정리 도구.</p>
                         <a href="https://geekuninstaller.com/geek.zip" class="btn">
-                            <i class="fa-solid fa-download"></i> 다운로드
+                            <i class="fa-solid fa-download"></i> 즉시 다운로드
                         </a>
                     </div>
                     <div class="card">
                         <div class="card-icon"><i class="fa-solid fa-cubes"></i></div>
                         <h2>Ninite</h2>
                         <p>Chrome, Zoom 등 필수 프로그램들을<br>한 번에 자동으로 설치해줍니다.</p>
-                        <!-- 아이콘 추가 -->
                         <a href="https://ninite.com/" target="_blank" class="btn btn-outline">
                             <i class="fa-solid fa-up-right-from-square"></i> 사이트 이동
                         </a>
@@ -362,7 +383,6 @@
                         <div class="password-badge" onclick="copyPassword('teus.me')">
                             <i class="fa-solid fa-key"></i> <span>teus.me</span> <i class="fa-regular fa-copy"></i>
                         </div>
-                        <!-- 아이콘 추가 -->
                         <a href="https://teus.me/hoaxeliminator/HoaxEliminator7.45/" target="_blank" class="btn">
                             <i class="fa-solid fa-up-right-from-square"></i> 다운로드 페이지
                         </a>
@@ -371,7 +391,6 @@
                         <div class="card-icon"><i class="fa-solid fa-bug-slash"></i></div>
                         <h2>Malware Zero</h2>
                         <p>악성코드, 애드웨어, 악성 광고 창을<br>강력하게 박멸하는 스크립트 도구.</p>
-                        <!-- 아이콘 추가 -->
                         <a href="https://malzero.xyz/download" target="_blank" class="btn btn-outline">
                             <i class="fa-solid fa-up-right-from-square"></i> 사이트 이동
                         </a>
@@ -401,7 +420,7 @@
                         <a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="btn"><i class="fa-brands fa-github"></i> GitHub 다운로드</a>
                     </div>
                     
-                    <!-- 공사중 카드 (세련된 버전) -->
+                    <!-- 공사중 카드 -->
                     <div class="card card-construction">
                         <div class="card-icon"><i class="fa-solid fa-person-digging"></i></div>
                         <h2>인증 도구 (Maintenance)</h2>
@@ -429,11 +448,11 @@
             <div class="accordion-body" style="max-height: 2000px; opacity: 1;">
                 <div class="grid">
                     <div class="card">
-                        <div class="card-icon" style="color:#ec4899"><i class="fa-solid fa-music"></i></div>
-                        <h2>Last Christmas</h2>
-                        <p>학교 축제 및 행사용 고음질 음원 파일<br>(Google Drive Secure Link)</p>
-                        <a href="https://drive.google.com/file/d/1sqAys8fwUr_qgFq3LYF8Kngvz45XDDw2/view?usp=sharing" target="_blank" class="btn staff-dl-btn">
-                            <i class="fa-brands fa-google-drive"></i> 드라이브 열기
+                        <div class="card-icon" style="background: #24292e; color: #fff;"><i class="fa-brands fa-github"></i></div>
+                        <h2>Developer GitHub</h2>
+                        <p>다소리 다운로드 센터 개발자 깃허브입니다.<br>최신 프로젝트 및 소스코드를 확인하세요.</p>
+                        <a href="https://github.com/rma3316" target="_blank" class="btn github-btn">
+                            <i class="fa-solid fa-arrow-right"></i> GitHub 프로필 방문
                         </a>
                     </div>
                 </div>
