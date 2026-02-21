@@ -95,36 +95,36 @@
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: floatOrb 20s infinite ease-in-out alternate;
+            filter: blur(100px);
+            opacity: 0.35;
+            animation: floatOrb 25s infinite ease-in-out alternate;
         }
 
         .orb-1 {
-            width: 400px;
-            height: 400px;
-            background: #1e3a8a;
-            top: -100px;
-            left: -100px;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            top: -150px;
+            left: -150px;
             animation-delay: 0s;
         }
 
         .orb-2 {
-            width: 300px;
-            height: 300px;
-            background: #581c87;
-            bottom: -50px;
-            right: -50px;
-            animation-delay: -5s;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #581c87, #a855f7);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -7s;
         }
 
         .orb-3 {
-            width: 200px;
-            height: 200px;
-            background: #0f766e;
-            top: 40%;
-            left: 60%;
-            animation-delay: -10s;
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(135deg, #0f766e, #2dd4bf);
+            top: 50%;
+            left: 55%;
+            animation-delay: -12s;
             opacity: 0.2;
         }
 
@@ -133,8 +133,12 @@
                 transform: translate(0, 0) scale(1);
             }
 
+            50% {
+                transform: translate(40px, -30px) scale(1.05);
+            }
+
             100% {
-                transform: translate(30px, 50px) scale(1.1);
+                transform: translate(-20px, 60px) scale(1.12);
             }
         }
 
@@ -227,10 +231,25 @@
             font-weight: 800;
             letter-spacing: -1px;
             margin-bottom: 15px;
-            background: var(--gradient-text);
+            background: linear-gradient(90deg, #60a5fa, #c084fc, #f472b6, #60a5fa);
+            background-size: 300% 100%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.2));
+            animation: shimmer 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.3));
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         header p {
@@ -238,10 +257,13 @@
             font-size: 1.05rem;
             font-weight: 300;
             display: inline-block;
-            padding: 5px 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 8px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            letter-spacing: 0.3px;
         }
 
         /* --- 아코디언 (Glassmorphism 2.0) --- */
@@ -350,16 +372,34 @@
             padding: 25px;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
         }
 
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 18px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.0), rgba(192, 132, 252, 0.0));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            transition: background 0.4s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::before {
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.6), rgba(192, 132, 252, 0.6));
+        }
+
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-6px) scale(1.01);
             background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.15), 0 15px 30px -5px rgba(0, 0, 0, 0.4);
         }
 
         .card-icon {
@@ -409,16 +449,36 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 0.95rem;
-            transition: 0.3s;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: none;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .btn:hover {
-            filter: brightness(1.1);
-            box-shadow: 0 0 25px var(--accent-glow);
-            transform: scale(1.02);
+            filter: brightness(1.15);
+            box-shadow: 0 6px 30px var(--accent-glow);
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
         }
 
         .btn-outline {
@@ -632,6 +692,188 @@
             }
         }
 
+        /* --- Scroll Reveal --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(2) {
+            transition-delay: 0.1s;
+        }
+
+        .reveal:nth-child(3) {
+            transition-delay: 0.2s;
+        }
+
+        /* --- Cursor Spotlight --- */
+        .cursor-spotlight {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        body:hover .cursor-spotlight {
+            opacity: 1;
+        }
+
+        /* --- Category Icon Colors --- */
+        .icon-blue {
+            color: #3b82f6;
+        }
+
+        .icon-green {
+            color: #22c55e;
+        }
+
+        .icon-red {
+            color: #ef4444;
+        }
+
+        .icon-purple {
+            color: #a855f7;
+        }
+
+        .icon-orange {
+            color: #f97316;
+        }
+
+        .icon-teal {
+            color: #14b8a6;
+        }
+
+        .card:hover .icon-blue {
+            color: #fff;
+        }
+
+        .card:hover .icon-green {
+            color: #fff;
+        }
+
+        .card:hover .icon-red {
+            color: #fff;
+        }
+
+        .card:hover .icon-purple {
+            color: #fff;
+        }
+
+        .card:hover .icon-orange {
+            color: #fff;
+        }
+
+        .card:hover .icon-teal {
+            color: #fff;
+        }
+
+        /* --- Back to Top --- */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--gradient-btn);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 6px 30px rgba(37, 99, 235, 0.6);
+        }
+
+        .back-to-top:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        /* --- Tool Counter in Header --- */
+        .tool-count {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        .count-item {
+            text-align: center;
+        }
+
+        .count-number {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .count-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        /* --- Accordion Header Count --- */
+        .tool-counter {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-left: 10px;
+            font-weight: 500;
+        }
+
+        /* --- Staff Button Enhancement --- */
+        .staff-btn {
+            position: relative;
+        }
+
+        .staff-btn .fa-lock {
+            transition: transform 0.3s;
+        }
+
+        .staff-btn:hover .fa-lock {
+            transform: rotate(-15deg);
+        }
+
         @media (max-width: 600px) {
             header h1 {
                 font-size: 2.2rem;
@@ -643,6 +885,21 @@
 
             .accordion-header {
                 padding: 20px;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .tool-count {
+                gap: 20px;
+            }
+
+            .count-number {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -672,6 +929,14 @@
         <div class="orb orb-3"></div>
     </div>
 
+    <!-- Cursor Spotlight -->
+    <div class="cursor-spotlight" id="cursorSpotlight"></div>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" title="맨 위로">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
     <!-- 네비게이션 -->
     <nav>
         <a href="#" target="_blank" class="gift-btn" title="Special Gift">
@@ -686,10 +951,11 @@
         <header>
             <h1>Dasory Toolkit</h1>
             <p>언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다.</p>
+
         </header>
 
         <!-- 1. 시스템 필수 도구 -->
-        <div class="accordion-item">
+        <div class="accordion-item reveal">
             <div class="accordion-header active">
                 <div class="header-content">
                     <div class="header-icon"><i class="fa-solid fa-toolbox"></i></div>
@@ -703,7 +969,7 @@
             <div class="accordion-body" style="max-height: 2000px; opacity: 1;">
                 <div class="grid">
                     <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <div class="card-icon"><i class="fa-solid fa-magnifying-glass icon-blue"></i></div>
                         <h2>Everything</h2>
                         <p>답답한 윈도우 검색은 그만.<br>파일 이름을 입력하는 즉시 찾아줍니다.</p>
                         <a href="https://www.voidtools.com/downloads/" target="_blank" class="btn">
@@ -711,15 +977,15 @@
                         </a>
                     </div>
                     <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-trash-can"></i></div>
+                        <div class="card-icon"><i class="fa-solid fa-trash-can icon-red"></i></div>
                         <h2>Geek Uninstaller</h2>
                         <p>삭제되지 않는 프로그램 강제 제거 및<br>레지스트리 찌꺼기 정리 도구.</p>
                         <a href="https://geekuninstaller.com/geek.zip" class="btn">
-                            <i class="fa-solid fa-download"></i> 즉시 다운로드
+                            <i class="fa-solid fa-download"></i> 다운로드
                         </a>
                     </div>
                     <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-cubes"></i></div>
+                        <div class="card-icon"><i class="fa-solid fa-cubes icon-purple"></i></div>
                         <h2>Ninite</h2>
                         <p>Chrome, Zoom 등 필수 프로그램들을<br>한 번에 자동으로 설치해줍니다.</p>
                         <a href="https://ninite.com/" target="_blank" class="btn btn-outline">
@@ -731,7 +997,7 @@
         </div>
 
         <!-- 2. 보안 및 최적화 -->
-        <div class="accordion-item">
+        <div class="accordion-item reveal">
             <div class="accordion-header">
                 <div class="header-content">
                     <div class="header-icon"><i class="fa-solid fa-shield-halved"></i></div>
@@ -745,7 +1011,7 @@
             <div class="accordion-body">
                 <div class="grid">
                     <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                        <div class="card-icon"><i class="fa-solid fa-shield-virus icon-green"></i></div>
                         <h2>구라제거기</h2>
                         <p>PC를 느리게 하는 뱅킹 보안 프로그램을<br>한방에 제거하여 속도를 향상시킵니다.</p>
                         <div class="password-badge" onclick="copyPassword('teus.me')">
@@ -756,7 +1022,7 @@
                         </a>
                     </div>
                     <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-bug-slash"></i></div>
+                        <div class="card-icon"><i class="fa-solid fa-bug-slash icon-orange"></i></div>
                         <h2>Malware Zero</h2>
                         <p>악성코드, 애드웨어, 악성 광고 창을<br>강력하게 박멸하는 스크립트 도구.</p>
                         <a href="https://malzero.xyz/download" target="_blank" class="btn btn-outline">
@@ -768,7 +1034,7 @@
         </div>
 
         <!-- 3. 원격 및 관리 -->
-        <div class="accordion-item">
+        <div class="accordion-item reveal">
             <div class="accordion-header">
                 <div class="header-content">
                     <div class="header-icon"><i class="fa-solid fa-network-wired"></i></div>
@@ -782,7 +1048,7 @@
             <div class="accordion-body">
                 <div class="grid">
                     <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-desktop"></i></div>
+                        <div class="card-icon"><i class="fa-solid fa-desktop icon-teal"></i></div>
                         <h2>Rustdesk</h2>
                         <p>TeamViewer를 대체할 빠르고 안전한<br>오픈소스 원격 제어 솔루션.</p>
                         <a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="btn"><i
@@ -830,7 +1096,7 @@
         </div>
 
         <footer>
-            &copy; 2026 Dasory Utility Center. All rights reserved.
+            &copy; 2026 Dasory Toolkit. All rights reserved.
         </footer>
     </div>
 
@@ -931,6 +1197,42 @@
 
         document.getElementById('staffPw').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') checkLogin();
+        });
+
+        // Scroll Reveal Observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            revealObserver.observe(el);
+        });
+
+        // Cursor Spotlight
+        const cursorSpotlight = document.getElementById('cursorSpotlight');
+        document.addEventListener('mousemove', (e) => {
+            cursorSpotlight.style.left = e.clientX + 'px';
+            cursorSpotlight.style.top = e.clientY + 'px';
+        });
+
+
+        // Back to Top Button
+        const backToTopBtn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     </script>
 </body>
