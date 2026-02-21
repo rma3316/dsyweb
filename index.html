@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="pepe.jpg" type="image/jpeg">
 
     <meta name="theme-color" content="#020617">
+    <meta name="description" content="언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다.">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Dasory Download Center">
-    <meta property="og:description" content="Premium Utilities for Efficiency & Management">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop">
+    <meta property="og:title" content="Dasory Toolkit">
+    <meta property="og:description" content="언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다.">
+    <meta property="og:image"
+        content="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop">
 
-    <title>Dasory Download Center</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <title>Dasory Toolkit</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             /* 컬러 팔레트: Deep Space & Neon Accent */
@@ -23,25 +27,33 @@
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-highlight: rgba(255, 255, 255, 0.15);
-            
+
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            
-            --accent-primary: #3b82f6; /* Blue */
-            --accent-secondary: #8b5cf6; /* Purple */
+
+            --accent-primary: #3b82f6;
+            /* Blue */
+            --accent-secondary: #8b5cf6;
+            /* Purple */
             --accent-glow: rgba(59, 130, 246, 0.6);
-            
+
             --gradient-text: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
             --gradient-btn: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Pretendard', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
-            display: flex; flex-direction: column; align-items: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
             padding: 0 20px 60px 20px;
             overflow-x: hidden;
@@ -49,249 +61,606 @@
         }
 
         /* ✅ 커스텀 스크롤바 */
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { 
-            background: rgba(255, 255, 255, 0.1); 
-            border-radius: 5px; 
-            border: 2px solid var(--bg-dark); 
+        ::-webkit-scrollbar {
+            width: 10px;
         }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            border: 2px solid var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
 
         /* --- 배경 애니메이션 (Moving Orbs) --- */
         .ambient-light {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; overflow: hidden; pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
         }
+
         .orb {
-            position: absolute; border-radius: 50%;
-            filter: blur(80px); opacity: 0.4;
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
             animation: floatOrb 20s infinite ease-in-out alternate;
         }
-        .orb-1 { width: 400px; height: 400px; background: #1e3a8a; top: -100px; left: -100px; animation-delay: 0s; }
-        .orb-2 { width: 300px; height: 300px; background: #581c87; bottom: -50px; right: -50px; animation-delay: -5s; }
-        .orb-3 { width: 200px; height: 200px; background: #0f766e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.2; }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: #1e3a8a;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: #581c87;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 200px;
+            height: 200px;
+            background: #0f766e;
+            top: 40%;
+            left: 60%;
+            animation-delay: -10s;
+            opacity: 0.2;
+        }
 
         @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 50px) scale(1.1); }
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(30px, 50px) scale(1.1);
+            }
         }
 
         /* --- 네비게이션 --- */
         nav {
-            width: 100%; max-width: 900px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 30px 0; margin-bottom: 20px; z-index: 10;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            z-index: 10;
         }
 
         .gift-btn {
-            width: 44px; height: 44px;
-            background: rgba(255,255,255,0.03);
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
-            color: #f472b6; font-size: 1.2rem;
-            display: flex; align-items: center; justify-content: center;
-            text-decoration: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; overflow: hidden;
+            color: #f472b6;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
         }
+
         .gift-btn::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle at center, rgba(244,114,182,0.4) 0%, transparent 70%);
-            opacity: 0; transition: opacity 0.3s;
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(244, 114, 182, 0.4) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .gift-btn:hover { border-color: #f472b6; transform: rotate(-10deg) scale(1.05); color: #fff; box-shadow: 0 0 20px rgba(244, 114, 182, 0.3); }
-        .gift-btn:hover::before { opacity: 1; }
+
+        .gift-btn:hover {
+            border-color: #f472b6;
+            transform: rotate(-10deg) scale(1.05);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(244, 114, 182, 0.3);
+        }
+
+        .gift-btn:hover::before {
+            opacity: 1;
+        }
 
         .staff-btn {
-            background: transparent; border: 1px solid var(--glass-border);
-            color: var(--text-muted); padding: 10px 20px;
-            border-radius: 30px; font-size: 0.85rem; font-weight: 500;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .staff-btn:hover { background: var(--glass-highlight); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+        .staff-btn:hover {
+            background: var(--glass-highlight);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
 
         /* --- 헤더 --- */
-        .container { width: 100%; max-width: 900px; position: relative; z-index: 1; }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+            z-index: 1;
+        }
 
-        header { text-align: center; margin: 40px 0 60px; animation: fadeIn 1s ease-out; }
-        
+        header {
+            text-align: center;
+            margin: 40px 0 60px;
+            animation: fadeIn 1s ease-out;
+        }
+
         header h1 {
-            font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 15px;
-            background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.2));
         }
-        
-        header p { 
-            color: var(--text-muted); font-size: 1.05rem; font-weight: 300; 
-            display: inline-block; padding: 5px 15px;
-            background: rgba(0,0,0,0.2); border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            font-weight: 300;
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         /* --- 아코디언 (Glassmorphism 2.0) --- */
         .accordion-item {
-            margin-bottom: 24px; border-radius: 24px;
+            margin-bottom: 24px;
+            border-radius: 24px;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .accordion-item:hover { border-color: rgba(255,255,255,0.15); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.3); }
+
+        .accordion-item:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+        }
 
         .accordion-header {
-            width: 100%; padding: 28px 32px; background: transparent;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; border: none; outline: none; color: var(--text-main);
+            width: 100%;
+            padding: 28px 32px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            color: var(--text-main);
         }
-        
-        .header-content { display: flex; align-items: center; gap: 18px; }
-        .header-icon {
-            width: 42px; height: 42px; border-radius: 12px;
-            background: rgba(255,255,255,0.05); color: #60a5fa;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; transition: 0.3s;
-        }
-        .accordion-header:hover .header-icon { background: var(--accent-primary); color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
-        .header-text h3 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; }
-        .header-text span { font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 4px; font-weight: 400; }
 
-        .accordion-toggle { color: var(--text-muted); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
-        .accordion-header.active .accordion-toggle { transform: rotate(180deg); color: #fff; }
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .header-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        .accordion-header:hover .header-icon {
+            background: var(--accent-primary);
+            color: #fff;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .header-text h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-text span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .accordion-toggle {
+            color: var(--text-muted);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .accordion-header.active .accordion-toggle {
+            transform: rotate(180deg);
+            color: #fff;
+        }
 
         .accordion-body {
-            max-height: 0; opacity: 0; overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
             transition: max-height 0.5s ease, opacity 0.4s ease;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.2);
         }
-        .accordion-header.active + .accordion-body { opacity: 1; }
+
+        .accordion-header.active+.accordion-body {
+            opacity: 1;
+        }
 
         /* --- 그리드 & 카드 --- */
-        .grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 20px; padding: 30px; 
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 30px;
         }
 
         .card {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--glass-border);
-            border-radius: 18px; padding: 25px;
-            display: flex; flex-direction: column;
-            transition: all 0.3s ease; position: relative;
+            border-radius: 18px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
             overflow: hidden;
         }
-        .card:hover { 
-            transform: translateY(-5px); 
-            background: rgba(255,255,255,0.05); 
-            border-color: rgba(255,255,255,0.2);
-            box-shadow: 0 15px 30px -5px rgba(0,0,0,0.4);
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.4);
         }
 
         .card-icon {
-            width: 48px; height: 48px; border-radius: 14px;
-            background: rgba(255,255,255,0.05); color: #94a3b8;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; margin-bottom: 15px; transition: 0.3s;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            transition: 0.3s;
         }
-        .card:hover .card-icon { background: var(--gradient-btn); color: #fff; }
 
-        .card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
-        .card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
+        .card:hover .card-icon {
+            background: var(--gradient-btn);
+            color: #fff;
+        }
+
+        .card h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
 
         /* 다운로드 버튼 */
         .btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px; border-radius: 12px;
-            background: var(--gradient-btn); color: #fff;
-            text-decoration: none; font-weight: 600; font-size: 0.95rem;
-            transition: 0.3s; border: none; cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--gradient-btn);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
         }
-        .btn:hover { filter: brightness(1.1); box-shadow: 0 0 25px var(--accent-glow); transform: scale(1.02); }
-        
-        .btn-outline {
-            background: transparent; border: 1px solid rgba(255,255,255,0.2);
-            color: var(--text-muted); box-shadow: none;
+
+        .btn:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 0 25px var(--accent-glow);
+            transform: scale(1.02);
         }
-        .btn-outline:hover { border-color: #fff; color: #fff; }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            border-color: #fff;
+            color: #fff;
+        }
 
         .password-badge {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;
-            color: var(--text-muted); display: flex; justify-content: space-between;
-            margin-bottom: 15px; cursor: pointer; transition: 0.2s;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .password-badge span { color: #f472b6; font-family: 'Courier New', monospace; font-weight: bold; }
-        .password-badge:hover { background: rgba(255,255,255,0.05); color: #fff; }
+
+        .password-badge span {
+            color: #f472b6;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .password-badge:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
 
         /* --- [공사중 카드 스타일] --- */
         .card-construction {
             opacity: 0.75;
-            background-image: repeating-linear-gradient(
-                45deg,
-                rgba(255, 255, 255, 0.01),
-                rgba(255, 255, 255, 0.01) 10px,
-                rgba(255, 255, 255, 0.03) 10px,
-                rgba(255, 255, 255, 0.03) 20px
-            );
+            background-image: repeating-linear-gradient(45deg,
+                    rgba(255, 255, 255, 0.01),
+                    rgba(255, 255, 255, 0.01) 10px,
+                    rgba(255, 255, 255, 0.03) 10px,
+                    rgba(255, 255, 255, 0.03) 20px);
         }
-        .card-construction:hover { transform: none; box-shadow: none; border-color: var(--glass-border); }
-        .card-construction .card-icon { color: #64748b; background: rgba(255,255,255,0.03); }
-        .card-construction h2 { color: #94a3b8; }
+
+        .card-construction:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: var(--glass-border);
+        }
+
+        .card-construction .card-icon {
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .card-construction h2 {
+            color: #94a3b8;
+        }
+
         .btn-disabled {
-            background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none;
+            background: #334155;
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
         }
-        .btn-disabled:hover { filter: none; transform: none; box-shadow: none; }
+
+        .btn-disabled:hover {
+            filter: none;
+            transform: none;
+            box-shadow: none;
+        }
 
         /* --- Staff 섹션 (Hidden) --- */
-        #staff-section { display: none; border-color: rgba(255, 255, 255, 0.2); }
-        #staff-section .header-icon { color: #fff; background: #333; }
-        #staff-section .accordion-header:hover .header-icon { background: #24292e; color: #fff; }
-        .github-btn { background: #24292e !important; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .github-btn:hover { background: #000 !important; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        #staff-section {
+            display: none;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #staff-section .header-icon {
+            color: #fff;
+            background: #333;
+        }
+
+        #staff-section .accordion-header:hover .header-icon {
+            background: #24292e;
+            color: #fff;
+        }
+
+        .github-btn {
+            background: #24292e !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .github-btn:hover {
+            background: #000 !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
 
         /* --- 모달 --- */
         .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
-            z-index: 100; justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.3s;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .modal-overlay.show { display: flex; opacity: 1; }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
         .login-box {
-            background: #1e293b; border: 1px solid rgba(255,255,255,0.1);
-            padding: 40px; border-radius: 24px; width: 340px; text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            transform: scale(0.95); transition: transform 0.3s;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 24px;
+            width: 340px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s;
         }
-        .modal-overlay.show .login-box { transform: scale(1); }
-        .login-box h2 { color: #fff; margin-bottom: 25px; font-size: 1.5rem; }
+
+        .modal-overlay.show .login-box {
+            transform: scale(1);
+        }
+
+        .login-box h2 {
+            color: #fff;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+
         .input-group input {
-            width: 100%; padding: 14px; margin-bottom: 12px;
-            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            border-radius: 12px; color: #fff; outline: none; transition: 0.3s;
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
         }
-        .input-group input:focus { border-color: #60a5fa; background: rgba(0,0,0,0.5); }
-        .modal-close { margin-top: 20px; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; text-decoration: underline; }
+
+        .input-group input:focus {
+            border-color: #60a5fa;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            margin-top: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+        }
 
         /* Toast */
         #toast {
-            visibility: hidden; min-width: 250px; background: rgba(255,255,255,0.9); color: #0f172a;
-            text-align: center; border-radius: 50px; padding: 16px 24px;
-            position: fixed; z-index: 1000; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px);
-            font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            visibility: hidden;
+            min-width: 250px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #0f172a;
+            text-align: center;
+            border-radius: 50px;
+            padding: 16px 24px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 40px;
+            transform: translateX(-50%) translateY(20px);
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        footer { margin-top: 80px; color: rgba(255,255,255,0.2); font-size: 0.85rem; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        footer {
+            margin-top: 80px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 600px) {
-            header h1 { font-size: 2.2rem; }
-            .grid { padding: 20px; }
-            .accordion-header { padding: 20px; }
+            header h1 {
+                font-size: 2.2rem;
+            }
+
+            .grid {
+                padding: 20px;
+            }
+
+            .accordion-header {
+                padding: 20px;
+            }
         }
     </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Dasory Toolkit",
+      "url": "https://dasory.kro.kr",
+      "description": "언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dasory.kro.kr/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 </head>
+
 <body>
 
     <!-- 은은한 배경 오로라 -->
@@ -313,8 +682,8 @@
 
     <div class="container">
         <header>
-            <h1>Dasory Download Center</h1>
-            <p>Premium Utilities for Efficiency</p>
+            <h1>Dasory Toolkit</h1>
+            <p>언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다.</p>
         </header>
 
         <!-- 1. 시스템 필수 도구 -->
@@ -414,9 +783,10 @@
                         <div class="card-icon"><i class="fa-solid fa-desktop"></i></div>
                         <h2>Rustdesk</h2>
                         <p>TeamViewer를 대체할 빠르고 안전한<br>오픈소스 원격 제어 솔루션.</p>
-                        <a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="btn"><i class="fa-brands fa-github"></i> GitHub 다운로드</a>
+                        <a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="btn"><i
+                                class="fa-brands fa-github"></i> GitHub 다운로드</a>
                     </div>
-                    
+
                     <!-- 공사중 카드 -->
                     <div class="card card-construction">
                         <div class="card-icon"><i class="fa-solid fa-person-digging"></i></div>
@@ -445,7 +815,8 @@
             <div class="accordion-body" style="max-height: 2000px; opacity: 1;">
                 <div class="grid">
                     <div class="card">
-                        <div class="card-icon" style="background: #24292e; color: #fff;"><i class="fa-brands fa-github"></i></div>
+                        <div class="card-icon" style="background: #24292e; color: #fff;"><i
+                                class="fa-brands fa-github"></i></div>
                         <h2>Developer GitHub</h2>
                         <p>다소리 다운로드 센터 개발자 깃허브입니다.<br>최신 프로젝트 및 소스코드를 확인하세요.</p>
                         <a href="https://github.com/rma3316" target="_blank" class="btn github-btn">
@@ -537,15 +908,15 @@
             const pw = document.getElementById('staffPw').value;
 
             // Simple Base64 Check (dasory / 1004)
-            if(btoa(id) === 'ZGFzb3J5' && btoa(pw) === 'MTAwNA==') {
+            if (btoa(id) === 'ZGFzb3J5' && btoa(pw) === 'MTAwNA==') {
                 closeModal();
-                staffSection.style.display = 'block'; 
-                
+                staffSection.style.display = 'block';
+
                 setTimeout(() => {
-                    staffSection.classList.add('active'); 
+                    staffSection.classList.add('active');
                     const body = staffSection.querySelector('.accordion-body');
                     body.style.maxHeight = body.scrollHeight + "px";
-                    body.style.opacity = "1"; 
+                    body.style.opacity = "1";
                     staffSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     showToast(`<i class="fa-solid fa-lock-open"></i> Staff Access Granted`);
                 }, 100);
@@ -561,4 +932,5 @@
         });
     </script>
 </body>
+
 </html>
