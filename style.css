@@ -922,6 +922,7 @@ body:hover .cursor-spotlight {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .memo-info {
@@ -939,43 +940,68 @@ body:hover .cursor-spotlight {
     color: #f472b6;
 }
 
+.memo-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+    padding-right: 5px;
+}
+
+.memo-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.memo-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.memo-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+    line-height: 1.5;
+    word-break: break-all;
+}
+
+.memo-item-time {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 6px;
+    text-align: right;
+    display: block;
+}
+
+.memo-input-container {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-top: 1px solid var(--glass-border);
+    margin: 0 -20px -20px -20px;
+}
+
 #memoTextarea {
     width: 100%;
-    flex: 1;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 15px;
-    color: #e2e8f0;
-    font-size: 0.95rem;
-    line-height: 1.6;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    color: #fff;
+    font-size: 0.9rem;
     resize: none;
     outline: none;
-    transition: border-color 0.3s;
     font-family: inherit;
+    transition: 0.3s;
 }
 
 #memoTextarea:focus {
     border-color: #60a5fa;
-    background: rgba(0, 0, 0, 0.3);
-}
-
-.memo-footer {
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-#memoStatus {
-    color: #22c55e;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-#memoStatus.show {
-    opacity: 1;
+    background: rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 600px) {

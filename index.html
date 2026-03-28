@@ -63,12 +63,14 @@
             <button class="memo-close" id="memoClose"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="memo-body">
-            <p class="memo-info">이곳에 작성된 메모는 사용자 브라우저에 임시 저장되며, <strong>작성 후 24시간이 지나면 자동으로 삭제</strong>됩니다. 서버에 전송되지 않는
-                개인용 공간입니다.</p>
-            <textarea id="memoTextarea" placeholder="오늘의 잊지 말아야 할 것들을 자유롭게 작성해보세요..."></textarea>
-            <div class="memo-footer">
-                <span id="memoStatus">저장됨</span>
-                <span id="memoTime"></span>
+            <p class="memo-info">이곳은 누구나 볼 수 있는 <strong>공용 메모장(방명록)</strong>입니다. <strong>최근 24시간 이내의 글만</strong> 나타납니다.
+            </p>
+            <div id="memoList" class="memo-list">
+                <!-- 메시지 렌더링 영역 -->
+            </div>
+            <div class="memo-input-container">
+                <textarea id="memoTextarea" placeholder="메모를 남겨보세요! (엔터로 전송)" rows="2"></textarea>
+                <button id="memoSubmitBtn" class="btn" style="width:100%; margin-top:10px;">남기기</button>
             </div>
         </div>
     </div>
@@ -276,6 +278,10 @@
     <!-- Toast -->
     <div id="toast"></div>
 
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
 

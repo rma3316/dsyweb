@@ -146,59 +146,111 @@ backToTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-/* --- Daily Memo 로직 --- */
+/* --- Daily Memo (Supabase 방명록) 로직 --- */
 const memoToggle = document.getElementById('memoToggle');
 const memoPanel = document.getElementById('memoPanel');
 const memoClose = document.getElementById('memoClose');
 const memoTextarea = document.getElementById('memoTextarea');
-const memoStatus = document.getElementById('memoStatus');
-const memoTime = document.getElementById('memoTime');
+const memoList = document.getElementById('memoList');
+const memoSubmitBtn = document.getElementById('memoSubmitBtn');
 
-const MEMO_KEY = 'dsy_daily_memo';
-const MEMO_TIME_KEY = 'dsy_daily_memo_time';
-const EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours in ms
+// Supabase 구성 (sec.txt 정보 반영)
+const SUPABASE_URL = 'https://hqqcumvikrculyhkjrss.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcWN1bXZpa3JjdWx5aGtqcnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjM5OTksImV4cCI6MjA5MDIzOTk5OX0.RSSn2vuoXhg6y3qp1Hkg1hoptfWRmiy2AsK18K60-cU';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function initMemo() {
-    const savedMemo = localStorage.getItem(MEMO_KEY);
-    const savedTime = localStorage.getItem(MEMO_TIME_KEY);
-    const now = Date.now();
-
-    if (savedMemo && savedTime) {
-        if (now - parseInt(savedTime) > EXPIRY_TIME) {
-            // Expired, clear memo
-            localStorage.removeItem(MEMO_KEY);
-            localStorage.removeItem(MEMO_TIME_KEY);
-            memoTextarea.value = '';
-            memoTime.textContent = '메모가 24시간이 경과하여 삭제되었습니다.';
-        } else {
-            memoTextarea.value = savedMemo;
-            const remainingHours = Math.floor((EXPIRY_TIME - (now - parseInt(savedTime))) / (1000 * 60 * 60));
-            memoTime.textContent = `저장됨 (${remainingHours}시간 후 만료)`;
-        }
-    }
+function formatTime(isoString) {
+    const date = new Date(isoString);
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${mm}/${dd} ${hh}:${min}`;
 }
 
-let saveTimeout;
-memoTextarea.addEventListener('input', () => {
-    clearTimeout(saveTimeout);
-    memoStatus.classList.remove('show');
+async function loadMemos() {
+    memoList.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:20px;">로딩 중...</div>';
 
-    saveTimeout = setTimeout(() => {
-        const text = memoTextarea.value;
-        const now = Date.now();
-        localStorage.setItem(MEMO_KEY, text);
-        localStorage.setItem(MEMO_TIME_KEY, now);
+    // 24시간 이내 데이터만 불러오기
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-        memoStatus.classList.add('show');
-        memoTime.textContent = '방금 저장됨';
+    const { data, error } = await supabase
+        .from('memos')
+        .select('*')
+        .gte('created_at', yesterday)
+        .order('created_at', { ascending: true });
 
-        setTimeout(() => memoStatus.classList.remove('show'), 2000);
-    }, 500); // 500ms debounce
+    if (error) {
+        memoList.innerHTML = '<div style="text-align:center; color:#ef4444;">데이터 불러오기 실패</div>';
+        console.error(error);
+        return;
+    }
+
+    memoList.innerHTML = '';
+    if (data.length === 0) {
+        memoList.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:20px;">아직 작성된 메모가 없습니다.<br>첫 번째 메시지를 남겨보세요!</div>';
+        return;
+    }
+
+    data.forEach(memo => {
+        const item = document.createElement('div');
+        item.className = 'memo-item';
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = memo.content; // XSS 방어
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'memo-item-time';
+        timeSpan.textContent = formatTime(memo.created_at);
+
+        item.appendChild(textSpan);
+        item.appendChild(timeSpan);
+        memoList.appendChild(item);
+    });
+
+    // 스크롤 맨 아래로
+    memoList.scrollTop = memoList.scrollHeight;
+}
+
+memoSubmitBtn.addEventListener('click', async () => {
+    const content = memoTextarea.value.trim();
+    if (!content) return;
+
+    memoSubmitBtn.disabled = true;
+    memoSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
+
+    const { error } = await supabase
+        .from('memos')
+        .insert([{ content }]);
+
+    memoSubmitBtn.disabled = false;
+    memoSubmitBtn.textContent = '남기기';
+
+    if (error) {
+        alert('메모 저장에 실패했습니다.');
+        console.error(error);
+    } else {
+        memoTextarea.value = '';
+        loadMemos();
+    }
 });
 
+memoTextarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        memoSubmitBtn.click();
+    }
+});
+
+let isFirstLoad = true;
 memoToggle.addEventListener('click', () => {
-    initMemo();
     memoPanel.classList.add('open');
+    if (isFirstLoad) {
+        loadMemos();
+        isFirstLoad = false;
+    } else {
+        loadMemos();
+    }
     setTimeout(() => memoTextarea.focus(), 400);
 });
 
@@ -206,7 +258,7 @@ memoClose.addEventListener('click', () => {
     memoPanel.classList.remove('open');
 });
 
-// 패널 외부 클릭 시 닫기
+// 패널 외부 클릭 막기
 document.addEventListener('click', (e) => {
     if (memoPanel.classList.contains('open') &&
         !memoPanel.contains(e.target) &&
@@ -214,7 +266,3 @@ document.addEventListener('click', (e) => {
         memoPanel.classList.remove('open');
     }
 });
-
-// Initialize on load
-initMemo();
-
