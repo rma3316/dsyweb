@@ -964,10 +964,31 @@ body:hover .cursor-spotlight {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     padding: 12px;
+    padding-right: 35px;
+    /* 삭제 버튼 공간 확보 */
     font-size: 0.9rem;
     color: #e2e8f0;
     line-height: 1.5;
     word-break: break-all;
+    position: relative;
+}
+
+.memo-delete-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 0.9rem;
+    opacity: 0.5;
+    transition: 0.2s;
+}
+
+.memo-delete-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 .memo-item-time {

@@ -204,6 +204,10 @@ function formatTime(isoString) {
 async function loadMemos() {
     memoList.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:20px;">로딩 중...</div>';
 
+    // 1. 관리자(인증 세션) 로그인 여부 확인
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const isAdmin = sessionData?.session !== null;
+
     // 24시간 이내 데이터만 불러오기
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
@@ -238,6 +242,31 @@ async function loadMemos() {
 
         item.appendChild(textSpan);
         item.appendChild(timeSpan);
+
+        // 관리자용 삭제 버튼
+        if (isAdmin) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'memo-delete-btn';
+            deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+            deleteBtn.title = '메모 삭제';
+            deleteBtn.onclick = async () => {
+                if (confirm('이 메모를 영구 삭제하시겠습니까?')) {
+                    const { error: deleteError } = await supabaseClient
+                        .from('memos')
+                        .delete()
+                        .eq('id', memo.id);
+
+                    if (deleteError) {
+                        alert('삭제 실패: 권한 확인 또는 네트워크 오류');
+                        console.error(deleteError);
+                    } else {
+                        loadMemos(); // 다시 렌더링
+                    }
+                }
+            };
+            item.appendChild(deleteBtn);
+        }
+
         memoList.appendChild(item);
     });
 
