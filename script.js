@@ -1,3 +1,18 @@
+// Supabase 구성 (sec.txt 정보 반영)
+const SUPABASE_URL = 'https://hqqcumvikrculyhkjrss.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcWN1bXZpa3JjdWx5aGtqcnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjM5OTksImV4cCI6MjA5MDIzOTk5OX0.RSSn2vuoXhg6y3qp1Hkg1hoptfWRmiy2AsK18K60-cU';
+
+let supabaseClient = null;
+try {
+    if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else {
+        console.warn('⚠️ Supabase SDK가 아직 로드되지 않았거나 차단되었습니다.');
+    }
+} catch (e) {
+    console.error('⚠️ Supabase 세팅 에러:', e);
+}
+
 // 아코디언 로직
 document.querySelectorAll('.accordion-header').forEach(header => {
     header.addEventListener('click', () => {
@@ -83,7 +98,7 @@ async function checkLogin() {
     loginBtn.disabled = true;
 
     // 1. Supabase Auth (이메일, 비밀번호 인증)
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: pw,
     });
@@ -98,7 +113,7 @@ async function checkLogin() {
     }
 
     // 2. 인증 성공 후 보호된 데이터(Staff Content) 불러오기
-    const { data: staffData, error: fetchError } = await supabase
+    const { data: staffData, error: fetchError } = await supabaseClient
         .from('staff_content')
         .select('content')
         .eq('id', 1)
@@ -176,10 +191,6 @@ const memoTextarea = document.getElementById('memoTextarea');
 const memoList = document.getElementById('memoList');
 const memoSubmitBtn = document.getElementById('memoSubmitBtn');
 
-// Supabase 구성 (sec.txt 정보 반영)
-const SUPABASE_URL = 'https://hqqcumvikrculyhkjrss.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcWN1bXZpa3JjdWx5aGtqcnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjM5OTksImV4cCI6MjA5MDIzOTk5OX0.RSSn2vuoXhg6y3qp1Hkg1hoptfWRmiy2AsK18K60-cU';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function formatTime(isoString) {
     const date = new Date(isoString);
@@ -196,7 +207,7 @@ async function loadMemos() {
     // 24시간 이내 데이터만 불러오기
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('memos')
         .select('*')
         .gte('created_at', yesterday)
@@ -241,7 +252,7 @@ memoSubmitBtn.addEventListener('click', async () => {
     memoSubmitBtn.disabled = true;
     memoSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('memos')
         .insert([{ content }]);
 
