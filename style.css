@@ -32,7 +32,7 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    padding: 0 20px 60px 20px;
+    padding: 100px 20px 60px 20px;
     overflow-x: hidden;
     word-break: keep-all;
 }
@@ -118,16 +118,46 @@ body {
     }
 }
 
-/* --- 네비게이션 --- */
-nav {
+/* --- GNB (Global Navigation Bar) --- */
+.gnb {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 900px;
+    height: 70px;
+    background: rgba(2, 6, 23, 0.25);
+    /* 투명도 대폭 증가 */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 30px 0;
-    margin-bottom: 20px;
-    z-index: 10;
+    padding: 0 40px;
+    z-index: 1000;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.gnb-logo {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
+}
+
+.gnb-logo i {
+    color: #3b82f6;
+    font-size: 1.5rem;
+}
+
+.gnb-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .gift-btn {
@@ -1087,4 +1117,113 @@ body:hover .cursor-spotlight {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
     color: #fef2f2;
+}
+
+/* --- PassGen Nav Button --- */
+.pwgen-nav-btn {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fde68a;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.pwgen-nav-btn:hover {
+    background: rgba(251, 191, 36, 0.25);
+    border-color: rgba(251, 191, 36, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+    color: #fef3c7;
+}
+
+/* --- Password Generator --- */
+.pw-gen-container {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pw-display-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    color: #a78bfa;
+    letter-spacing: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 15px;
+    word-break: break-all;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    padding: 5px;
+}
+
+.icon-btn:hover {
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.pw-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.pw-length-slider {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+
+.pw-length-slider input[type="range"] {
+    width: 100%;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.pw-checkboxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+}
+
+.pw-checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.pw-checkboxes input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6;
 }

@@ -82,6 +82,20 @@ function closePrivacyModal() {
     setTimeout(() => privacyModal.style.display = 'none', 300);
 }
 
+/* --- 패스워드 생성기 모달 --- */
+const pwModal = document.getElementById('pwGenModal');
+
+function openPwModal() {
+    pwModal.style.display = 'flex';
+    setTimeout(() => pwModal.classList.add('show'), 10);
+    if (typeof generatePassword === 'function') generatePassword();
+}
+
+function closePwModal() {
+    pwModal.classList.remove('show');
+    setTimeout(() => pwModal.style.display = 'none', 300);
+}
+
 // Supabase 로그인 검증 및 보안 금고 오픈
 async function checkLogin() {
     const email = document.getElementById('staffId').value;
@@ -371,9 +385,72 @@ memoClose.addEventListener('click', () => {
 
 // 패널 외부 클릭 막기
 document.addEventListener('click', (e) => {
-    if (memoPanel.classList.contains('open') &&
+    const memoPanel = document.getElementById('memoPanel');
+    const memoToggle = document.getElementById('memoToggle');
+    if (memoPanel && memoPanel.classList.contains('open') &&
         !memoPanel.contains(e.target) &&
         !memoToggle.contains(e.target)) {
         memoPanel.classList.remove('open');
     }
 });
+
+/* --- Password Generator 로직 --- */
+const pwLength = document.getElementById('pwLength');
+const pwLengthVal = document.getElementById('pwLengthVal');
+const pwUpper = document.getElementById('pwUpper');
+const pwLower = document.getElementById('pwLower');
+const pwNum = document.getElementById('pwNum');
+const pwSym = document.getElementById('pwSym');
+const generatedPw = document.getElementById('generatedPw');
+const generatePwBtn = document.getElementById('generatePwBtn');
+const copyPwBtn = document.getElementById('copyPwBtn');
+
+const UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
+const NUMBERS = '0123456789';
+const SYMBOLS = '!@#$%^&*()_+~`|}{[]:;?><,./-=';
+
+function generatePassword() {
+    if (!pwLength) return; // 비밀번호 UI가 없는 경우 에러 방지
+
+    let charSet = '';
+    if (pwUpper.checked) charSet += UPPERCASE;
+    if (pwLower.checked) charSet += LOWERCASE;
+    if (pwNum.checked) charSet += NUMBERS;
+    if (pwSym.checked) charSet += SYMBOLS;
+
+    // 만약 옵션이 전부 해제되어 있으면 기본 소문자 풀 강제 세팅
+    if (charSet === '') {
+        pwLower.checked = true;
+        charSet = LOWERCASE;
+        showToast('📍 보안을 위해 최소 1개의 옵션(소문자)이 강제 지정되었습니다.');
+    }
+
+    const length = parseInt(pwLength.value);
+    let password = '';
+
+    // Crypto API를 이용한 강력하고 안전한 난수 생성
+    const array = new Uint32Array(length);
+    window.crypto.getRandomValues(array);
+
+    for (let i = 0; i < length; i++) {
+        password += charSet[array[i] % charSet.length];
+    }
+
+    generatedPw.textContent = password;
+}
+
+if (pwLength) {
+    pwLength.addEventListener('input', (e) => {
+        pwLengthVal.textContent = e.target.value;
+    });
+
+    generatePwBtn.addEventListener('click', generatePassword);
+
+    copyPwBtn.addEventListener('click', () => {
+        const pw = generatedPw.textContent;
+        if (pw && pw !== 'Click Generate!') {
+            copyPassword(pw);
+        }
+    });
+}
