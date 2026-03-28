@@ -51,6 +51,28 @@
         <i class="fa-solid fa-arrow-up"></i>
     </button>
 
+    <!-- Daily Memo Toggle -->
+    <button class="memo-toggle" id="memoToggle" title="일일 메모장 (24시간 보관)">
+        <i class="fa-solid fa-pen-nib"></i>
+    </button>
+
+    <!-- Daily Memo Panel -->
+    <div class="memo-panel" id="memoPanel">
+        <div class="memo-header">
+            <h3><i class="fa-solid fa-note-sticky"></i> Daily Memo</h3>
+            <button class="memo-close" id="memoClose"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="memo-body">
+            <p class="memo-info">이곳에 작성된 메모는 사용자 브라우저에 임시 저장되며, <strong>작성 후 24시간이 지나면 자동으로 삭제</strong>됩니다. 서버에 전송되지 않는
+                개인용 공간입니다.</p>
+            <textarea id="memoTextarea" placeholder="오늘의 잊지 말아야 할 것들을 자유롭게 작성해보세요..."></textarea>
+            <div class="memo-footer">
+                <span id="memoStatus">저장됨</span>
+                <span id="memoTime"></span>
+            </div>
+        </div>
+    </div>
+
     <!-- 네비게이션 -->
     <nav>
         <a href="#" target="_blank" class="gift-btn" title="Special Gift">
@@ -210,7 +232,8 @@
         </div>
 
         <footer>
-            &copy; 2026 Dasory Toolkit. All rights reserved.
+            &copy; 2026 Dasory Toolkit. All rights reserved. | <a href="#" onclick="openPrivacyModal(event)"
+                style="color: inherit; text-decoration: underline;">개인정보 처리방침</a>
         </footer>
     </div>
 
@@ -224,6 +247,29 @@
             </div>
             <button class="btn" onclick="checkLogin()" style="width:100%">Verify & Login</button>
             <div class="modal-close" onclick="closeModal()">Cancel</div>
+        </div>
+    </div>
+
+    <!-- 개인정보 처리방침 모달 -->
+    <div class="modal-overlay" id="privacyModal" onclick="if(event.target === this) closePrivacyModal()">
+        <div class="login-box"
+            style="width: 500px; max-width: 90%; text-align: left; max-height: 80vh; overflow-y: auto;">
+            <h2 style="text-align: center;"><i class="fa-solid fa-shield-halved"></i> 개인정보 처리방침</h2>
+            <div style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                <p><strong>1. 기본 원칙</strong><br>
+                    Dasory Toolkit(이하 '본 사이트')은 사용자의 어떠한 개인정보도 수집, 저장, 또는 처리하지 않습니다.</p>
+                <br>
+                <p><strong>2. 데이터 처리</strong><br>
+                    본 사이트에서 입력되는 데이터(예: 인증 정보 등)는 오직 사용자의 브라우저 내에서만 처리되며, 외부 서버로 전송되지 않습니다. 서버 단의 데이터베이스가 존재하지 않는 정적
+                    웹사이트입니다.</p>
+                <br>
+                <p><strong>3. 외부 링크</strong><br>
+                    본 사이트에서 제공하는 다운로드 외부 링크 및 제3자 서비스로의 이동은 해당 제3자 서비스 제공자의 개인정보 처리방침을 따르며, 본 사이트와는 무관합니다.</p>
+                <br>
+                <p><strong>4. 문의</strong><br>
+                    관련 문의사항은 개발자의 GitHub를 통해 남겨주시기 바랍니다.</p>
+            </div>
+            <button class="btn" onclick="closePrivacyModal()" style="width:100%; margin-top: 25px;">닫기</button>
         </div>
     </div>
 

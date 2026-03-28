@@ -53,6 +53,20 @@ function closeModal() {
     document.getElementById('staffPw').value = '';
 }
 
+/* --- 개인정보 처리방침 모달 --- */
+const privacyModal = document.getElementById('privacyModal');
+
+function openPrivacyModal(e) {
+    if (e) e.preventDefault();
+    privacyModal.style.display = 'flex';
+    setTimeout(() => privacyModal.classList.add('show'), 10);
+}
+
+function closePrivacyModal() {
+    privacyModal.classList.remove('show');
+    setTimeout(() => privacyModal.style.display = 'none', 300);
+}
+
 // SHA-256 해시 함수 (Web Crypto API)
 async function sha256(message) {
     const encoder = new TextEncoder();
@@ -131,3 +145,76 @@ window.addEventListener('scroll', () => {
 backToTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+
+/* --- Daily Memo 로직 --- */
+const memoToggle = document.getElementById('memoToggle');
+const memoPanel = document.getElementById('memoPanel');
+const memoClose = document.getElementById('memoClose');
+const memoTextarea = document.getElementById('memoTextarea');
+const memoStatus = document.getElementById('memoStatus');
+const memoTime = document.getElementById('memoTime');
+
+const MEMO_KEY = 'dsy_daily_memo';
+const MEMO_TIME_KEY = 'dsy_daily_memo_time';
+const EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours in ms
+
+function initMemo() {
+    const savedMemo = localStorage.getItem(MEMO_KEY);
+    const savedTime = localStorage.getItem(MEMO_TIME_KEY);
+    const now = Date.now();
+
+    if (savedMemo && savedTime) {
+        if (now - parseInt(savedTime) > EXPIRY_TIME) {
+            // Expired, clear memo
+            localStorage.removeItem(MEMO_KEY);
+            localStorage.removeItem(MEMO_TIME_KEY);
+            memoTextarea.value = '';
+            memoTime.textContent = '메모가 24시간이 경과하여 삭제되었습니다.';
+        } else {
+            memoTextarea.value = savedMemo;
+            const remainingHours = Math.floor((EXPIRY_TIME - (now - parseInt(savedTime))) / (1000 * 60 * 60));
+            memoTime.textContent = `저장됨 (${remainingHours}시간 후 만료)`;
+        }
+    }
+}
+
+let saveTimeout;
+memoTextarea.addEventListener('input', () => {
+    clearTimeout(saveTimeout);
+    memoStatus.classList.remove('show');
+
+    saveTimeout = setTimeout(() => {
+        const text = memoTextarea.value;
+        const now = Date.now();
+        localStorage.setItem(MEMO_KEY, text);
+        localStorage.setItem(MEMO_TIME_KEY, now);
+
+        memoStatus.classList.add('show');
+        memoTime.textContent = '방금 저장됨';
+
+        setTimeout(() => memoStatus.classList.remove('show'), 2000);
+    }, 500); // 500ms debounce
+});
+
+memoToggle.addEventListener('click', () => {
+    initMemo();
+    memoPanel.classList.add('open');
+    setTimeout(() => memoTextarea.focus(), 400);
+});
+
+memoClose.addEventListener('click', () => {
+    memoPanel.classList.remove('open');
+});
+
+// 패널 외부 클릭 시 닫기
+document.addEventListener('click', (e) => {
+    if (memoPanel.classList.contains('open') &&
+        !memoPanel.contains(e.target) &&
+        !memoToggle.contains(e.target)) {
+        memoPanel.classList.remove('open');
+    }
+});
+
+// Initialize on load
+initMemo();
+
