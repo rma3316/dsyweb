@@ -206,7 +206,7 @@
             </div>
         </div>
 
-        <!-- 4. Staff Only (Hidden) -->
+        <!-- 4. Staff Only (Hidden / Protected by Supabase) -->
         <div id="staff-section" class="accordion-item">
             <div class="accordion-header active">
                 <div class="header-content">
@@ -218,18 +218,8 @@
                 </div>
                 <i class="fa-solid fa-chevron-down accordion-toggle"></i>
             </div>
-            <div class="accordion-body" style="max-height: 2000px; opacity: 1;">
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-icon" style="background: #24292e; color: #fff;"><i
-                                class="fa-brands fa-github"></i></div>
-                        <h2>Developer GitHub</h2>
-                        <p>다소리 다운로드 센터 개발자 깃허브입니다.<br>최신 프로젝트 및 소스코드를 확인하세요.</p>
-                        <a href="https://github.com/rma3316" target="_blank" class="btn github-btn">
-                            <i class="fa-solid fa-arrow-right"></i> GitHub 프로필 방문
-                        </a>
-                    </div>
-                </div>
+            <div class="accordion-body" id="staffContentBody" style="max-height: 2000px; opacity: 1;">
+                <!-- 내용이 안전하게 비워져 있으며, Supabase 인증 성공 시 렌더링 됩니다 -->
             </div>
         </div>
 

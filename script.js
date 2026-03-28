@@ -67,44 +67,66 @@ function closePrivacyModal() {
     setTimeout(() => privacyModal.style.display = 'none', 300);
 }
 
-// SHA-256 해시 함수 (Web Crypto API)
-async function sha256(message) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// 로그인 검증 (SHA-256 해시 비교 — 원문 노출 없음)
+// Supabase 로그인 검증 및 보안 금고 오픈
 async function checkLogin() {
-    const id = document.getElementById('staffId').value;
+    const email = document.getElementById('staffId').value;
     const pw = document.getElementById('staffPw').value;
 
-    const idHash = await sha256(id);
-    const pwHash = await sha256(pw);
+    if (!email || !pw) {
+        showToast('📍 ID(Email)와 패스워드를 입력해주세요.');
+        return;
+    }
 
-    // SHA-256 해시값만 저장 (원문 복원 불가)
-    const validIdHash = 'c98a1f3249e82e420ea37447f1455939de1844e6ed184b91d5be2b72ea701aa5';
-    const validPwHash = '75992a5ac67ff644d3063976c2effd10bdd93fcc109798e3d5c1acf2e530d01a';
+    const loginBtn = document.querySelector('.login-box .btn');
+    const originalText = loginBtn.textContent;
+    loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+    loginBtn.disabled = true;
 
-    if (idHash === validIdHash && pwHash === validPwHash) {
-        closeModal();
-        staffSection.style.display = 'block';
+    // 1. Supabase Auth (이메일, 비밀번호 인증)
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: pw,
+    });
 
-        setTimeout(() => {
-            staffSection.classList.add('active');
-            const body = staffSection.querySelector('.accordion-body');
-            body.style.maxHeight = body.scrollHeight + "px";
-            body.style.opacity = "1";
-            staffSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            showToast('🔓 Staff Access Granted');
-        }, 100);
-    } else {
+    if (authError) {
         alert('Access Denied. Invalid Credentials.');
+        loginBtn.innerHTML = originalText;
+        loginBtn.disabled = false;
         document.getElementById('staffPw').value = '';
         document.getElementById('staffPw').focus();
+        return;
     }
+
+    // 2. 인증 성공 후 보호된 데이터(Staff Content) 불러오기
+    const { data: staffData, error: fetchError } = await supabase
+        .from('staff_content')
+        .select('content')
+        .eq('id', 1)
+        .single();
+
+    loginBtn.innerHTML = originalText;
+    loginBtn.disabled = false;
+
+    if (fetchError || !staffData) {
+        alert('보안 데이터를 불러오는 데 실패했습니다.');
+        console.error(fetchError);
+        return;
+    }
+
+    // 3. UI 렌더링 및 해제
+    document.getElementById('staffContentBody').innerHTML = staffData.content;
+
+    closeModal();
+    staffSection.style.display = 'block';
+
+    setTimeout(() => {
+        staffSection.classList.add('active');
+        const body = staffSection.querySelector('.accordion-body');
+        body.style.maxHeight = body.scrollHeight + "px";
+        body.style.opacity = "1";
+        staffSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showToast('🔓 Staff Access Granted');
+    }, 100);
 }
 
 document.getElementById('staffPw').addEventListener('keypress', (e) => {
