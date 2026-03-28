@@ -132,6 +132,8 @@ async function checkLogin() {
     document.getElementById('staffContentBody').innerHTML = staffData.content;
 
     closeModal();
+    document.getElementById('logoutBtn').style.display = 'inline-flex';
+    document.getElementById('staffBtn').style.display = 'none';
     staffSection.style.display = 'block';
 
     setTimeout(() => {
@@ -143,6 +145,53 @@ async function checkLogin() {
         showToast('🔓 Staff Access Granted');
     }, 100);
 }
+
+// 로그아웃
+async function logout() {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+        alert('로그아웃에 실패했습니다.');
+        return;
+    }
+
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('staffBtn').style.display = 'inline-flex';
+
+    // UI 초기화
+    document.getElementById('staffContentBody').innerHTML = '';
+    staffSection.style.display = 'none';
+    staffSection.classList.remove('active');
+
+    showToast('🔒 관리자 로그아웃 완료');
+
+    // 방명록 열린 상태면 리로드 (휴지통 버튼 등 강제 제거)
+    const memoPanel = document.getElementById('memoPanel');
+    if (memoPanel && memoPanel.classList.contains('open')) {
+        loadMemos();
+    }
+}
+
+// 자동 로그인(세션 복원) : 새로고침 시에도 유지되도록 구현
+async function restoreAdminSession() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+        document.getElementById('logoutBtn').style.display = 'inline-flex';
+        document.getElementById('staffBtn').style.display = 'none';
+
+        // 보호된 데이터(Staff 영역) 자동 불러오기
+        const { data: staffData } = await supabaseClient
+            .from('staff_content')
+            .select('content')
+            .eq('id', 1)
+            .single();
+
+        if (staffData) {
+            document.getElementById('staffContentBody').innerHTML = staffData.content;
+            staffSection.style.display = 'block';
+        }
+    }
+}
+window.addEventListener('DOMContentLoaded', restoreAdminSession);
 
 document.getElementById('staffPw').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') checkLogin();
