@@ -392,14 +392,15 @@ async function loadMemos() {
         }
 
         const authorStrong = document.createElement('strong');
-        authorStrong.textContent = authorText;
 
         if (memoHash === 'ADMIN') {
             item.classList.add('admin-memo');
             authorStrong.style.color = '#fbbf24'; // Gold
-            authorStrong.innerHTML = '<i class="fa-solid fa-crown" style="font-size:0.85rem;margin-right:4px;"></i>' + authorText;
+            authorStrong.innerHTML = '<i class="fa-solid fa-crown" style="font-size:0.85rem;margin-right:4px;"></i>';
+            authorStrong.appendChild(document.createTextNode(authorText));
         } else {
             authorStrong.style.color = '#60a5fa'; // Blue
+            authorStrong.textContent = authorText;
         }
 
         const messageNode = document.createTextNode(` : ${messageText}`);
@@ -470,14 +471,34 @@ memoSubmitBtn.addEventListener('click', async () => {
     const rawContent = memoTextarea.value.trim();
     if (!rawContent) return;
 
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const isAdmin = sessionData?.session !== null;
+
     const authorInput = document.getElementById('memoAuthor');
-    const authorName = authorInput && authorInput.value.trim() ? authorInput.value.trim() : '익명';
+    let authorName = authorInput && authorInput.value.trim() ? authorInput.value.trim() : '';
+
+    if (authorName) {
+        if (authorName.length > 8) {
+            alert('닉네임은 최대 8글자까지만 가능합니다.');
+            return;
+        }
+
+        if (/[^a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s]/.test(authorName)) {
+            alert('닉네임에 특수문자는 사용할 수 없습니다.');
+            return;
+        }
+
+        if (!isAdmin && authorName.includes('관리자')) {
+            alert('"관리자"라는 단어가 포함된 닉네임은 사칭 방지를 위해 사용할 수 없습니다.');
+            return;
+        }
+    } else {
+        authorName = '익명';
+    }
 
     const pwInput = document.getElementById('memoPw');
     const authorPw = pwInput && pwInput.value.trim() ? pwInput.value.trim() : '';
 
-    const { data: sessionData } = await supabaseClient.auth.getSession();
-    const isAdmin = sessionData?.session !== null;
     const isAdminNotice = isAdmin && document.getElementById('isAdminNotice')?.checked;
 
     let pwHash = 'NONE';
