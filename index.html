@@ -69,6 +69,19 @@
                 <!-- 메시지 렌더링 영역 -->
             </div>
             <div class="memo-input-container">
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="memoAuthor" placeholder="닉네임" class="memo-author-input" style="flex: 1;">
+                    <input type="password" id="memoPw" placeholder="비밀번호(삭제용)" class="memo-author-input"
+                        style="flex: 1;">
+                </div>
+                <div id="adminMemoOption"
+                    style="display: none; text-align: left; margin-bottom: 8px; padding-left: 4px;">
+                    <label
+                        style="font-size: 0.85rem; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" id="isAdminNotice" checked> <i class="fa-solid fa-crown"
+                            style="font-size: 0.8rem;"></i> 관리자 공지로 등록
+                    </label>
+                </div>
                 <textarea id="memoTextarea" placeholder="메모를 남겨보세요! (엔터로 전송)" rows="2"></textarea>
                 <button id="memoSubmitBtn" class="btn" style="width:100%; margin-top:10px;">남기기</button>
             </div>
@@ -221,7 +234,7 @@
                     <!-- 공사중 카드 -->
                     <div class="card card-construction">
                         <div class="card-icon"><i class="fa-solid fa-person-digging"></i></div>
-                        <h2>인증 도구 (Maintenance)</h2>
+                        <h2>Maintenance</h2>
                         <p>더 안전하고 확실한 도구 제공을 위해<br>현재 시스템 점검 및 업데이트 중입니다.</p>
                         <button class="btn btn-disabled">
                             <i class="fa-solid fa-wrench"></i> 점검 중 (N/A)
@@ -309,13 +322,14 @@
     <!-- 로그인 모달 -->
     <div class="modal-overlay" id="loginModal">
         <div class="login-box">
-            <h2><i class="fa-solid fa-fingerprint"></i> Identity Verify</h2>
+            <h2><i class="fa-solid fa-user-lock" style="color:var(--accent-primary);"></i> 관리자 로그인</h2>
             <div class="input-group">
-                <input type="text" id="staffId" placeholder="Access ID">
-                <input type="password" id="staffPw" placeholder="Passcode">
+                <input type="email" id="staffId" placeholder="이메일 주소">
+                <input type="password" id="staffPw" placeholder="비밀번호">
             </div>
-            <button class="btn" onclick="checkLogin()" style="width:100%">Verify & Login</button>
-            <div class="modal-close" onclick="closeModal()">Cancel</div>
+            <button class="btn" onclick="checkLogin()" style="width:100%"><i class="fa-solid fa-right-to-bracket"></i>
+                로그인</button>
+            <div class="modal-close" onclick="closeModal()">닫기</div>
         </div>
     </div>
 

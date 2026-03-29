@@ -1,4 +1,3 @@
-// Supabase 구성 (sec.txt 정보 반영)
 const SUPABASE_URL = 'https://hqqcumvikrculyhkjrss.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcWN1bXZpa3JjdWx5aGtqcnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjM5OTksImV4cCI6MjA5MDIzOTk5OX0.RSSn2vuoXhg6y3qp1Hkg1hoptfWRmiy2AsK18K60-cU';
 
@@ -13,7 +12,6 @@ try {
     console.error('⚠️ Supabase 세팅 에러:', e);
 }
 
-// 아코디언 로직
 document.querySelectorAll('.accordion-header').forEach(header => {
     header.addEventListener('click', () => {
         const body = header.nextElementSibling;
@@ -28,7 +26,6 @@ document.querySelectorAll('.accordion-header').forEach(header => {
     });
 });
 
-// 창 크기 조절 시 아코디언 높이 보정
 window.addEventListener('resize', () => {
     document.querySelectorAll('.accordion-header.active').forEach(header => {
         const body = header.nextElementSibling;
@@ -36,14 +33,12 @@ window.addEventListener('resize', () => {
     });
 });
 
-// 비밀번호 복사 Toast
 function copyPassword(text) {
     navigator.clipboard.writeText(text).then(() => {
         showToast('✅ Password Copied: ' + text);
     });
 }
 
-// XSS 방지: textContent 사용
 function showToast(msg) {
     const toast = document.getElementById("toast");
     toast.textContent = msg;
@@ -96,7 +91,6 @@ function closePwModal() {
     setTimeout(() => pwModal.style.display = 'none', 300);
 }
 
-// Supabase 로그인 검증 및 보안 금고 오픈
 async function checkLogin() {
     const email = document.getElementById('staffId').value;
     const pw = document.getElementById('staffPw').value;
@@ -111,7 +105,6 @@ async function checkLogin() {
     loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
     loginBtn.disabled = true;
 
-    // 1. Supabase Auth (이메일, 비밀번호 인증)
     const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: pw,
@@ -126,7 +119,6 @@ async function checkLogin() {
         return;
     }
 
-    // 2. 인증 성공 후 보호된 데이터(Staff Content) 불러오기
     const { data: staffData, error: fetchError } = await supabaseClient
         .from('staff_content')
         .select('content')
@@ -142,7 +134,6 @@ async function checkLogin() {
         return;
     }
 
-    // 3. UI 렌더링 및 해제
     document.getElementById('staffContentBody').innerHTML = staffData.content;
 
     closeModal();
@@ -160,7 +151,6 @@ async function checkLogin() {
     }, 100);
 }
 
-// 로그아웃
 async function logout() {
     const { error } = await supabaseClient.auth.signOut();
     if (error) {
@@ -171,28 +161,24 @@ async function logout() {
     document.getElementById('logoutBtn').style.display = 'none';
     document.getElementById('staffBtn').style.display = 'inline-flex';
 
-    // UI 초기화
     document.getElementById('staffContentBody').innerHTML = '';
     staffSection.style.display = 'none';
     staffSection.classList.remove('active');
 
     showToast('🔒 관리자 로그아웃 완료');
 
-    // 방명록 열린 상태면 리로드 (휴지통 버튼 등 강제 제거)
     const memoPanel = document.getElementById('memoPanel');
     if (memoPanel && memoPanel.classList.contains('open')) {
         loadMemos();
     }
 }
 
-// 자동 로그인(세션 복원) : 새로고침 시에도 유지되도록 구현
 async function restoreAdminSession() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
         document.getElementById('logoutBtn').style.display = 'inline-flex';
         document.getElementById('staffBtn').style.display = 'none';
 
-        // 보호된 데이터(Staff 영역) 자동 불러오기
         const { data: staffData } = await supabaseClient
             .from('staff_content')
             .select('content')
@@ -218,9 +204,7 @@ async function translateToKorean(text) {
         const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ko&dt=t&q=${encodeURIComponent(text)}`;
         const response = await fetch(url);
         const data = await response.json();
-        // Google Translate API는 문단별로 배열에 나눠서 응답할 수 있으므로 병합
-        const translatedText = data[0].map(item => item[0]).join(' ');
-        return translatedText;
+        return data[0].map(item => item[0]).join(' ');
     } catch (e) {
         console.error('번역 에러:', e);
         return '번역을 가져올 수 없습니다.';
@@ -244,7 +228,6 @@ async function loadQuotes() {
 async function displayRandomQuote() {
     if (quotesData.length === 0) return;
 
-    // 버튼 비활성화 (연타 방지)
     if (quoteRefreshBtn) {
         quoteRefreshBtn.disabled = true;
         quoteRefreshBtn.style.opacity = "0.5";
@@ -253,17 +236,14 @@ async function displayRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotesData.length);
     const quote = quotesData[randomIndex];
 
-    // 페이드 아웃
     if (quoteTextKo && quoteTextEn && quoteAuthor) {
         quoteTextKo.style.opacity = 0;
         quoteTextEn.style.opacity = 0;
         quoteAuthor.style.opacity = 0;
     }
 
-    // 번역 실행
     const translated = await translateToKorean(quote.text);
 
-    // 페이드 인 및 텍스트 교체
     setTimeout(() => {
         if (quoteTextKo) {
             quoteTextKo.textContent = translated;
@@ -278,7 +258,6 @@ async function displayRandomQuote() {
             quoteAuthor.style.opacity = 1;
         }
 
-        // 버튼 활성화
         if (quoteRefreshBtn) {
             quoteRefreshBtn.disabled = false;
             quoteRefreshBtn.style.opacity = "1";
@@ -342,6 +321,12 @@ const memoTextarea = document.getElementById('memoTextarea');
 const memoList = document.getElementById('memoList');
 const memoSubmitBtn = document.getElementById('memoSubmitBtn');
 
+async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 function formatTime(isoString) {
     const date = new Date(isoString);
@@ -355,11 +340,14 @@ function formatTime(isoString) {
 async function loadMemos() {
     memoList.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:20px;">로딩 중...</div>';
 
-    // 1. 관리자(인증 세션) 로그인 여부 확인
     const { data: sessionData } = await supabaseClient.auth.getSession();
     const isAdmin = sessionData?.session !== null;
 
-    // 24시간 이내 데이터만 불러오기
+    const adminOption = document.getElementById('adminMemoOption');
+    if (adminOption) {
+        adminOption.style.display = isAdmin ? 'block' : 'none';
+    }
+
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
     const { data, error } = await supabaseClient
@@ -385,7 +373,39 @@ async function loadMemos() {
         item.className = 'memo-item';
 
         const textSpan = document.createElement('span');
-        textSpan.textContent = memo.content; // XSS 방어
+
+        let authorText = "익명";
+        let messageText = memo.content;
+        let memoHash = "NONE";
+
+        // 인코딩된 데이터 파싱 ("닉네임:::해시:::내용" 또는 "닉네임:::내용" 형태)
+        if (memo.content.includes(':::')) {
+            const parts = memo.content.split(':::');
+            if (parts.length >= 3) {
+                authorText = parts[0];
+                memoHash = parts[1];
+                messageText = parts.slice(2).join(':::');
+            } else if (parts.length === 2) {
+                authorText = parts[0];
+                messageText = parts[1];
+            }
+        }
+
+        const authorStrong = document.createElement('strong');
+        authorStrong.textContent = authorText;
+
+        if (memoHash === 'ADMIN') {
+            item.classList.add('admin-memo');
+            authorStrong.style.color = '#fbbf24'; // Gold
+            authorStrong.innerHTML = '<i class="fa-solid fa-crown" style="font-size:0.85rem;margin-right:4px;"></i>' + authorText;
+        } else {
+            authorStrong.style.color = '#60a5fa'; // Blue
+        }
+
+        const messageNode = document.createTextNode(` : ${messageText}`);
+
+        textSpan.appendChild(authorStrong);
+        textSpan.appendChild(messageNode);
 
         const timeSpan = document.createElement('span');
         timeSpan.className = 'memo-item-time';
@@ -394,24 +414,46 @@ async function loadMemos() {
         item.appendChild(textSpan);
         item.appendChild(timeSpan);
 
-        // 관리자용 삭제 버튼
-        if (isAdmin) {
+        const canShowDeleteBtn = isAdmin || (memoHash !== 'NONE' && memoHash !== 'ADMIN');
+
+        if (canShowDeleteBtn) {
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'memo-delete-btn';
             deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-            deleteBtn.title = '메모 삭제';
-            deleteBtn.onclick = async () => {
-                if (confirm('이 메모를 영구 삭제하시겠습니까?')) {
-                    const { error: deleteError } = await supabaseClient
-                        .from('memos')
-                        .delete()
-                        .eq('id', memo.id);
+            deleteBtn.title = isAdmin ? '관리자 권한 삭제' : '메모 삭제 (비밀번호)';
 
-                    if (deleteError) {
-                        alert('삭제 실패: 권한 확인 또는 네트워크 오류');
-                        console.error(deleteError);
+            deleteBtn.onclick = async () => {
+                let canDelete = isAdmin;
+
+                if (!isAdmin) {
+                    const inputPw = prompt('메모를 삭제하려면 등록 시 입력한 비밀번호를 입력해주세요:');
+                    if (inputPw === null) return; // user cancelled
+
+                    const inputHash = await sha256(inputPw);
+                    if (inputHash === memoHash) {
+                        canDelete = true;
                     } else {
-                        loadMemos(); // 다시 렌더링
+                        alert('비밀번호가 일치하지 않습니다.');
+                        return;
+                    }
+                }
+
+                if (canDelete) {
+                    if (confirm('이 메모를 영구 삭제하시겠습니까?')) {
+                        const { data: deletedData, error: deleteError } = await supabaseClient
+                            .from('memos')
+                            .delete()
+                            .eq('id', memo.id)
+                            .select();
+
+                        if (deleteError) {
+                            alert('삭제 실패: 네트워크 오류');
+                            console.error(deleteError);
+                        } else if (deletedData && deletedData.length === 0) {
+                            alert('서버 응답: 삭제 권한이 차단되었습니다.\\n(Supabase 데이터베이스의 RLS 정책에서 익명 사용자의 DELETE 권한을 허용해야 합니다.)');
+                        } else {
+                            loadMemos(); // 다시 렌더링
+                        }
                     }
                 }
             };
@@ -421,13 +463,33 @@ async function loadMemos() {
         memoList.appendChild(item);
     });
 
-    // 스크롤 맨 아래로
     memoList.scrollTop = memoList.scrollHeight;
 }
 
 memoSubmitBtn.addEventListener('click', async () => {
-    const content = memoTextarea.value.trim();
-    if (!content) return;
+    const rawContent = memoTextarea.value.trim();
+    if (!rawContent) return;
+
+    const authorInput = document.getElementById('memoAuthor');
+    const authorName = authorInput && authorInput.value.trim() ? authorInput.value.trim() : '익명';
+
+    const pwInput = document.getElementById('memoPw');
+    const authorPw = pwInput && pwInput.value.trim() ? pwInput.value.trim() : '';
+
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const isAdmin = sessionData?.session !== null;
+    const isAdminNotice = isAdmin && document.getElementById('isAdminNotice')?.checked;
+
+    let pwHash = 'NONE';
+    if (isAdminNotice) {
+        pwHash = 'ADMIN';
+    } else if (authorPw) {
+        pwHash = await sha256(authorPw);
+    }
+
+    // 내용에 닉네임과 암호화된(Hash) 비밀번호 병합 저장 (DB 스키마 유지)
+    // 포맷: "닉네임:::비밀번호해시:::내용"
+    const content = `${authorName}:::${pwHash}:::${rawContent}`;
 
     memoSubmitBtn.disabled = true;
     memoSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
@@ -471,7 +533,6 @@ memoClose.addEventListener('click', () => {
     memoPanel.classList.remove('open');
 });
 
-// 패널 외부 클릭 막기
 document.addEventListener('click', (e) => {
     const memoPanel = document.getElementById('memoPanel');
     const memoToggle = document.getElementById('memoToggle');
@@ -514,7 +575,7 @@ if (symConfigBtn && symConfigArea) {
 }
 
 function generatePassword() {
-    if (!pwLength) return; // 비밀번호 UI가 없는 경우 에러 방지
+    if (!pwLength) return;
 
     let charSet = '';
     if (pwUpper.checked) charSet += UPPERCASE;
@@ -528,7 +589,6 @@ function generatePassword() {
         }
     }
 
-    // 만약 옵션이 전부 해제되어 있으면 기본 소문자 풀 강제 세팅
     if (charSet === '') {
         pwLower.checked = true;
         charSet = LOWERCASE;
@@ -538,7 +598,6 @@ function generatePassword() {
     const length = parseInt(pwLength.value);
     let password = '';
 
-    // Crypto API를 이용한 강력하고 안전한 난수 생성
     const array = new Uint32Array(length);
     window.crypto.getRandomValues(array);
 
