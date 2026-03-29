@@ -281,6 +281,97 @@ header p {
     letter-spacing: 0.3px;
 }
 
+/* --- 랜덤 명언 위젯 --- */
+.quote-widget {
+    margin: 35px auto 0;
+    max-width: 650px;
+    padding: 22px 40px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: relative;
+    text-align: center;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.quote-widget:hover {
+    border-color: rgba(96, 165, 250, 0.4);
+    box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.quote-content {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 12px;
+}
+
+.quote-text-en {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    font-style: italic;
+    transition: opacity 0.3s ease;
+}
+
+.quote-text-ko {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.4;
+    word-break: keep-all;
+    transition: opacity 0.3s ease;
+}
+
+.quote-icon-bg {
+    position: absolute;
+    top: -10px;
+    left: 15px;
+    font-size: 4rem;
+    color: var(--glass-highlight);
+    opacity: 0.1;
+    z-index: 1;
+}
+
+.quote-author {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+}
+
+.quote-refresh {
+    position: absolute;
+    bottom: 15px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quote-refresh:hover {
+    color: var(--accent-primary);
+    transform: rotate(180deg);
+}
+
+.quote-refresh:active {
+    transform: rotate(360deg) scale(0.9);
+}
+
 /* --- 아코디언 (Glassmorphism 2.0) --- */
 .accordion-item {
     margin-bottom: 24px;

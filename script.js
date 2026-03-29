@@ -205,7 +205,95 @@ async function restoreAdminSession() {
         }
     }
 }
-window.addEventListener('DOMContentLoaded', restoreAdminSession);
+
+/* --- 랜덤 명언 로직 (단순 번역 API 적용) --- */
+const quoteTextKo = document.getElementById('quoteTextKo');
+const quoteTextEn = document.getElementById('quoteTextEn');
+const quoteAuthor = document.getElementById('quoteAuthor');
+const quoteRefreshBtn = document.getElementById('quoteRefreshBtn');
+let quotesData = [];
+
+async function translateToKorean(text) {
+    try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ko&dt=t&q=${encodeURIComponent(text)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        // Google Translate API는 문단별로 배열에 나눠서 응답할 수 있으므로 병합
+        const translatedText = data[0].map(item => item[0]).join(' ');
+        return translatedText;
+    } catch (e) {
+        console.error('번역 에러:', e);
+        return '번역을 가져올 수 없습니다.';
+    }
+}
+
+async function loadQuotes() {
+    try {
+        const response = await fetch('quotes.json');
+        if (!response.ok) throw new Error('Network file load failed');
+        quotesData = await response.json();
+        displayRandomQuote();
+    } catch (error) {
+        console.error('명언 데이터를 불러오는 데 실패했습니다:', error);
+        if (quoteTextKo) quoteTextKo.textContent = "코딩은 타이핑이 아니라 생각하는 과정이다.";
+        if (quoteTextEn) quoteTextEn.textContent = "Coding is not typing, it's thinking.";
+        if (quoteAuthor) quoteAuthor.textContent = "- Anonymous -";
+    }
+}
+
+async function displayRandomQuote() {
+    if (quotesData.length === 0) return;
+
+    // 버튼 비활성화 (연타 방지)
+    if (quoteRefreshBtn) {
+        quoteRefreshBtn.disabled = true;
+        quoteRefreshBtn.style.opacity = "0.5";
+    }
+
+    const randomIndex = Math.floor(Math.random() * quotesData.length);
+    const quote = quotesData[randomIndex];
+
+    // 페이드 아웃
+    if (quoteTextKo && quoteTextEn && quoteAuthor) {
+        quoteTextKo.style.opacity = 0;
+        quoteTextEn.style.opacity = 0;
+        quoteAuthor.style.opacity = 0;
+    }
+
+    // 번역 실행
+    const translated = await translateToKorean(quote.text);
+
+    // 페이드 인 및 텍스트 교체
+    setTimeout(() => {
+        if (quoteTextKo) {
+            quoteTextKo.textContent = translated;
+            quoteTextKo.style.opacity = 1;
+        }
+        if (quoteTextEn) {
+            quoteTextEn.textContent = `"${quote.text}"`;
+            quoteTextEn.style.opacity = 1;
+        }
+        if (quoteAuthor) {
+            quoteAuthor.textContent = quote.author ? `- ${quote.author} -` : '- Anonymous -';
+            quoteAuthor.style.opacity = 1;
+        }
+
+        // 버튼 활성화
+        if (quoteRefreshBtn) {
+            quoteRefreshBtn.disabled = false;
+            quoteRefreshBtn.style.opacity = "1";
+        }
+    }, 300);
+}
+
+if (quoteRefreshBtn) {
+    quoteRefreshBtn.addEventListener('click', displayRandomQuote);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    restoreAdminSession();
+    loadQuotes();
+});
 
 document.getElementById('staffPw').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') checkLogin();
