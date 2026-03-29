@@ -489,6 +489,9 @@ const pwUpper = document.getElementById('pwUpper');
 const pwLower = document.getElementById('pwLower');
 const pwNum = document.getElementById('pwNum');
 const pwSym = document.getElementById('pwSym');
+const customSymbols = document.getElementById('customSymbols');
+const symConfigBtn = document.getElementById('symConfigBtn');
+const symConfigArea = document.getElementById('symConfigArea');
 const generatedPw = document.getElementById('generatedPw');
 const generatePwBtn = document.getElementById('generatePwBtn');
 const copyPwBtn = document.getElementById('copyPwBtn');
@@ -496,7 +499,19 @@ const copyPwBtn = document.getElementById('copyPwBtn');
 const UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
 const NUMBERS = '0123456789';
-const SYMBOLS = '!@#$%^&*()_+~`|}{[]:;?><,./-=';
+const DEFAULT_SYMBOLS = '!@#$%^&*()_+~`|}{[]:;?><,./-=';
+
+if (symConfigBtn && symConfigArea) {
+    symConfigBtn.addEventListener('click', () => {
+        if (symConfigArea.style.display === 'none') {
+            symConfigArea.style.display = 'block';
+            symConfigBtn.style.color = '#60a5fa'; // accent-primary 로 활성화
+        } else {
+            symConfigArea.style.display = 'none';
+            symConfigBtn.style.color = 'var(--text-muted)';
+        }
+    });
+}
 
 function generatePassword() {
     if (!pwLength) return; // 비밀번호 UI가 없는 경우 에러 방지
@@ -505,7 +520,13 @@ function generatePassword() {
     if (pwUpper.checked) charSet += UPPERCASE;
     if (pwLower.checked) charSet += LOWERCASE;
     if (pwNum.checked) charSet += NUMBERS;
-    if (pwSym.checked) charSet += SYMBOLS;
+    if (pwSym.checked) {
+        if (customSymbols && customSymbols.value) {
+            charSet += customSymbols.value;
+        } else {
+            charSet += DEFAULT_SYMBOLS;
+        }
+    }
 
     // 만약 옵션이 전부 해제되어 있으면 기본 소문자 풀 강제 세팅
     if (charSet === '') {
