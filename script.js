@@ -12,6 +12,35 @@ try {
     console.error('⚠️ Supabase 세팅 에러:', e);
 }
 
+/* --- Theme Toggle Logic --- */
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+function setTheme(theme, animate = false) {
+    if (animate) {
+        document.body.classList.add('theme-transitioning');
+        setTimeout(() => document.body.classList.remove('theme-transitioning'), 500);
+    }
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('dsyweb-theme', theme);
+    if (themeIcon) {
+        themeIcon.className = theme === 'dark'
+            ? 'fa-solid fa-sun'
+            : 'fa-solid fa-moon';
+    }
+}
+
+// 초기 로드 시 저장된 테마 적용 (기본값: dark)
+const savedTheme = localStorage.getItem('dsyweb-theme') || 'dark';
+setTheme(savedTheme);
+
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        setTheme(current === 'dark' ? 'light' : 'dark', true);
+    });
+}
+
 document.querySelectorAll('.accordion-header').forEach(header => {
     header.addEventListener('click', () => {
         const body = header.nextElementSibling;
@@ -353,7 +382,7 @@ async function loadMemos() {
     const { data, error } = await supabaseClient
         .from('memos')
         .select('*')
-        .gte('created_at', yesterday)
+        .or(`created_at.gte.${yesterday},content.ilike.%:::ADMIN_PERM:::%,content.ilike.%:::ADMIN:::%`)
         .order('created_at', { ascending: true });
 
     if (error) {
@@ -393,7 +422,7 @@ async function loadMemos() {
 
         const authorStrong = document.createElement('strong');
 
-        if (memoHash === 'ADMIN') {
+        if (memoHash === 'ADMIN' || memoHash === 'ADMIN_PERM' || memoHash === 'ADMIN_TEMP') {
             item.classList.add('admin-memo');
             authorStrong.style.color = '#fbbf24'; // Gold
             authorStrong.innerHTML = '<i class="fa-solid fa-crown" style="font-size:0.85rem;margin-right:4px;"></i>';
@@ -415,7 +444,7 @@ async function loadMemos() {
         item.appendChild(textSpan);
         item.appendChild(timeSpan);
 
-        const canShowDeleteBtn = isAdmin || (memoHash !== 'NONE' && memoHash !== 'ADMIN');
+        const canShowDeleteBtn = isAdmin || (memoHash !== 'NONE' && memoHash !== 'ADMIN' && memoHash !== 'ADMIN_PERM' && memoHash !== 'ADMIN_TEMP');
 
         if (canShowDeleteBtn) {
             const deleteBtn = document.createElement('button');
@@ -500,10 +529,11 @@ memoSubmitBtn.addEventListener('click', async () => {
     const authorPw = pwInput && pwInput.value.trim() ? pwInput.value.trim() : '';
 
     const isAdminNotice = isAdmin && document.getElementById('isAdminNotice')?.checked;
+    const isAdminPerm = isAdmin && document.getElementById('isAdminPerm')?.checked;
 
     let pwHash = 'NONE';
     if (isAdminNotice) {
-        pwHash = 'ADMIN';
+        pwHash = isAdminPerm ? 'ADMIN_PERM' : 'ADMIN_TEMP';
     } else if (authorPw) {
         pwHash = await sha256(authorPw);
     }
@@ -643,3 +673,318 @@ if (pwLength) {
         }
     });
 }
+
+/* --- Chat Group 로직 --- */
+let currentChatRoom = null;
+let currentChatNickname = null;
+let chatSubscription = null;
+let renderedMessageIds = new Set();
+
+const chatLobbyModal = document.getElementById('chatLobbyModal');
+const chatRoomPanel = document.getElementById('chatRoomPanel');
+const chatMessageList = document.getElementById('chatMessageList');
+const chatInputText = document.getElementById('chatInputText');
+
+function openChatLobbyModal() {
+    chatLobbyModal.style.display = 'flex';
+    setTimeout(() => chatLobbyModal.classList.add('show'), 10);
+    switchChatTab('join');
+    loadAdminRoomList();
+}
+
+async function loadAdminRoomList() {
+    const adminRoomListDiv = document.getElementById('adminRoomList');
+    const adminRoomListContent = document.getElementById('adminRoomListContent');
+    if (!adminRoomListDiv || !adminRoomListContent) return;
+
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const isAdmin = sessionData?.session !== null;
+
+    if (!isAdmin) {
+        adminRoomListDiv.style.display = 'none';
+        return;
+    }
+
+    adminRoomListDiv.style.display = 'block';
+    adminRoomListContent.innerHTML = '<span style="color:var(--text-muted);">로딩 중...</span>';
+
+    const { data, error } = await supabaseClient
+        .from('chat_rooms')
+        .select('room_name, retention_hours, created_at')
+        .order('created_at', { ascending: false });
+
+    if (error || !data) {
+        adminRoomListContent.innerHTML = '<span style="color:var(--error-color);">불러오기 실패</span>';
+        return;
+    }
+
+    if (data.length === 0) {
+        adminRoomListContent.innerHTML = '<span style="color:var(--text-muted);">활성 채팅방 없음</span>';
+        return;
+    }
+
+    adminRoomListContent.innerHTML = '';
+    data.forEach(room => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding: 6px 10px; background: var(--memo-item-bg); border: 1px solid var(--glass-border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;';
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.style.cssText = 'color: var(--accent-primary); font-weight: 600;';
+        nameSpan.textContent = room.room_name;
+
+        const infoSpan = document.createElement('span');
+        infoSpan.style.cssText = 'color: var(--text-muted); font-size: 0.75rem;';
+        infoSpan.textContent = `${room.retention_hours}h`;
+
+        item.appendChild(nameSpan);
+        item.appendChild(infoSpan);
+        adminRoomListContent.appendChild(item);
+    });
+}
+
+function closeChatLobbyModal() {
+    chatLobbyModal.classList.remove('show');
+    setTimeout(() => chatLobbyModal.style.display = 'none', 300);
+}
+
+function switchChatTab(tab) {
+    document.getElementById('tabJoin').style.display = tab === 'join' ? 'block' : 'none';
+    document.getElementById('tabCreate').style.display = tab === 'create' ? 'block' : 'none';
+    
+    const tabs = document.querySelectorAll('.chat-tab');
+    tabs[0].classList.toggle('active', tab === 'join');
+    tabs[1].classList.toggle('active', tab === 'create');
+}
+
+async function createChatRoom() {
+    const roomName = document.getElementById('createRoomName').value.trim();
+    const pw = document.getElementById('createPassword').value.trim();
+    const nickname = document.getElementById('createNickname').value.trim();
+    const retention = parseInt(document.getElementById('createRetention').value);
+
+    if (!roomName || !pw || !nickname) {
+        alert('모든 필드를 입력해주세요.');
+        return;
+    }
+    
+    if (nickname.length > 8) {
+        alert('닉네임은 최대 8글자입니다.');
+        return;
+    }
+
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const isAdmin = sessionData?.session !== null;
+    
+    if (!isAdmin && nickname.includes('관리자')) {
+        alert('"관리자"가 포함된 닉네임은 사용할 수 없습니다.');
+        return;
+    }
+
+    const pwHash = await sha256(pw);
+
+    // 방 생성
+    const { error } = await supabaseClient
+        .from('chat_rooms')
+        .insert([{ room_name: roomName, password_hash: pwHash, retention_hours: retention }]);
+
+    if (error) {
+        if (error.code === '23505') {
+            alert('이미 존재하는 방 이름입니다.');
+        } else {
+            console.error(error);
+            alert('방 생성 중 오류가 발생했습니다.');
+        }
+        return;
+    }
+
+    joinChatProcess(roomName, pwHash, nickname, retention);
+}
+
+async function joinChatRoom() {
+    const roomName = document.getElementById('joinRoomName').value.trim();
+    const pw = document.getElementById('joinPassword').value.trim();
+    const nickname = document.getElementById('joinNickname').value.trim();
+
+    if (!roomName || !pw || !nickname) {
+        alert('모든 필드를 입력해주세요.');
+        return;
+    }
+    
+    if (nickname.length > 8) {
+        alert('닉네임은 최대 8글자입니다.');
+        return;
+    }
+    
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const isAdmin = sessionData?.session !== null;
+    
+    if (!isAdmin && nickname.includes('관리자')) {
+        alert('"관리자"가 포함된 닉네임은 사용할 수 없습니다.');
+        return;
+    }
+
+    const pwHash = await sha256(pw);
+
+    const { data: roomInfo, error } = await supabaseClient
+        .from('chat_rooms')
+        .select('*')
+        .eq('room_name', roomName)
+        .single();
+
+    if (error || !roomInfo) {
+        alert('존재하지 않는 방입니다.');
+        return;
+    }
+
+    if (roomInfo.password_hash !== pwHash) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+    }
+
+    joinChatProcess(roomName, pwHash, nickname, roomInfo.retention_hours);
+}
+
+function joinChatProcess(roomName, pwHash, nickname, retentionHours) {
+    currentChatRoom = roomName;
+    currentChatNickname = nickname;
+    document.getElementById('currentChatRoomTitle').textContent = roomName;
+    
+    closeChatLobbyModal();
+    chatRoomPanel.classList.add('open');
+    loadChatMessages(retentionHours);
+    subscribeToChat();
+}
+
+async function loadChatMessages(retentionHours) {
+    chatMessageList.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:20px;">로딩 중...</div>';
+    
+    // 만료 기간 설정 (retentionHours 이전 시간)
+    const cutoffTime = new Date(Date.now() - retentionHours * 60 * 60 * 1000).toISOString();
+
+    const { data, error } = await supabaseClient
+        .from('chat_messages')
+        .select('*')
+        .eq('room_name', currentChatRoom)
+        .gte('created_at', cutoffTime)
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        chatMessageList.innerHTML = '<div style="text-align:center; color:#ef4444;">데이터 불러오기 실패</div>';
+        return;
+    }
+
+    chatMessageList.innerHTML = '';
+    renderedMessageIds.clear();
+    
+    if (data.length === 0) {
+        chatMessageList.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:20px;">대화가 없습니다. 새로운 메시지를 남겨보세요!</div>';
+    } else {
+        data.forEach(msg => appendChatMessage(msg));
+    }
+    chatMessageList.scrollTop = chatMessageList.scrollHeight;
+}
+
+function appendChatMessage(msg) {
+    if (!msg || renderedMessageIds.has(msg.id)) return;
+    renderedMessageIds.add(msg.id);
+
+    // 만약 "대화가 없습니다." 박스가 있다면 제거
+    const emptyBox = chatMessageList.querySelector('div[style*="text-align:center"]');
+    if (emptyBox) emptyBox.remove();
+
+    const isMe = msg.nickname === currentChatNickname;
+    
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${isMe ? 'me' : ''}`;
+    
+    const header = document.createElement('div');
+    header.className = 'chat-bubble-header';
+    
+    const authorSpan = document.createElement('span');
+    authorSpan.className = 'chat-bubble-author';
+    authorSpan.textContent = msg.nickname;
+    
+    const timeSpan = document.createElement('span');
+    timeSpan.textContent = formatTime(msg.created_at);
+    
+    header.appendChild(authorSpan);
+    header.appendChild(timeSpan);
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'chat-bubble-content';
+    contentDiv.textContent = msg.content;
+    
+    bubble.appendChild(header);
+    bubble.appendChild(contentDiv);
+    
+    chatMessageList.appendChild(bubble);
+    chatMessageList.scrollTop = chatMessageList.scrollHeight;
+}
+
+function subscribeToChat() {
+    if (chatSubscription) {
+        chatSubscription.unsubscribe();
+    }
+    
+    chatSubscription = supabaseClient
+        .channel(`chat-${currentChatRoom}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_name=eq.${currentChatRoom}` }, payload => {
+            appendChatMessage(payload.new);
+        })
+        .subscribe();
+}
+
+function leaveChatRoom() {
+    if (chatSubscription) {
+        chatSubscription.unsubscribe();
+        chatSubscription = null;
+    }
+    currentChatRoom = null;
+    currentChatNickname = null;
+    renderedMessageIds.clear();
+    chatRoomPanel.classList.remove('open');
+}
+
+const chatSendBtn = document.getElementById('chatSendBtn');
+if (chatSendBtn) {
+    chatSendBtn.addEventListener('click', sendChatMessage);
+}
+
+if (chatInputText) {
+    chatInputText.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendChatMessage();
+        }
+    });
+}
+
+async function sendChatMessage() {
+    const text = chatInputText.value.trim();
+    if (!text || !currentChatRoom) return;
+
+    chatInputText.value = '';
+    
+    // 작성자가 메시지를 보내면 .select()로 방금 자신이 보낸 데이터를 받아와서
+    // 실시간 동기화를 기다리지 않고 로컬 화면에 즉시(Optimistic) 렌더링합니다!
+    const { data, error } = await supabaseClient
+        .from('chat_messages')
+        .insert([{
+            room_name: currentChatRoom,
+            nickname: currentChatNickname,
+            content: text
+        }])
+        .select();
+
+    if (error) {
+        console.error(error);
+        alert('메시지 전송 실패');
+        return;
+    }
+    
+    // 내가 쓴 메시지 화면에 딜레이 없이 즉시 띄우기
+    if (data && data.length > 0) {
+        appendChatMessage(data[0]);
+    }
+}
+

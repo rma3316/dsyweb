@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,7 @@
 
     <title>Dasory Toolkit</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -77,11 +77,17 @@
                 </div>
                 <div id="adminMemoOption"
                     style="display: none; text-align: left; margin-bottom: 8px; padding-left: 4px;">
-                    <label
-                        style="font-size: 0.85rem; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                        <input type="checkbox" id="isAdminNotice" checked> <i class="fa-solid fa-crown"
-                            style="font-size: 0.8rem;"></i> 관리자 공지로 등록
-                    </label>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <label
+                            style="font-size: 0.85rem; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <input type="checkbox" id="isAdminNotice" checked onchange="document.getElementById('isAdminPerm').disabled = !this.checked"> <i class="fa-solid fa-crown"
+                                style="font-size: 0.8rem;"></i> 관리자 공지로 등록
+                        </label>
+                        <label
+                            style="font-size: 0.8rem; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="isAdminPerm" checked> 영구 보관 (24h 유지)
+                        </label>
+                    </div>
                 </div>
                 <textarea id="memoTextarea" placeholder="메모를 남겨보세요! (엔터로 전송)" rows="2"></textarea>
                 <button id="memoSubmitBtn" class="btn" style="width:100%; margin-top:10px;">남기기</button>
@@ -98,6 +104,12 @@
             <a href="#" target="_blank" class="gift-btn" title="Special Gift">
                 <i class="fa-solid fa-gift"></i>
             </a>
+            <button class="theme-toggle" id="themeToggle" title="테마 전환">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+            <button class="chat-nav-btn" onclick="openChatLobbyModal()" title="그룹 채팅">
+                <i class="fa-solid fa-comments"></i> Chat
+            </button>
             <button class="pwgen-nav-btn" onclick="openPwModal()" title="비밀번호 생성기">
                 <i class="fa-solid fa-key"></i> PassGen
             </button>
@@ -266,6 +278,79 @@
             &copy; 2026 Dasory Toolkit. All rights reserved. | <a href="#" onclick="openPrivacyModal(event)"
                 style="color: inherit; text-decoration: underline;">개인정보 처리방침</a>
         </footer>
+    </div>
+
+    <!-- Chat Lobby Modal -->
+    <div class="modal-overlay" id="chatLobbyModal" onclick="if(event.target === this) closeChatLobbyModal()">
+        <div class="login-box" style="width: 400px; max-width: 90%;">
+            <div class="chat-tabs">
+                <button class="chat-tab active" onclick="switchChatTab('join')">입장하기</button>
+                <button class="chat-tab" onclick="switchChatTab('create')">방 만들기</button>
+            </div>
+            
+            <!-- 관리자 방 목록 -->
+            <div id="adminRoomList" style="display:none; margin-bottom: 15px;">
+                <div style="font-size: 0.8rem; color: var(--accent-yellow); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-crown" style="font-size: 0.75rem;"></i> 활성 채팅방 목록
+                </div>
+                <div id="adminRoomListContent" style="max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
+                    <!-- 방 리스트 -->
+                </div>
+            </div>
+
+            <!-- 방 입장 탭 -->
+            <div id="tabJoin" class="chat-tab-content">
+                <h2 style="margin-top: 10px;"><i class="fa-solid fa-door-open" style="color:#60a5fa;"></i> 방 입장</h2>
+                <div class="input-group">
+                    <input type="text" id="joinRoomName" placeholder="방 이름 (선착순 고유 이름)" maxlength="20">
+                    <input type="password" id="joinPassword" placeholder="비밀번호">
+                    <input type="text" id="joinNickname" placeholder="사용할 닉네임" maxlength="8">
+                </div>
+                <button class="btn" onclick="joinChatRoom()" style="width:100%"><i class="fa-solid fa-right-to-bracket"></i> 입장하기</button>
+            </div>
+
+            <!-- 방 생성 탭 -->
+            <div id="tabCreate" class="chat-tab-content" style="display:none;">
+                <h2 style="margin-top: 10px;"><i class="fa-solid fa-house-medical" style="color:#f472b6;"></i> 방 만들기</h2>
+                <div class="input-group">
+                    <input type="text" id="createRoomName" placeholder="새 방 이름" maxlength="20">
+                    <input type="password" id="createPassword" placeholder="비밀번호 설정">
+                    <input type="text" id="createNickname" placeholder="내 닉네임" maxlength="8">
+                    <div style="margin-bottom: 12px; text-align: left;">
+                        <label style="color:var(--text-muted); font-size: 0.85rem; padding-left: 5px;">메시지 보존 기간:</label>
+                        <select id="createRetention" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color:#fff; border-radius: 12px; margin-top: 5px; outline: none; appearance: none;">
+                            <option value="1">1시간</option>
+                            <option value="24" selected>1일 (24시간)</option>
+                            <option value="72">3일</option>
+                            <option value="168">7일 (최대)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="createChatRoom()" style="width:100%;"><i class="fa-solid fa-plus"></i> 생성 및 입장</button>
+            </div>
+            
+            <button class="btn" onclick="closeChatLobbyModal()" style="width:100%; margin-top: 15px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);">취소</button>
+        </div>
+    </div>
+
+    <!-- Chat Panel (실제 채팅 화면) -->
+    <div class="memo-panel chat-panel" id="chatRoomPanel">
+        <div class="memo-header" style="background: rgba(30, 58, 138, 0.4);">
+            <h3><i class="fa-solid fa-comments"></i> <span id="currentChatRoomTitle">채팅방</span></h3>
+            <button class="memo-close" onclick="leaveChatRoom()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <div class="memo-body" style="height: calc(100% - 60px); display: flex; flex-direction: column;">
+            <p class="memo-info" id="chatRoomInfoBox">안전한 프라이빗 채팅방입니다. 대화 내용은 보호 처리됩니다.</p>
+            <div id="chatMessageList" class="memo-list" style="flex:1; overflow-y:auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px;">
+                <!-- 메시지 렌더링 영역 -->
+            </div>
+            <div class="memo-input-container">
+                <textarea id="chatInputText" placeholder="메시지 입력 (엔터로 전송)" rows="2" style="border-radius: 12px;"></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                    <button id="chatSendBtn" class="btn" style="width: 100px;">전송 <i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 비밀번호 생성기 모달 -->
