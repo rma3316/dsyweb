@@ -710,7 +710,7 @@ async function loadAdminRoomList() {
 
     const { data, error } = await supabaseClient
         .from('chat_rooms')
-        .select('room_name, retention_hours, created_at')
+        .select('room_name, password_hash, retention_hours, created_at')
         .order('created_at', { ascending: false });
 
     if (error || !data) {
@@ -732,12 +732,41 @@ async function loadAdminRoomList() {
         nameSpan.style.cssText = 'color: var(--accent-primary); font-weight: 600;';
         nameSpan.textContent = room.room_name;
 
+        const rightGroup = document.createElement('div');
+        rightGroup.style.cssText = 'display: flex; align-items: center; gap: 8px;';
+
         const infoSpan = document.createElement('span');
         infoSpan.style.cssText = 'color: var(--text-muted); font-size: 0.75rem;';
         infoSpan.textContent = `${room.retention_hours}h`;
 
+        const deleteBtn = document.createElement('button');
+        deleteBtn.style.cssText = 'background: none; border: none; color: var(--error-color); cursor: pointer; font-size: 0.8rem; opacity: 0.6; transition: opacity 0.2s;';
+        deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+        deleteBtn.title = '방 삭제 (비밀번호 필요)';
+        deleteBtn.onmouseenter = () => deleteBtn.style.opacity = '1';
+        deleteBtn.onmouseleave = () => deleteBtn.style.opacity = '0.6';
+        deleteBtn.onclick = async () => {
+            const inputPw = prompt(`"${room.room_name}" 방을 삭제하려면 방 비밀번호를 입력하세요:`);
+            if (inputPw === null) return;
+            const inputHash = await sha256(inputPw);
+            if (inputHash !== room.password_hash) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            if (!confirm(`"${room.room_name}" 방을 영구 삭제하시겠습니까?\n(모든 채팅 내역도 함께 삭제됩니다.)`)) return;
+            const { error: delErr } = await supabaseClient.from('chat_rooms').delete().eq('room_name', room.room_name);
+            if (delErr) {
+                alert('삭제 실패: ' + delErr.message);
+            } else {
+                showToast('🗑️ 채팅방이 삭제되었습니다.');
+                loadAdminRoomList();
+            }
+        };
+
+        rightGroup.appendChild(infoSpan);
+        rightGroup.appendChild(deleteBtn);
         item.appendChild(nameSpan);
-        item.appendChild(infoSpan);
+        item.appendChild(rightGroup);
         adminRoomListContent.appendChild(item);
     });
 }
@@ -759,11 +788,19 @@ function switchChatTab(tab) {
 async function createChatRoom() {
     const roomName = document.getElementById('createRoomName').value.trim();
     const pw = document.getElementById('createPassword').value.trim();
+    const pwConfirm = document.getElementById('createPasswordConfirm').value.trim();
     const nickname = document.getElementById('createNickname').value.trim();
     const retention = parseInt(document.getElementById('createRetention').value);
 
-    if (!roomName || !pw || !nickname) {
+    if (!roomName || !pw || !pwConfirm || !nickname) {
         alert('모든 필드를 입력해주세요.');
+        return;
+    }
+    
+    if (pw !== pwConfirm) {
+        alert('비밀번호가 일치하지 않습니다. 다시 확인해주세요.');
+        document.getElementById('createPasswordConfirm').value = '';
+        document.getElementById('createPasswordConfirm').focus();
         return;
     }
     
