@@ -1041,6 +1041,10 @@ body:hover .cursor-spotlight {
     opacity: 0.15;
 }
 
+[data-theme="light"] body:hover .cursor-spotlight {
+    opacity: 0.8;
+}
+
 /* --- Category Icon Colors --- */
 .icon-blue { color: #3b82f6; }
 .icon-green { color: #22c55e; }
