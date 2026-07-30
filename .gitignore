@@ -1,6 +1,41 @@
+# Editors and operating-system files
 .vscode/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Logs and local scratch files
 *.log
+*.tmp
 sec.txt
+
+# Local-only site prototypes and AI agent resources
+/aba/
+/skills/
+/Skills-main/
+/.agents/
+/.cursor/
+/.gemini/
+/.codex/
+/.impeccable/
+/semantic-review/
+
+# Python-generated files and local environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Secrets, credentials, and session data
+.env
+.env.*
+!.env.example
+cookies.txt
+
+# Archived or runtime-only bot data
+/BOTFORDSY/nouse/
+/BOTFORDSY/data/prefixes.json

@@ -41,26 +41,114 @@ if (themeToggle) {
     });
 }
 
-document.querySelectorAll('.accordion-header').forEach(header => {
-    header.addEventListener('click', () => {
+const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+function syncAccordion(header, expanded) {
+    const body = header.nextElementSibling;
+    if (!body) return;
+
+    header.classList.toggle('active', expanded);
+    header.setAttribute('aria-expanded', String(expanded));
+    body.style.maxHeight = expanded ? `${body.scrollHeight}px` : '0';
+    body.style.opacity = expanded ? '1' : '0';
+}
+
+function refreshExpandedAccordions() {
+    document.querySelectorAll('.accordion-header.active').forEach(header => {
         const body = header.nextElementSibling;
-        header.classList.toggle('active');
-        if (header.classList.contains('active')) {
-            body.style.maxHeight = body.scrollHeight + "px";
-            body.style.opacity = "1";
-        } else {
-            body.style.maxHeight = "0";
-            body.style.opacity = "0";
-        }
+        if (body) body.style.maxHeight = `${body.scrollHeight}px`;
+    });
+}
+
+accordionHeaders.forEach(header => {
+    syncAccordion(header, header.classList.contains('active'));
+    header.addEventListener('click', () => {
+        syncAccordion(header, !header.classList.contains('active'));
     });
 });
 
-window.addEventListener('resize', () => {
-    document.querySelectorAll('.accordion-header.active').forEach(header => {
-        const body = header.nextElementSibling;
-        body.style.maxHeight = body.scrollHeight + "px";
+window.addEventListener('resize', refreshExpandedAccordions);
+window.addEventListener('load', refreshExpandedAccordions);
+requestAnimationFrame(refreshExpandedAccordions);
+
+/* --- Responsive navigation --- */
+const appSidebar = document.getElementById('appSidebar');
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+
+function setMobileMenu(open) {
+    if (!appSidebar || !mobileMenuToggle) return;
+    appSidebar.classList.toggle('is-open', open);
+    mobileMenuToggle.setAttribute('aria-expanded', String(open));
+    mobileMenuToggle.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    const icon = mobileMenuToggle.querySelector('i');
+    if (icon) icon.className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+}
+
+if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', () => {
+        setMobileMenu(!appSidebar.classList.contains('is-open'));
+    });
+}
+
+document.querySelectorAll('.section-nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        document.querySelectorAll('.section-nav-link').forEach(item => item.classList.remove('active'));
+        link.classList.add('active');
+        setMobileMenu(false);
     });
 });
+
+/* --- Tool search --- */
+const toolSearch = document.getElementById('toolSearch');
+const searchStatus = document.getElementById('searchStatus');
+const toolCards = Array.from(document.querySelectorAll('[data-tool-card]'));
+const toolSections = Array.from(document.querySelectorAll('[data-tool-section]'));
+
+function filterTools() {
+    if (!toolSearch) return;
+    const query = toolSearch.value.trim().toLocaleLowerCase('ko-KR');
+    let visibleCount = 0;
+
+    toolCards.forEach(card => {
+        const searchableText = `${card.dataset.search || ''} ${card.textContent}`.toLocaleLowerCase('ko-KR');
+        const matches = !query || searchableText.includes(query);
+        card.hidden = !matches;
+        if (matches && !card.classList.contains('card-construction')) visibleCount += 1;
+    });
+
+    toolSections.forEach(section => {
+        section.hidden = !section.querySelector('[data-tool-card]:not([hidden])');
+    });
+
+    if (searchStatus) {
+        searchStatus.textContent = query
+            ? `${visibleCount}개의 도구를 찾았습니다.`
+            : '6개의 사용 가능한 도구';
+    }
+    requestAnimationFrame(refreshExpandedAccordions);
+}
+
+if (toolSearch) {
+    toolSearch.addEventListener('input', filterTools);
+}
+
+document.addEventListener('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k' && toolSearch) {
+        if (getTopOpenLayer()) return;
+        event.preventDefault();
+        toolSearch.focus();
+        toolSearch.select();
+    }
+});
+
+function syncThemeToggleLabel() {
+    if (!themeToggle) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    themeToggle.setAttribute('aria-label', isDark ? '밝은 테마로 전환' : '어두운 테마로 전환');
+}
+
+syncThemeToggleLabel();
+if (themeToggle) themeToggle.addEventListener('click', syncThemeToggleLabel);
 
 function copyPassword(text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -79,17 +167,46 @@ function showToast(msg) {
 const modal = document.getElementById('loginModal');
 const staffSection = document.getElementById('staff-section');
 
+const layerTriggers = new Map();
+
+function openLayer(layer, focusSelector) {
+    if (!layer) return;
+    layerTriggers.set(layer.id, document.activeElement);
+    layer.style.display = 'flex';
+    layer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('has-open-layer');
+    requestAnimationFrame(() => {
+        layer.classList.add('show');
+        const focusTarget = focusSelector ? layer.querySelector(focusSelector) : null;
+        if (focusTarget) focusTarget.focus();
+    });
+}
+
+function closeLayer(layer, clearAfterClose) {
+    if (!layer) return;
+    layer.classList.remove('show');
+    layer.setAttribute('aria-hidden', 'true');
+    setTimeout(() => {
+        layer.style.display = 'none';
+        if (typeof clearAfterClose === 'function') clearAfterClose();
+        if (!document.querySelector('.modal-overlay.show')) {
+            document.body.classList.remove('has-open-layer');
+        }
+        const trigger = layerTriggers.get(layer.id);
+        if (trigger && document.contains(trigger)) trigger.focus();
+        layerTriggers.delete(layer.id);
+    }, 200);
+}
+
 function openModal() {
-    modal.style.display = 'flex';
-    setTimeout(() => modal.classList.add('show'), 10);
-    document.getElementById('staffId').focus();
+    openLayer(modal, '#staffId');
 }
 
 function closeModal() {
-    modal.classList.remove('show');
-    setTimeout(() => modal.style.display = 'none', 300);
-    document.getElementById('staffId').value = '';
-    document.getElementById('staffPw').value = '';
+    closeLayer(modal, () => {
+        document.getElementById('staffId').value = '';
+        document.getElementById('staffPw').value = '';
+    });
 }
 
 /* --- 개인정보 처리방침 모달 --- */
@@ -97,27 +214,23 @@ const privacyModal = document.getElementById('privacyModal');
 
 function openPrivacyModal(e) {
     if (e) e.preventDefault();
-    privacyModal.style.display = 'flex';
-    setTimeout(() => privacyModal.classList.add('show'), 10);
+    openLayer(privacyModal, '.dialog-header .icon-button');
 }
 
 function closePrivacyModal() {
-    privacyModal.classList.remove('show');
-    setTimeout(() => privacyModal.style.display = 'none', 300);
+    closeLayer(privacyModal);
 }
 
 /* --- 패스워드 생성기 모달 --- */
 const pwModal = document.getElementById('pwGenModal');
 
 function openPwModal() {
-    pwModal.style.display = 'flex';
-    setTimeout(() => pwModal.classList.add('show'), 10);
+    openLayer(pwModal, '#generatePwBtn');
     if (typeof generatePassword === 'function') generatePassword();
 }
 
 function closePwModal() {
-    pwModal.classList.remove('show');
-    setTimeout(() => pwModal.style.display = 'none', 300);
+    closeLayer(pwModal);
 }
 
 async function checkLogin() {
@@ -129,7 +242,7 @@ async function checkLogin() {
         return;
     }
 
-    const loginBtn = document.querySelector('.login-box .btn');
+    const loginBtn = document.getElementById('loginSubmitBtn');
     const originalText = loginBtn.textContent;
     loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
     loginBtn.disabled = true;
@@ -217,6 +330,7 @@ async function restoreAdminSession() {
         if (staffData) {
             document.getElementById('staffContentBody').innerHTML = staffData.content;
             staffSection.style.display = 'block';
+            requestAnimationFrame(refreshExpandedAccordions);
         }
     }
 }
@@ -321,12 +435,7 @@ document.querySelectorAll('.reveal').forEach(el => {
     revealObserver.observe(el);
 });
 
-// Cursor Spotlight
-const cursorSpotlight = document.getElementById('cursorSpotlight');
-document.addEventListener('mousemove', (e) => {
-    cursorSpotlight.style.left = e.clientX + 'px';
-    cursorSpotlight.style.top = e.clientY + 'px';
-});
+// Cursor spotlight was intentionally removed in the operational redesign.
 
 // Back to Top Button
 const backToTopBtn = document.getElementById('backToTop');
@@ -374,7 +483,7 @@ async function loadMemos() {
 
     const adminOption = document.getElementById('adminMemoOption');
     if (adminOption) {
-        adminOption.style.display = isAdmin ? 'block' : 'none';
+        adminOption.style.display = isAdmin ? 'flex' : 'none';
     }
 
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -568,29 +677,44 @@ memoTextarea.addEventListener('keydown', (e) => {
     }
 });
 
+function setSidePanelOpen(panel, trigger, open, focusSelector) {
+    if (!panel) return;
+    panel.classList.toggle('open', open);
+    panel.setAttribute('aria-hidden', String(!open));
+    if (trigger?.hasAttribute('aria-controls')) trigger.setAttribute('aria-expanded', String(open));
+
+    const compactNavigation = window.matchMedia('(max-width: 1080px)').matches;
+    const fallbackTarget = compactNavigation ? mobileMenuToggle : toolSearch;
+
+    if (open) {
+        const returnTarget = compactNavigation ? mobileMenuToggle : (trigger || toolSearch);
+        if (returnTarget) layerTriggers.set(panel.id, returnTarget);
+        setMobileMenu(false);
+        if (focusSelector) setTimeout(() => panel.querySelector(focusSelector)?.focus(), 240);
+    } else {
+        const previousTrigger = layerTriggers.get(panel.id);
+        const focusTarget = previousTrigger && previousTrigger.offsetParent !== null ? previousTrigger : fallbackTarget;
+        if (focusTarget && document.contains(focusTarget)) focusTarget.focus();
+        layerTriggers.delete(panel.id);
+    }
+}
+
 let isFirstLoad = true;
 memoToggle.addEventListener('click', () => {
-    memoPanel.classList.add('open');
-    if (isFirstLoad) {
-        loadMemos();
-        isFirstLoad = false;
-    } else {
-        loadMemos();
-    }
-    setTimeout(() => memoTextarea.focus(), 400);
+    setSidePanelOpen(memoPanel, memoToggle, true, '#memoTextarea');
+    loadMemos();
+    isFirstLoad = false;
 });
 
 memoClose.addEventListener('click', () => {
-    memoPanel.classList.remove('open');
+    setSidePanelOpen(memoPanel, memoToggle, false);
 });
 
 document.addEventListener('click', (e) => {
-    const memoPanel = document.getElementById('memoPanel');
-    const memoToggle = document.getElementById('memoToggle');
     if (memoPanel && memoPanel.classList.contains('open') &&
         !memoPanel.contains(e.target) &&
         !memoToggle.contains(e.target)) {
-        memoPanel.classList.remove('open');
+        setSidePanelOpen(memoPanel, memoToggle, false);
     }
 });
 
@@ -615,13 +739,9 @@ const DEFAULT_SYMBOLS = '!@#$%^&*()_+~`|}{[]:;?><,./-=';
 
 if (symConfigBtn && symConfigArea) {
     symConfigBtn.addEventListener('click', () => {
-        if (symConfigArea.style.display === 'none') {
-            symConfigArea.style.display = 'block';
-            symConfigBtn.style.color = '#60a5fa'; // accent-primary 로 활성화
-        } else {
-            symConfigArea.style.display = 'none';
-            symConfigBtn.style.color = 'var(--text-muted)';
-        }
+        const isOpening = symConfigArea.style.display === 'none';
+        symConfigArea.style.display = isOpening ? 'block' : 'none';
+        symConfigBtn.setAttribute('aria-expanded', String(isOpening));
     });
 }
 
@@ -686,9 +806,8 @@ const chatMessageList = document.getElementById('chatMessageList');
 const chatInputText = document.getElementById('chatInputText');
 
 function openChatLobbyModal() {
-    chatLobbyModal.style.display = 'flex';
-    setTimeout(() => chatLobbyModal.classList.add('show'), 10);
     switchChatTab('join');
+    openLayer(chatLobbyModal, '#joinRoomName');
     loadAdminRoomList();
 }
 
@@ -726,7 +845,7 @@ async function loadAdminRoomList() {
     adminRoomListContent.innerHTML = '';
     data.forEach(room => {
         const item = document.createElement('div');
-        item.style.cssText = 'padding: 6px 10px; background: var(--memo-item-bg); border: 1px solid var(--glass-border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;';
+        item.style.cssText = 'padding: 6px 10px; background: var(--memo-item-bg); border: 1px solid var(--border); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;';
         
         const nameSpan = document.createElement('span');
         nameSpan.style.cssText = 'color: var(--accent-primary); font-weight: 600;';
@@ -772,18 +891,39 @@ async function loadAdminRoomList() {
 }
 
 function closeChatLobbyModal() {
-    chatLobbyModal.classList.remove('show');
-    setTimeout(() => chatLobbyModal.style.display = 'none', 300);
+    closeLayer(chatLobbyModal);
 }
 
 function switchChatTab(tab) {
-    document.getElementById('tabJoin').style.display = tab === 'join' ? 'block' : 'none';
-    document.getElementById('tabCreate').style.display = tab === 'create' ? 'block' : 'none';
-    
-    const tabs = document.querySelectorAll('.chat-tab');
-    tabs[0].classList.toggle('active', tab === 'join');
-    tabs[1].classList.toggle('active', tab === 'create');
+    const joinPanel = document.getElementById('tabJoin');
+    const createPanel = document.getElementById('tabCreate');
+    joinPanel.style.display = tab === 'join' ? 'block' : 'none';
+    createPanel.style.display = tab === 'create' ? 'block' : 'none';
+
+    document.querySelectorAll('[data-chat-tab]').forEach(tabButton => {
+        const isActive = tabButton.dataset.chatTab === tab;
+        tabButton.classList.toggle('active', isActive);
+        tabButton.setAttribute('aria-selected', String(isActive));
+        tabButton.tabIndex = isActive ? 0 : -1;
+    });
 }
+
+const chatTabButtons = Array.from(document.querySelectorAll('[data-chat-tab]'));
+chatTabButtons.forEach((tabButton, index) => {
+    tabButton.addEventListener('keydown', event => {
+        let targetIndex = null;
+        if (event.key === 'ArrowRight') targetIndex = (index + 1) % chatTabButtons.length;
+        if (event.key === 'ArrowLeft') targetIndex = (index - 1 + chatTabButtons.length) % chatTabButtons.length;
+        if (event.key === 'Home') targetIndex = 0;
+        if (event.key === 'End') targetIndex = chatTabButtons.length - 1;
+        if (targetIndex === null) return;
+
+        event.preventDefault();
+        const targetTab = chatTabButtons[targetIndex];
+        switchChatTab(targetTab.dataset.chatTab);
+        targetTab.focus();
+    });
+});
 
 async function createChatRoom() {
     const roomName = document.getElementById('createRoomName').value.trim();
@@ -885,9 +1025,10 @@ function joinChatProcess(roomName, pwHash, nickname, retentionHours) {
     currentChatRoom = roomName;
     currentChatNickname = nickname;
     document.getElementById('currentChatRoomTitle').textContent = roomName;
-    
+
+    const returnTrigger = layerTriggers.get(chatLobbyModal.id) || document.activeElement;
     closeChatLobbyModal();
-    chatRoomPanel.classList.add('open');
+    setSidePanelOpen(chatRoomPanel, returnTrigger, true, '#chatInputText');
     loadChatMessages(retentionHours);
     subscribeToChat();
 }
@@ -979,7 +1120,7 @@ function leaveChatRoom() {
     currentChatRoom = null;
     currentChatNickname = null;
     renderedMessageIds.clear();
-    chatRoomPanel.classList.remove('open');
+    setSidePanelOpen(chatRoomPanel, null, false);
 }
 
 const chatSendBtn = document.getElementById('chatSendBtn');
@@ -1025,3 +1166,65 @@ async function sendChatMessage() {
     }
 }
 
+
+/* --- Shared keyboard and focus management --- */
+const focusableSelector = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+].join(',');
+
+function getTopOpenLayer() {
+    const layers = Array.from(document.querySelectorAll('.modal-overlay.show, .side-panel.open'));
+    return layers.at(-1) || null;
+}
+
+function closeTopOpenLayer(layer) {
+    if (!layer) return;
+    switch (layer.id) {
+        case 'loginModal': closeModal(); break;
+        case 'privacyModal': closePrivacyModal(); break;
+        case 'pwGenModal': closePwModal(); break;
+        case 'chatLobbyModal': closeChatLobbyModal(); break;
+        case 'memoPanel': setSidePanelOpen(memoPanel, memoToggle, false); break;
+        case 'chatRoomPanel': leaveChatRoom(); break;
+        default: break;
+    }
+}
+
+document.addEventListener('keydown', event => {
+    const activeLayer = getTopOpenLayer();
+
+    if (event.key === 'Escape') {
+        if (activeLayer) {
+            event.preventDefault();
+            closeTopOpenLayer(activeLayer);
+            return;
+        }
+        if (appSidebar?.classList.contains('is-open')) {
+            setMobileMenu(false);
+            mobileMenuToggle.focus();
+        }
+    }
+
+    if (event.key !== 'Tab' || !activeLayer) return;
+    const focusableItems = Array.from(activeLayer.querySelectorAll(focusableSelector))
+        .filter(item => item.offsetParent !== null);
+    if (focusableItems.length === 0) return;
+
+    const firstItem = focusableItems[0];
+    const lastItem = focusableItems[focusableItems.length - 1];
+    if (!activeLayer.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? lastItem : firstItem).focus();
+    } else if (event.shiftKey && document.activeElement === firstItem) {
+        event.preventDefault();
+        lastItem.focus();
+    } else if (!event.shiftKey && document.activeElement === lastItem) {
+        event.preventDefault();
+        firstItem.focus();
+    }
+});

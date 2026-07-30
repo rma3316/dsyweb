@@ -6,18 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="pepe.jpg" type="image/jpeg">
 
-    <meta name="theme-color" content="#020617">
-    <meta name="description" content="언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다.">
+    <meta name="theme-color" content="#0a0c10">
+    <meta name="description" content="Windows 필수 도구를 한곳에서 빠르게 찾는 Dasory Toolkit입니다.">
     <meta name="keywords" content="다소리, Dasory, Dasory Toolkit, 다소리 툴킷, 시스템 도구, 유틸리티">
     <meta property="og:type" content="website">
     <meta property="og:title" content="다소리 Toolkit (Dasory Toolkit)">
-    <meta property="og:description" content="언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다.">
+    <meta property="og:description" content="Windows 필수 도구를 한곳에서 빠르게 찾아보세요.">
     <meta property="og:image"
         content="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop">
 
     <title>Dasory Toolkit</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -29,297 +30,410 @@
       "name": "Dasory Toolkit",
       "alternateName": "다소리 Toolkit",
       "url": "https://dasory.kro.kr",
-      "description": "언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다."
+      "description": "Windows 필수 도구를 한곳에서 빠르게 찾는 도구 디렉터리입니다."
     }
     </script>
 </head>
 
 <body>
+    <a class="skip-link" href="#mainContent">본문으로 바로가기</a>
 
-    <!-- 은은한 배경 오로라 -->
-    <div class="ambient-light">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
-
-    <!-- Cursor Spotlight -->
-    <div class="cursor-spotlight" id="cursorSpotlight"></div>
-
-    <!-- Back to Top -->
-    <button class="back-to-top" id="backToTop" title="맨 위로">
-        <i class="fa-solid fa-arrow-up"></i>
-    </button>
-
-    <!-- Daily Memo Toggle -->
-    <button class="memo-toggle" id="memoToggle" title="일일 메모장 (24시간 보관)">
-        <i class="fa-solid fa-pen-nib"></i>
-    </button>
-
-    <!-- Daily Memo Panel -->
-    <div class="memo-panel" id="memoPanel">
-        <div class="memo-header">
-            <h3><i class="fa-solid fa-note-sticky"></i> Daily Memo</h3>
-            <button class="memo-close" id="memoClose"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="memo-body">
-            <p class="memo-info">이곳은 누구나 볼 수 있는 <strong>공용 메모장(방명록)</strong>입니다. <strong>최근 24시간 이내의 글만</strong> 나타납니다.
-            </p>
-            <div id="memoList" class="memo-list">
-                <!-- 메시지 렌더링 영역 -->
-            </div>
-            <div class="memo-input-container">
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="memoAuthor" placeholder="닉네임" class="memo-author-input" style="flex: 1;"
-                        maxlength="8">
-                    <input type="password" id="memoPw" placeholder="비밀번호(삭제용)" class="memo-author-input"
-                        style="flex: 1;">
-                </div>
-                <div id="adminMemoOption"
-                    style="display: none; text-align: left; margin-bottom: 8px; padding-left: 4px;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <label
-                            style="font-size: 0.85rem; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                            <input type="checkbox" id="isAdminNotice" checked onchange="document.getElementById('isAdminPerm').disabled = !this.checked"> <i class="fa-solid fa-crown"
-                                style="font-size: 0.8rem;"></i> 관리자 공지로 등록
-                        </label>
-                        <label
-                            style="font-size: 0.8rem; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="isAdminPerm" checked> 영구 보관 (24h 유지)
-                        </label>
-                    </div>
-                </div>
-                <textarea id="memoTextarea" placeholder="메모를 남겨보세요! (엔터로 전송)" rows="2"></textarea>
-                <button id="memoSubmitBtn" class="btn" style="width:100%; margin-top:10px;">남기기</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 글로벌 네비게이션 바 (GNB) -->
-    <nav class="gnb">
-        <div class="gnb-logo">
-            <i class="fa-solid fa-bolt"></i> Dasory Toolkit
-        </div>
-        <div class="gnb-menu">
-            <a href="#" target="_blank" class="gift-btn" title="Special Gift">
-                <i class="fa-solid fa-gift"></i>
+    <aside class="app-sidebar" id="appSidebar" aria-label="사이트 탐색">
+        <div class="sidebar-header">
+            <a class="brand" href="#overview" aria-label="Dasory Toolkit 홈">
+                <span class="brand-mark" aria-hidden="true"><i class="fa-solid fa-bolt"></i></span>
+                <span class="brand-copy">
+                    <strong>Dasory</strong>
+                    <small>Toolkit</small>
+                </span>
             </a>
-            <button class="theme-toggle" id="themeToggle" title="테마 전환">
-                <i class="fa-solid fa-sun" id="themeIcon"></i>
-            </button>
-            <button class="chat-nav-btn" onclick="openChatLobbyModal()" title="그룹 채팅">
-                <i class="fa-solid fa-comments"></i> Chat
-            </button>
-            <button class="pwgen-nav-btn" onclick="openPwModal()" title="비밀번호 생성기">
-                <i class="fa-solid fa-key"></i> PassGen
-            </button>
-            <button class="staff-btn" id="staffBtn" onclick="openModal()">
-                <i class="fa-solid fa-lock"></i> Admin
-            </button>
-            <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="logout()">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-expanded="false"
+                aria-controls="sidebarContent" aria-label="메뉴 열기">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
             </button>
         </div>
-    </nav>
 
-    <div class="container">
-        <header>
-            <h1>Dasory Toolkit</h1>
-            <p>언제까지 수동으로 설치하세요? 그냥 여기서 딸깍 한 번이면 끝납니다.</p>
+        <div class="sidebar-content" id="sidebarContent">
+            <nav class="section-nav" aria-label="도구 카테고리">
+                <span class="sidebar-label">Directory</span>
+                <a class="section-nav-link active" href="#overview">
+                    <i class="fa-solid fa-grid-2" aria-hidden="true"></i><span>개요</span>
+                </a>
+                <a class="section-nav-link" href="#essentials">
+                    <i class="fa-solid fa-toolbox" aria-hidden="true"></i><span>필수 도구</span><small>3</small>
+                </a>
+                <a class="section-nav-link" href="#security">
+                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>보안 · 최적화</span><small>2</small>
+                </a>
+                <a class="section-nav-link" href="#remote">
+                    <i class="fa-solid fa-display" aria-hidden="true"></i><span>원격 · 관리</span><small>1</small>
+                </a>
+            </nav>
 
-            <!-- 랜덤 명언 위젯 -->
-            <div class="quote-widget" id="quoteWidget">
-                <i class="fa-solid fa-quote-left quote-icon-bg"></i>
-                <div class="quote-content">
-                    <div id="quoteTextEn" class="quote-text-en">Loading inspiration...</div>
-                    <div id="quoteTextKo" class="quote-text-ko">번역을 불러오는 중입니다...</div>
-                </div>
-                <div class="quote-author" id="quoteAuthor">- Dasory -</div>
-                <button class="quote-refresh" id="quoteRefreshBtn" title="새로운 명언 보기">
-                    <i class="fa-solid fa-rotate-right"></i>
+            <div class="sidebar-utilities">
+                <span class="sidebar-label">Utilities</span>
+                <button class="utility-action memo-toggle" id="memoToggle" type="button"
+                    aria-controls="memoPanel" aria-expanded="false">
+                    <i class="fa-regular fa-note-sticky" aria-hidden="true"></i><span>공용 메모</span>
+                </button>
+                <button class="utility-action chat-nav-btn" type="button" onclick="openChatLobbyModal()">
+                    <i class="fa-regular fa-comments" aria-hidden="true"></i><span>그룹 채팅</span>
+                </button>
+                <button class="utility-action pwgen-nav-btn" type="button" onclick="openPwModal()">
+                    <i class="fa-solid fa-key" aria-hidden="true"></i><span>비밀번호 생성기</span>
+                </button>
+                <button class="utility-action theme-toggle" id="themeToggle" type="button" aria-label="밝은 테마로 전환">
+                    <i class="fa-solid fa-sun" id="themeIcon" aria-hidden="true"></i><span>테마 전환</span>
+                </button>
+                <button class="utility-action staff-btn" id="staffBtn" type="button" onclick="openModal()">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i><span>관리자</span>
+                </button>
+                <button class="utility-action logout-btn" id="logoutBtn" type="button" style="display: none;"
+                    onclick="logout()">
+                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>로그아웃</span>
                 </button>
             </div>
-        </header>
 
-        <!-- 1. 시스템 필수 도구 -->
-        <div class="accordion-item reveal">
-            <div class="accordion-header active">
-                <div class="header-content">
-                    <div class="header-icon"><i class="fa-solid fa-toolbox"></i></div>
-                    <div class="header-text">
-                        <h3>시스템 필수 도구</h3>
-                        <span>System Essentials</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down accordion-toggle"></i>
-            </div>
-            <div class="accordion-body" style="max-height: 2000px; opacity: 1;">
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-magnifying-glass icon-blue"></i></div>
-                        <h2>Everything</h2>
-                        <p>답답한 윈도우 검색은 그만.<br>파일 이름을 입력하는 즉시 찾아줍니다.</p>
-                        <a href="https://www.voidtools.com/downloads/" target="_blank" class="btn">
-                            <i class="fa-solid fa-up-right-from-square"></i> 다운로드 페이지
-                        </a>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-trash-can icon-red"></i></div>
-                        <h2>Geek Uninstaller</h2>
-                        <p>삭제되지 않는 프로그램 강제 제거 및<br>레지스트리 찌꺼기 정리 도구.</p>
-                        <a href="https://geekuninstaller.com/geek.zip" class="btn">
-                            <i class="fa-solid fa-download"></i> 다운로드
-                        </a>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-cubes icon-purple"></i></div>
-                        <h2>Ninite</h2>
-                        <p>Chrome, Zoom 등 필수 프로그램들을<br>한 번에 자동으로 설치해줍니다.</p>
-                        <a href="https://ninite.com/" target="_blank" class="btn btn-outline">
-                            <i class="fa-solid fa-up-right-from-square"></i> 사이트 이동
-                        </a>
-                    </div>
-                </div>
+            <div class="sidebar-status" aria-label="디렉터리 상태">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span><strong>6개</strong> 도구 제공 중</span>
             </div>
         </div>
+    </aside>
 
-        <!-- 2. 보안 및 최적화 -->
-        <div class="accordion-item reveal">
-            <div class="accordion-header">
-                <div class="header-content">
-                    <div class="header-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                    <div class="header-text">
-                        <h3>보안 및 최적화</h3>
-                        <span>Security & Optimization</span>
+    <main class="workspace" id="mainContent">
+        <div class="workspace-inner">
+            <header class="overview" id="overview">
+                <div class="overview-copy">
+                    <p class="eyebrow">Windows utility directory</p>
+                    <h1>필요한 도구를,<br>필요한 순간에.</h1>
+                    <p class="overview-description">검색, 제거, 보안, 원격 지원에 필요한 검증된 도구를 한곳에서 빠르게 찾아보세요.</p>
+                </div>
+
+                <div class="overview-meta" aria-label="디렉터리 요약">
+                    <div class="metric">
+                        <strong>06</strong>
+                        <span>Available tools</span>
+                    </div>
+                    <div class="metric">
+                        <strong>03</strong>
+                        <span>Categories</span>
+                    </div>
+                    <div class="source-note">
+                        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                        <span>다운로드는 공식 제공처로 연결됩니다.</span>
                     </div>
                 </div>
-                <i class="fa-solid fa-chevron-down accordion-toggle"></i>
-            </div>
-            <div class="accordion-body">
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-shield-virus icon-green"></i></div>
-                        <h2>구라제거기</h2>
-                        <p>PC를 느리게 하는 뱅킹 보안 프로그램을<br>한방에 제거하여 속도를 향상시킵니다.</p>
-                        <div class="password-badge" onclick="copyPassword('teus.me')">
-                            <i class="fa-solid fa-key"></i> <span>teus.me</span> <i class="fa-regular fa-copy"></i>
+            </header>
+
+            <section class="directory-controls" aria-labelledby="directoryTitle">
+                <div>
+                    <p class="eyebrow">Tool index</p>
+                    <h2 id="directoryTitle">도구 디렉터리</h2>
+                </div>
+                <div class="search-field">
+                    <label class="visually-hidden" for="toolSearch">도구 검색</label>
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input id="toolSearch" type="search" placeholder="이름이나 기능으로 검색" autocomplete="off">
+                    <kbd>Ctrl K</kbd>
+                </div>
+                <p class="search-status" id="searchStatus" aria-live="polite">6개의 사용 가능한 도구</p>
+            </section>
+
+            <div class="tool-directory">
+                <section class="tool-section accordion-item reveal" id="essentials" data-tool-section>
+                    <button class="section-heading accordion-header active" type="button" aria-expanded="true"
+                        aria-controls="essentialsBody">
+                        <span class="section-heading-copy header-content">
+                            <span class="section-index">01</span>
+                            <span class="header-text"><strong>시스템 필수 도구</strong><small>검색과 설치, 프로그램 관리를 위한 기본 도구</small></span>
+                        </span>
+                        <span class="section-count">3 tools</span>
+                        <i class="fa-solid fa-chevron-down accordion-toggle" aria-hidden="true"></i>
+                    </button>
+                    <div class="section-body accordion-body" id="essentialsBody">
+                        <div class="tool-grid grid">
+                            <article class="tool-card card" data-tool-card data-search="everything 파일 검색 빠른 검색 voidtools">
+                                <div class="tool-card-head">
+                                    <span class="tool-icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></span>
+                                    <div class="tool-tags"><span>Windows</span><span>Search</span></div>
+                                </div>
+                                <div class="tool-card-copy">
+                                    <h3>Everything</h3>
+                                    <p>파일 이름을 입력하는 즉시 로컬 드라이브 전체에서 결과를 찾습니다.</p>
+                                </div>
+                                <div class="tool-card-footer">
+                                    <span class="link-type">공식 페이지</span>
+                                    <a href="https://www.voidtools.com/downloads/" target="_blank" rel="noopener noreferrer" class="btn">
+                                        열기 <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </article>
+
+                            <article class="tool-card card" data-tool-card data-search="geek uninstaller 프로그램 제거 강제 삭제 portable">
+                                <div class="tool-card-head">
+                                    <span class="tool-icon"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></span>
+                                    <div class="tool-tags"><span>Windows</span><span>Portable</span></div>
+                                </div>
+                                <div class="tool-card-copy">
+                                    <h3>Geek Uninstaller</h3>
+                                    <p>삭제되지 않는 프로그램을 제거하고 남은 레지스트리 항목을 정리합니다.</p>
+                                </div>
+                                <div class="tool-card-footer">
+                                    <span class="link-type">ZIP 직접 다운로드</span>
+                                    <a href="https://geekuninstaller.com/geek.zip" class="btn">
+                                        다운로드 <i class="fa-solid fa-download" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </article>
+
+                            <article class="tool-card card" data-tool-card data-search="ninite 일괄 설치 chrome zoom 필수 프로그램">
+                                <div class="tool-card-head">
+                                    <span class="tool-icon"><i class="fa-solid fa-cubes" aria-hidden="true"></i></span>
+                                    <div class="tool-tags"><span>Windows</span><span>Installer</span></div>
+                                </div>
+                                <div class="tool-card-copy">
+                                    <h3>Ninite</h3>
+                                    <p>브라우저와 메신저 등 여러 필수 프로그램을 한 번에 자동 설치합니다.</p>
+                                </div>
+                                <div class="tool-card-footer">
+                                    <span class="link-type">공식 페이지</span>
+                                    <a href="https://ninite.com/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                                        사이트 이동 <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </article>
                         </div>
-                        <a href="https://teus.me/hoaxeliminator/HoaxEliminator7.45/" target="_blank" class="btn">
-                            <i class="fa-solid fa-up-right-from-square"></i> 다운로드 페이지
-                        </a>
                     </div>
-                    <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-bug-slash icon-orange"></i></div>
-                        <h2>Malware Zero</h2>
-                        <p>악성코드, 애드웨어, 악성 광고 창을<br>강력하게 박멸하는 스크립트 도구.</p>
-                        <a href="https://malzero.xyz/download" target="_blank" class="btn btn-outline">
-                            <i class="fa-solid fa-up-right-from-square"></i> 사이트 이동
-                        </a>
+                </section>
+
+                <section class="tool-section accordion-item reveal" id="security" data-tool-section>
+                    <button class="section-heading accordion-header active" type="button" aria-expanded="true"
+                        aria-controls="securityBody">
+                        <span class="section-heading-copy header-content">
+                            <span class="section-index">02</span>
+                            <span class="header-text"><strong>보안 및 최적화</strong><small>불필요한 보안 모듈과 악성코드 정리</small></span>
+                        </span>
+                        <span class="section-count">2 tools</span>
+                        <i class="fa-solid fa-chevron-down accordion-toggle" aria-hidden="true"></i>
+                    </button>
+                    <div class="section-body accordion-body" id="securityBody">
+                        <div class="tool-grid grid">
+                            <article class="tool-card card" data-tool-card data-search="구라제거기 hoax eliminator 뱅킹 보안 프로그램 제거 최적화">
+                                <div class="tool-card-head">
+                                    <span class="tool-icon"><i class="fa-solid fa-shield-virus" aria-hidden="true"></i></span>
+                                    <div class="tool-tags"><span>Cleanup</span><span>Security</span></div>
+                                </div>
+                                <div class="tool-card-copy">
+                                    <h3>구라제거기</h3>
+                                    <p>PC를 느리게 하는 뱅킹 보안 프로그램을 한 번에 찾아 제거합니다.</p>
+                                </div>
+                                <button class="password-badge" type="button" onclick="copyPassword('teus.me')"
+                                    aria-label="압축 비밀번호 teus.me 복사">
+                                    <i class="fa-solid fa-key" aria-hidden="true"></i><span>teus.me</span><small>비밀번호 복사</small>
+                                </button>
+                                <div class="tool-card-footer">
+                                    <span class="link-type">공식 페이지</span>
+                                    <a href="https://teus.me/hoaxeliminator/HoaxEliminator7.55/" target="_blank"
+                                        rel="noopener noreferrer" class="btn">
+                                        열기 <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </article>
+
+                            <article class="tool-card card" data-tool-card data-search="malware zero mzk 악성코드 애드웨어 제거 보안">
+                                <div class="tool-card-head">
+                                    <span class="tool-icon"><i class="fa-solid fa-bug-slash" aria-hidden="true"></i></span>
+                                    <div class="tool-tags"><span>Security</span><span>Script</span></div>
+                                </div>
+                                <div class="tool-card-copy">
+                                    <h3>Malware Zero</h3>
+                                    <p>악성코드와 애드웨어, 악성 광고 프로그램을 점검하고 제거합니다.</p>
+                                </div>
+                                <div class="tool-card-footer">
+                                    <span class="link-type">공식 페이지</span>
+                                    <a href="https://malzero.xyz/download" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                                        사이트 이동 <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </article>
+                        </div>
                     </div>
+                </section>
 
+                <section class="tool-section accordion-item reveal" id="remote" data-tool-section>
+                    <button class="section-heading accordion-header active" type="button" aria-expanded="true"
+                        aria-controls="remoteBody">
+                        <span class="section-heading-copy header-content">
+                            <span class="section-index">03</span>
+                            <span class="header-text"><strong>원격 및 관리</strong><small>원격 지원과 시스템 관리 도구</small></span>
+                        </span>
+                        <span class="section-count">1 tool</span>
+                        <i class="fa-solid fa-chevron-down accordion-toggle" aria-hidden="true"></i>
+                    </button>
+                    <div class="section-body accordion-body" id="remoteBody">
+                        <div class="tool-grid grid">
+                            <article class="tool-card card" data-tool-card data-search="rustdesk rust desk 원격 제어 remote 오픈소스">
+                                <div class="tool-card-head">
+                                    <span class="tool-icon"><i class="fa-solid fa-display" aria-hidden="true"></i></span>
+                                    <div class="tool-tags"><span>Remote</span><span>Open source</span></div>
+                                </div>
+                                <div class="tool-card-copy">
+                                    <h3>RustDesk</h3>
+                                    <p>빠르고 독립적으로 운영할 수 있는 오픈소스 원격 제어 솔루션입니다.</p>
+                                </div>
+                                <div class="tool-card-footer">
+                                    <span class="link-type">GitHub Releases</span>
+                                    <a href="https://github.com/rustdesk/rustdesk/releases" target="_blank"
+                                        rel="noopener noreferrer" class="btn">
+                                        다운로드 <i class="fa-brands fa-github" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </article>
 
+                            <article class="tool-card card card-construction" data-tool-card data-search="maintenance 준비중 추가 도구">
+                                <div class="tool-card-head">
+                                    <span class="tool-icon"><i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+                                    <div class="tool-tags"><span>Soon</span></div>
+                                </div>
+                                <div class="tool-card-copy">
+                                    <h3>다음 도구 준비 중</h3>
+                                    <p>안전성과 공식 배포 경로를 확인한 뒤 새로운 관리 도구를 추가합니다.</p>
+                                </div>
+                                <div class="tool-card-footer">
+                                    <span class="link-type">검토 중</span>
+                                    <button class="btn btn-disabled" type="button" disabled>준비 중</button>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="staff-section" class="tool-section accordion-item staff-section">
+                    <button class="section-heading accordion-header active" type="button" aria-expanded="true"
+                        aria-controls="staffContentBody">
+                        <span class="section-heading-copy header-content">
+                            <span class="section-index"><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
+                            <span class="header-text"><strong>관리자 도구</strong><small>인증된 관리자 전용 콘텐츠</small></span>
+                        </span>
+                        <span class="section-count">Private</span>
+                        <i class="fa-solid fa-chevron-down accordion-toggle" aria-hidden="true"></i>
+                    </button>
+                    <div class="section-body accordion-body" id="staffContentBody"></div>
+                </section>
+            </div>
+
+            <aside class="quote-widget reveal" id="quoteWidget" aria-labelledby="quoteTitle">
+                <div class="quote-label">
+                    <i class="fa-regular fa-lightbulb" aria-hidden="true"></i>
+                    <span id="quoteTitle">오늘의 문장</span>
                 </div>
+                <div class="quote-content">
+                    <p id="quoteTextKo" class="quote-text-ko">번역을 불러오는 중입니다.</p>
+                    <p id="quoteTextEn" class="quote-text-en">Loading inspiration...</p>
+                    <span class="quote-author" id="quoteAuthor">— Dasory</span>
+                </div>
+                <button class="quote-refresh icon-button" id="quoteRefreshBtn" type="button" aria-label="새로운 명언 보기">
+                    <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                </button>
+            </aside>
+
+            <footer class="site-footer">
+                <p>&copy; 2026 Dasory Toolkit</p>
+                <div>
+                    <button type="button" class="footer-link" onclick="openPrivacyModal(event)">개인정보 처리 안내</button>
+                    <span aria-hidden="true">·</span>
+                    <span>공식 제공처 링크 모음</span>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <button class="back-to-top icon-button" id="backToTop" type="button" aria-label="맨 위로 이동">
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <section class="side-panel memo-panel" id="memoPanel" role="dialog" aria-modal="true"
+        aria-labelledby="memoPanelTitle" aria-hidden="true">
+        <div class="panel-header memo-header">
+            <div>
+                <span class="panel-kicker">Shared board</span>
+                <h2 id="memoPanelTitle"><i class="fa-regular fa-note-sticky" aria-hidden="true"></i> 공용 메모</h2>
+            </div>
+            <button class="memo-close icon-button" id="memoClose" type="button" aria-label="메모 패널 닫기">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="panel-body memo-body">
+            <p class="memo-info">누구나 볼 수 있는 공용 공간입니다. 일반 메모는 최근 24시간 이내 항목만 표시됩니다.</p>
+            <div id="memoList" class="memo-list" aria-live="polite"></div>
+            <div class="memo-input-container">
+                <div class="field-row">
+                    <div class="field">
+                        <label for="memoAuthor">닉네임</label>
+                        <input type="text" id="memoAuthor" placeholder="최대 8글자" class="memo-author-input" maxlength="8">
+                    </div>
+                    <div class="field">
+                        <label for="memoPw">삭제 비밀번호</label>
+                        <input type="password" id="memoPw" placeholder="선택 입력" class="memo-author-input">
+                    </div>
+                </div>
+                <div id="adminMemoOption" class="admin-memo-option" style="display: none;">
+                    <label><input type="checkbox" id="isAdminNotice" checked
+                            onchange="document.getElementById('isAdminPerm').disabled = !this.checked"> 관리자 공지로 등록</label>
+                    <label><input type="checkbox" id="isAdminPerm" checked> 영구 보관</label>
+                </div>
+                <div class="field">
+                    <label for="memoTextarea">메모 내용</label>
+                    <textarea id="memoTextarea" placeholder="메모를 입력하세요. Enter로 전송할 수 있습니다." rows="3"></textarea>
+                </div>
+                <button id="memoSubmitBtn" class="btn btn-wide" type="button">메모 남기기</button>
             </div>
         </div>
+    </section>
 
-        <!-- 3. 원격 및 관리 -->
-        <div class="accordion-item reveal">
-            <div class="accordion-header">
-                <div class="header-content">
-                    <div class="header-icon"><i class="fa-solid fa-network-wired"></i></div>
-                    <div class="header-text">
-                        <h3>원격 및 관리</h3>
-                        <span>Remote & Management</span>
-                    </div>
+    <div class="modal-overlay" id="chatLobbyModal" aria-hidden="true"
+        onclick="if(event.target === this) closeChatLobbyModal()">
+        <section class="dialog login-box dialog-medium" role="dialog" aria-modal="true" aria-labelledby="chatLobbyTitle">
+            <div class="dialog-header">
+                <div>
+                    <span class="panel-kicker">Group chat</span>
+                    <h2 id="chatLobbyTitle">채팅방</h2>
                 </div>
-                <i class="fa-solid fa-chevron-down accordion-toggle"></i>
+                <button class="icon-button" type="button" onclick="closeChatLobbyModal()" aria-label="채팅방 창 닫기">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
             </div>
-            <div class="accordion-body">
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-icon"><i class="fa-solid fa-desktop icon-teal"></i></div>
-                        <h2>Rustdesk</h2>
-                        <p>TeamViewer를 대체할 빠르고 안전한<br>오픈소스 원격 제어 솔루션.</p>
-                        <a href="https://github.com/rustdesk/rustdesk/releases" target="_blank" class="btn"><i
-                                class="fa-brands fa-github"></i> GitHub 다운로드</a>
-                    </div>
-
-                    <!-- 공사중 카드 -->
-                    <div class="card card-construction">
-                        <div class="card-icon"><i class="fa-solid fa-person-digging"></i></div>
-                        <h2>Maintenance</h2>
-                        <p>더 안전하고 확실한 도구 제공을 위해<br>현재 시스템 점검 및 업데이트 중입니다.</p>
-                        <button class="btn btn-disabled">
-                            <i class="fa-solid fa-wrench"></i> 점검 중 (N/A)
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. Staff Only (Hidden / Protected by Supabase) -->
-        <div id="staff-section" class="accordion-item">
-            <div class="accordion-header active">
-                <div class="header-content">
-                    <div class="header-icon"><i class="fa-solid fa-user-secret"></i></div>
-                    <div class="header-text">
-                        <h3>Staff Only</h3>
-                        <span>Authorized Personnel Only</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down accordion-toggle"></i>
-            </div>
-            <div class="accordion-body" id="staffContentBody" style="max-height: 2000px; opacity: 1;">
-                <!-- 내용이 안전하게 비워져 있으며, Supabase 인증 성공 시 렌더링 됩니다 -->
-            </div>
-        </div>
-
-        <footer>
-            &copy; 2026 Dasory Toolkit. All rights reserved. | <a href="#" onclick="openPrivacyModal(event)"
-                style="color: inherit; text-decoration: underline;">개인정보 처리방침</a>
-        </footer>
-    </div>
-
-    <!-- Chat Lobby Modal -->
-    <div class="modal-overlay" id="chatLobbyModal" onclick="if(event.target === this) closeChatLobbyModal()">
-        <div class="login-box" style="width: 400px; max-width: 90%;">
-            <div class="chat-tabs">
-                <button class="chat-tab active" onclick="switchChatTab('join')">입장하기</button>
-                <button class="chat-tab" onclick="switchChatTab('create')">방 만들기</button>
-            </div>
-            
-            <!-- 관리자 방 목록 -->
-            <div id="adminRoomList" style="display:none; margin-bottom: 15px;">
-                <div style="font-size: 0.8rem; color: var(--accent-yellow); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-crown" style="font-size: 0.75rem;"></i> 활성 채팅방 목록
-                </div>
-                <div id="adminRoomListContent" style="max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
-                    <!-- 방 리스트 -->
-                </div>
+            <div class="chat-tabs" role="tablist" aria-label="채팅방 작업 선택">
+                <button class="chat-tab active" id="joinChatTab" type="button" role="tab" aria-selected="true"
+                    aria-controls="tabJoin" data-chat-tab="join" onclick="switchChatTab('join')">입장하기</button>
+                <button class="chat-tab" id="createChatTab" type="button" role="tab" aria-selected="false"
+                    aria-controls="tabCreate" data-chat-tab="create" onclick="switchChatTab('create')">방 만들기</button>
             </div>
 
-            <!-- 방 입장 탭 -->
-            <div id="tabJoin" class="chat-tab-content">
-                <h2 style="margin-top: 10px;"><i class="fa-solid fa-door-open" style="color:#60a5fa;"></i> 방 입장</h2>
+            <div id="adminRoomList" class="admin-room-list" style="display:none;">
+                <strong><i class="fa-solid fa-crown" aria-hidden="true"></i> 활성 채팅방</strong>
+                <div id="adminRoomListContent" class="admin-room-list-content"></div>
+            </div>
+
+            <div id="tabJoin" class="chat-tab-content" role="tabpanel" aria-labelledby="joinChatTab">
                 <div class="input-group">
-                    <input type="text" id="joinRoomName" placeholder="방 이름 (선착순 고유 이름)" maxlength="20">
-                    <input type="password" id="joinPassword" placeholder="비밀번호">
-                    <input type="text" id="joinNickname" placeholder="사용할 닉네임" maxlength="8">
+                    <div class="field"><label for="joinRoomName">방 이름</label><input type="text" id="joinRoomName" maxlength="20"></div>
+                    <div class="field"><label for="joinPassword">방 비밀번호</label><input type="password" id="joinPassword"></div>
+                    <div class="field"><label for="joinNickname">사용할 닉네임</label><input type="text" id="joinNickname" maxlength="8"></div>
                 </div>
-                <button class="btn" onclick="joinChatRoom()" style="width:100%"><i class="fa-solid fa-right-to-bracket"></i> 입장하기</button>
+                <button class="btn btn-wide" type="button" onclick="joinChatRoom()">입장하기</button>
             </div>
 
-            <!-- 방 생성 탭 -->
-            <div id="tabCreate" class="chat-tab-content" style="display:none;">
-                <h2 style="margin-top: 10px;"><i class="fa-solid fa-house-medical" style="color:#f472b6;"></i> 방 만들기</h2>
+            <div id="tabCreate" class="chat-tab-content" role="tabpanel" aria-labelledby="createChatTab" style="display:none;">
                 <div class="input-group">
-                    <input type="text" id="createRoomName" placeholder="새 방 이름" maxlength="20">
-                    <input type="password" id="createPassword" placeholder="비밀번호 설정">
-                    <input type="password" id="createPasswordConfirm" placeholder="비밀번호 확인">
-                    <input type="text" id="createNickname" placeholder="내 닉네임" maxlength="8">
-                    <div style="margin-bottom: 12px; text-align: left;">
-                        <label style="color:var(--text-muted); font-size: 0.85rem; padding-left: 5px;">메시지 보존 기간:</label>
-                        <select id="createRetention" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color:#fff; border-radius: 12px; margin-top: 5px; outline: none; appearance: none;">
+                    <div class="field"><label for="createRoomName">새 방 이름</label><input type="text" id="createRoomName" maxlength="20"></div>
+                    <div class="field"><label for="createPassword">비밀번호</label><input type="password" id="createPassword"></div>
+                    <div class="field"><label for="createPasswordConfirm">비밀번호 확인</label><input type="password" id="createPasswordConfirm"></div>
+                    <div class="field"><label for="createNickname">사용할 닉네임</label><input type="text" id="createNickname" maxlength="8"></div>
+                    <div class="field">
+                        <label for="createRetention">메시지 표시 기간</label>
+                        <select id="createRetention">
                             <option value="1">1시간</option>
                             <option value="24" selected>1일 (24시간)</option>
                             <option value="72">3일</option>
@@ -327,126 +441,112 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn" onclick="createChatRoom()" style="width:100%;"><i class="fa-solid fa-plus"></i> 생성 및 입장</button>
+                <button class="btn btn-wide" type="button" onclick="createChatRoom()">생성 및 입장</button>
             </div>
-            
-            <button class="btn" onclick="closeChatLobbyModal()" style="width:100%; margin-top: 15px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);">취소</button>
-        </div>
+        </section>
     </div>
 
-    <!-- Chat Panel (실제 채팅 화면) -->
-    <div class="memo-panel chat-panel" id="chatRoomPanel">
-        <div class="memo-header" style="background: rgba(30, 58, 138, 0.4);">
-            <h3><i class="fa-solid fa-comments"></i> <span id="currentChatRoomTitle">채팅방</span></h3>
-            <button class="memo-close" onclick="leaveChatRoom()"><i class="fa-solid fa-right-from-bracket"></i></button>
-        </div>
-        <div class="memo-body" style="height: calc(100% - 60px); display: flex; flex-direction: column;">
-            <p class="memo-info" id="chatRoomInfoBox">안전한 프라이빗 채팅방입니다. 대화 내용은 보호 처리됩니다.</p>
-            <div id="chatMessageList" class="memo-list" style="flex:1; overflow-y:auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px;">
-                <!-- 메시지 렌더링 영역 -->
+    <section class="side-panel memo-panel chat-panel" id="chatRoomPanel" role="dialog" aria-modal="true"
+        aria-labelledby="currentChatRoomTitle" aria-hidden="true">
+        <div class="panel-header memo-header">
+            <div>
+                <span class="panel-kicker">Active room</span>
+                <h2><i class="fa-regular fa-comments" aria-hidden="true"></i> <span id="currentChatRoomTitle">채팅방</span></h2>
             </div>
+            <button class="memo-close icon-button" type="button" onclick="leaveChatRoom()" aria-label="채팅방 나가기">
+                <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="panel-body memo-body chat-body">
+            <p class="memo-info" id="chatRoomInfoBox">방 이름과 비밀번호를 아는 사용자가 입장할 수 있습니다. 민감한 정보는 입력하지 마세요.</p>
+            <div id="chatMessageList" class="memo-list chat-message-list" aria-live="polite"></div>
             <div class="memo-input-container">
-                <textarea id="chatInputText" placeholder="메시지 입력 (엔터로 전송)" rows="2" style="border-radius: 12px;"></textarea>
-                <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-                    <button id="chatSendBtn" class="btn" style="width: 100px;">전송 <i class="fa-solid fa-paper-plane"></i></button>
+                <div class="field">
+                    <label for="chatInputText">메시지</label>
+                    <textarea id="chatInputText" placeholder="메시지를 입력하세요. Enter로 전송할 수 있습니다." rows="3"></textarea>
                 </div>
+                <button id="chatSendBtn" class="btn btn-wide" type="button">전송 <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- 비밀번호 생성기 모달 -->
-    <div class="modal-overlay" id="pwGenModal" onclick="if(event.target === this) closePwModal()">
-        <div class="login-box" style="width: 450px; max-width: 90%;">
-            <h2 style="text-align: center;"><i class="fa-solid fa-key icon-yellow" style="color:#fbbf24;"></i> 비밀번호 생성기
-            </h2>
-
-            <div class="pw-gen-container" style="margin-top: 15px; border: none; padding: 0; background: transparent;">
+    <div class="modal-overlay" id="pwGenModal" aria-hidden="true" onclick="if(event.target === this) closePwModal()">
+        <section class="dialog login-box dialog-medium" role="dialog" aria-modal="true" aria-labelledby="pwGenTitle">
+            <div class="dialog-header">
+                <div><span class="panel-kicker">Local utility</span><h2 id="pwGenTitle">비밀번호 생성기</h2></div>
+                <button class="icon-button" type="button" onclick="closePwModal()" aria-label="비밀번호 생성기 닫기">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="pw-gen-container">
                 <div class="pw-display-box">
                     <span id="generatedPw">Click Generate!</span>
-                    <button id="copyPwBtn" class="icon-btn" title="비밀번호 복사"><i class="fa-regular fa-copy"></i></button>
+                    <button id="copyPwBtn" class="icon-button" type="button" aria-label="생성된 비밀번호 복사">
+                        <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                    </button>
                 </div>
-
                 <div class="pw-controls">
-                    <div class="pw-length-slider">
-                        <label>길이: <span id="pwLengthVal" style="color:#60a5fa; font-weight:bold;">16</span> 글자</label>
+                    <div class="pw-length-slider field">
+                        <label for="pwLength">길이: <strong id="pwLengthVal">16</strong>자</label>
                         <input type="range" id="pwLength" min="8" max="32" value="16">
                     </div>
                     <div class="pw-checkboxes">
                         <label><input type="checkbox" id="pwUpper" checked> 대문자</label>
                         <label><input type="checkbox" id="pwLower" checked> 소문자</label>
                         <label><input type="checkbox" id="pwNum" checked> 숫자</label>
-
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <label><input type="checkbox" id="pwSym" checked> 특수기호</label>
-                            <button id="symConfigBtn" title="기호 설정"
-                                style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; padding: 0 5px; transition: color 0.2s;">
-                                <i class="fa-solid fa-gear"></i>
-                            </button>
+                        <label><input type="checkbox" id="pwSym" checked> 특수기호</label>
+                    </div>
+                    <button id="symConfigBtn" class="text-button" type="button" aria-expanded="false"
+                        aria-controls="symConfigArea"><i class="fa-solid fa-sliders" aria-hidden="true"></i> 특수기호 설정</button>
+                    <div id="symConfigArea" class="symbol-config" style="display: none;">
+                        <div class="field">
+                            <label for="customSymbols">사용할 특수문자</label>
+                            <input type="text" id="customSymbols" value="!@#$%^&*()_+~`|}{[]:;?><,./-=">
                         </div>
+                        <small>원하지 않는 문자를 지우거나 사용할 기호만 남겨두세요.</small>
                     </div>
                 </div>
+                <button id="generatePwBtn" class="btn btn-wide" type="button">새 비밀번호 생성</button>
+            </div>
+        </section>
+    </div>
 
-                <div id="symConfigArea"
-                    style="display: none; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); text-align: left;">
-                    <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; display: block;">사용할
-                        특수문자 지정:</label>
-                    <input type="text" id="customSymbols" value="!@#$%^&*()_+~`|}{[]:;?><,./-="
-                        style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); color: #60a5fa; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-family: monospace; font-size: 0.95rem; outline: none;">
-                    <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 6px;">기본값에서 원하지 않는 문자를
-                        지우시거나, 원하는 기호만 입력하세요.</div>
-                </div>
-
-                <button id="generatePwBtn" class="btn"
-                    style="width: 100%; margin-top: 25px; background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> 즉시 생성하기
+    <div class="modal-overlay" id="loginModal" aria-hidden="true" onclick="if(event.target === this) closeModal()">
+        <section class="dialog login-box dialog-small" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+            <div class="dialog-header">
+                <div><span class="panel-kicker">Restricted</span><h2 id="loginTitle">관리자 로그인</h2></div>
+                <button class="icon-button" type="button" onclick="closeModal()" aria-label="로그인 창 닫기">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                 </button>
             </div>
-            <button class="btn" onclick="closePwModal()"
-                style="width:100%; margin-top: 15px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);">닫기</button>
-        </div>
-    </div>
-
-    <!-- 로그인 모달 -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="login-box">
-            <h2><i class="fa-solid fa-user-lock" style="color:var(--accent-primary);"></i> 관리자 로그인</h2>
             <div class="input-group">
-                <input type="email" id="staffId" placeholder="이메일 주소">
-                <input type="password" id="staffPw" placeholder="비밀번호">
+                <div class="field"><label for="staffId">이메일 주소</label><input type="email" id="staffId" autocomplete="username"></div>
+                <div class="field"><label for="staffPw">비밀번호</label><input type="password" id="staffPw" autocomplete="current-password"></div>
             </div>
-            <button class="btn" onclick="checkLogin()" style="width:100%"><i class="fa-solid fa-right-to-bracket"></i>
-                로그인</button>
-            <div class="modal-close" onclick="closeModal()">닫기</div>
-        </div>
+            <button class="btn btn-wide" id="loginSubmitBtn" type="button" onclick="checkLogin()">로그인</button>
+        </section>
     </div>
 
-    <!-- 개인정보 처리방침 모달 -->
-    <div class="modal-overlay" id="privacyModal" onclick="if(event.target === this) closePrivacyModal()">
-        <div class="login-box"
-            style="width: 500px; max-width: 90%; text-align: left; max-height: 80vh; overflow-y: auto;">
-            <h2 style="text-align: center;"><i class="fa-solid fa-shield-halved"></i> 개인정보 처리방침</h2>
-            <div style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
-                <p><strong>1. 기본 원칙</strong><br>
-                    Dasory Toolkit(이하 '본 사이트')은 사용자의 어떠한 개인정보도 수집, 저장, 또는 처리하지 않습니다.</p>
-                <br>
-                <p><strong>2. 데이터 처리</strong><br>
-                    본 사이트에서 입력되는 데이터(예: 인증 정보 등)는 오직 사용자의 브라우저 내에서만 처리되며, 외부 서버로 전송되지 않습니다. 서버 단의 데이터베이스가 존재하지 않는 정적
-                    웹사이트입니다.</p>
-                <br>
-                <p><strong>3. 외부 링크</strong><br>
-                    본 사이트에서 제공하는 다운로드 외부 링크 및 제3자 서비스로의 이동은 해당 제3자 서비스 제공자의 개인정보 처리방침을 따르며, 본 사이트와는 무관합니다.</p>
-                <br>
-                <p><strong>4. 문의</strong><br>
-                    관련 문의사항은 개발자의 GitHub를 통해 남겨주시기 바랍니다.</p>
+    <div class="modal-overlay" id="privacyModal" aria-hidden="true" onclick="if(event.target === this) closePrivacyModal()">
+        <section class="dialog login-box dialog-large privacy-dialog" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+            <div class="dialog-header">
+                <div><span class="panel-kicker">Data notice</span><h2 id="privacyTitle">개인정보 처리 안내</h2></div>
+                <button class="icon-button" type="button" onclick="closePrivacyModal()" aria-label="개인정보 처리 안내 닫기">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
             </div>
-            <button class="btn" onclick="closePrivacyModal()" style="width:100%; margin-top: 25px;">닫기</button>
-        </div>
+            <div class="privacy-content">
+                <section><h3>1. 서비스 구성</h3><p>도구 디렉터리는 정적 페이지로 제공되며, 다운로드 버튼은 각 도구의 외부 공식 제공처로 연결됩니다.</p></section>
+                <section><h3>2. 온라인 기능</h3><p>관리자 인증, 공용 메모와 그룹 채팅 기능에는 Supabase가 사용됩니다. 해당 기능에 입력한 인증 정보, 닉네임, 메모 및 채팅 내용은 기능 제공을 위해 외부 서버로 전송될 수 있습니다.</p></section>
+                <section><h3>3. 명언 번역</h3><p>명언의 한국어 번역을 불러올 때 원문이 Google 번역 엔드포인트로 전송될 수 있습니다.</p></section>
+                <section><h3>4. 외부 서비스</h3><p>외부 다운로드 페이지에서는 각 서비스 제공자의 개인정보 처리방침과 이용 조건이 적용됩니다. 메모와 채팅에는 민감한 정보를 입력하지 마세요.</p></section>
+            </div>
+            <button class="btn btn-wide" type="button" onclick="closePrivacyModal()">확인</button>
+        </section>
     </div>
 
-    <!-- Toast -->
-    <div id="toast"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
 
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
